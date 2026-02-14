@@ -83,9 +83,23 @@ function renderPostContent(post) {
 function renderAuthorProfile(post) {
   const img = document.getElementById("authorImg");
   const name = document.getElementById("authorName");
+  const bio = document.querySelector(".author-bio") || document.querySelector(".author-desc"); 
+
+  // ★ 수정된 부분: getProfileImage 함수 사용
+  if(img) img.src = getProfileImage(post.writer);
   
-  if(img) img.src = post.writerImg || `https://ui-avatars.com/api/?name=${post.writer}&background=random&color=fff`;
   if(name) name.textContent = post.writer;
+
+  // (자기소개글 로직은 기존 유지)
+  if (bio) {
+    const myNick = localStorage.getItem("user_nick");
+    if (post.writer === myNick || (post.writer === "익명" && post.isMyPost)) {
+       const myBio = localStorage.getItem("user_bio");
+       bio.textContent = myBio || `안녕하세요. ${myNick}입니다.`;
+    } else {
+       bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
+    }
+  }
 }
 
 // =========================================
@@ -103,7 +117,7 @@ function renderComments(list) {
   el.innerHTML = list.map((c, index) => `
     <div class="comment-item">
       <div class="cmt-profile">
-        ${c.profileImg ? `<img src="${c.profileImg}">` : `<div class="cmt-profile-placeholder">👤</div>`}
+        <img src="${getProfileImage(c.writer)}" alt="프사">
       </div>
       <div class="cmt-body">
         <div class="cmt-top">

@@ -399,3 +399,19 @@
     color: var(--text);
     white-space: pre-wrap;
 }
+
+.post-top-btns {
+    margin-bottom: 30px; /* 기존: 간격 없음 -> 변경: 30px */
+}
+
+.comment-container {
+    margin-top: 30px;    /* 기존: 20px -> 변경: 30px (더 넓게) */
+    padding: 24px 30px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--line);
+}
+
+.board-below-wrap {
+    margin-top: 30px;    /* 기존: 간격 없음 -> 변경: 30px */
+}

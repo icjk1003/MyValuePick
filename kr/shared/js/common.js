@@ -220,3 +220,24 @@ function logout() {
 
 // HTML의 onclick="logout()"에서 접근할 수 있도록 window 객체에 할당
 window.logout = logout;
+
+// [New] 프로필 이미지 URL 가져오기 유틸리티
+// 1순위: 사용자가 직접 올린 이미지 (localStorage 'user_img')
+// 2순위: 닉네임 기반 자동 생성 이미지 (ui-avatars)
+function getProfileImage(nickname) {
+  // 로그인한 유저 본인의 닉네임과 일치하는지 확인
+  const myNick = localStorage.getItem("user_nick");
+  const myCustomImg = localStorage.getItem("user_img");
+
+  // "내 닉네임"을 요청했고, "내 커스텀 이미지"가 있다면 그것을 리턴
+  if (nickname === myNick && myCustomImg) {
+    return myCustomImg;
+  }
+
+  // 그 외(다른 사람 or 커스텀 이미지 없음) -> 닉네임 두 글자 따서 생성
+  // 배경색 random, 글자색 흰색
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(nickname)}&background=random&color=fff&length=2`;
+}
+
+// 전역에서 쓸 수 있게 window에 등록
+window.getProfileImage = getProfileImage;
