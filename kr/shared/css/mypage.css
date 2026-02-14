@@ -19,7 +19,7 @@
     align-items: flex-start;
 }
 
-/* 모바일 대응: 세로 배치 */
+/* 모바일 대응 */
 @media (max-width: 768px) {
     .mypage-container {
         flex-direction: column;
@@ -30,7 +30,6 @@
     }
 }
 
-/* 카드 공통 */
 .card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -75,7 +74,7 @@
     display: block;
 }
 
-/* 프로필 오버레이 (Hover 효과) */
+/* 프로필 오버레이 */
 .profile-overlay {
     position: absolute;
     top: 0;
@@ -142,7 +141,6 @@
     font-weight: 700;
 }
 
-/* 로그아웃 버튼 전용 스타일 */
 .mypage-menu a.menu-logout {
     color: #ef4444;
 }
@@ -221,7 +219,6 @@
     border-color: var(--primary);
 }
 
-/* 버튼 영역 */
 .btn-area {
     margin-top: 40px;
     text-align: right;
@@ -243,49 +240,40 @@
 }
 
 /* =========================================
-   5. 인라인 스타일 대체 유틸리티 (New)
+   5. 유틸리티 & 이미지 크롭 스타일 (New)
    ========================================= 
 */
 
-/* 숨겨진 파일 입력창 */
-.file-input-hidden {
-    display: none;
-}
+.file-input-hidden { display: none; }
+.input-gap-top { margin-top: 8px; }
 
-/* 인풋 간격 (비밀번호 확인창용) */
-.input-gap-top {
-    margin-top: 8px;
-}
-
-/* [New] 자기소개글 스타일 */
+/* 자기소개글 */
 .input-bio {
     width: 100%;
     min-height: 80px;
     padding: 12px;
     border-radius: 8px;
-    resize: none; /* 크기 조절 막기 */
+    resize: none;
     line-height: 1.5;
     font-family: inherit;
     transition: 0.2s;
 }
 
-/* 읽기 전용 상태 (테두리 없음, 배경색 투명 혹은 연하게) */
 .input-bio.input-readonly {
-    border: 1px solid transparent; /* 테두리 숨김 */
-    background: var(--bg);         /* 배경색을 페이지 배경과 맞춤 */
+    border: 1px solid transparent;
+    background: var(--bg);
     color: var(--muted);
     cursor: default;
     outline: none;
 }
 
-/* 수정 상태 (테두리 있음, 흰색 배경) */
 .input-bio.editable {
     border: 1px solid var(--primary);
     background: var(--surface);
     color: var(--text);
 }
 
-/* 텍스트 버튼 (수정, 저장, 취소) */
+/* 텍스트 버튼 */
 .bio-btn-group {
     display: flex;
     gap: 8px;
@@ -302,62 +290,50 @@
     padding: 0;
 }
 
-.btn-text-action:hover {
-    color: var(--text);
-}
+.btn-text-action:hover { color: var(--text); }
+.btn-text-action.primary { color: var(--primary); text-decoration: none; }
+.btn-text-action.bad { color: var(--bad); text-decoration: none; }
 
-.btn-text-action.primary {
-    color: var(--primary);
-    text-decoration: none;
-}
+.hidden { display: none !important; }
 
-.btn-text-action.bad {
-    color: var(--bad); /* 빨간색 */
-    text-decoration: none;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* 1. 배경은 다시 은은한 반투명으로 복귀 */
+/* [크롭 모달] */
+/* 배경: 은은한 반투명 검은색 */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* 뒤가 살짝 비치는 검은색 */
+    background: rgba(0, 0, 0, 0.7); 
     z-index: 9999;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* 2. 자르기 창(흰색 박스)은 완전 불투명 */
+/* 박스: 완전 불투명 */
 .crop-container {
-    background: var(--surface); /* 흰색(다크모드면 검정) 불투명 배경 */
+    background: var(--surface);
     padding: 24px;
     border-radius: 16px;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* 그림자 진하게 */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     text-align: center;
-    position: relative; /* z-index 적용을 위해 */
-    z-index: 10000;     /* 배경보다 위에 */
+    position: relative;
+    z-index: 10000;
 }
 
-/* 3. 이미지가 들어가는 영역 (검은색 배경) */
+/* 이미지 영역: 검은색 배경 */
 .crop-area {
     height: 400px;
-    background-color: #000; /* 이미지가 없는 빈 공간은 검은색으로 채움 */
+    background-color: #000;
     margin-bottom: 20px;
     overflow: hidden;
     border-radius: 8px;
-    border: 1px solid var(--line); /* 테두리 추가 */
+    border: 1px solid var(--line);
 }
 
-/* Cropper.js 이미지 크기 제한 */
 .crop-area img {
     display: block;
     max-width: 100%;
@@ -367,4 +343,12 @@
     display: flex;
     justify-content: flex-end;
     gap: 16px;
+}
+
+/* shared/css/mypage.css */
+#nickCheckMsg.success {
+    color: var(--good); /* 초록색 */
+}
+#nickCheckMsg.error {
+    color: var(--bad);  /* 빨간색 */
 }
