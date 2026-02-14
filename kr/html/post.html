@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시글 읽기</title>
+  
+  <link rel="stylesheet" href="../shared/css/common.css">
+  <link rel="stylesheet" href="../shared/css/board.css">
+  <link rel="stylesheet" href="../shared/css/post.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    "headline": "게시글 제목 로딩중...", 
+    "author": {
+      "@type": "Person",
+      "name": "작성자"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <div id="global-header"></div>
+
+  <main class="container boardWide">
+    <div class="boardLayoutCenter">
+      
+      <aside class="adTall">
+        <div class="ad-placeholder ad-skyscraper">
+          <span class="ad-label">AD</span>
+          <div class="ad-text-placeholder">300 x 600</div>
+        </div>
+      </aside>
+
+      <section class="boardCardWrap">
+        
+        <div class="post-top-btns">
+          <a href="board.html" class="btn">≡ 목록으로</a>
+        </div>
+
+        <article class="card post-view-card">
+          
+          <header class="post-view-header">
+            <div id="postTag" class="post-tag">태그</div>
+            <h1 id="postTitle" class="post-title">제목 로딩중...</h1>
+            
+            <div class="post-meta-row">
+              <div class="meta-left">
+                <span id="postWriter" class="writer-name">작성자</span> 
+                <span class="meta-divider">|</span> 
+                <span id="postDate">날짜</span>
+              </div>
+              <div class="meta-right">
+                조회 <b id="postViews">0</b> <span class="meta-divider">|</span> 
+                추천 <b id="postVotes">0</b> <span class="meta-divider">|</span> 
+                댓글 <b id="postCommentCount">0</b>
+              </div>
+            </div>
+          </header>
+
+          <div class="post-view-body" id="postBody">
+            내용 로딩중...
+          </div>
+
+          <footer class="post-view-footer">
+            <div class="vote-group">
+              <button class="vote-btn up" id="btnVoteUp">
+                <span id="voteUpCount">0</span>
+              </button>
+              <button class="vote-btn down" id="btnVoteDown">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div class="utils-group">
+              <button class="util-btn" onclick="sharePost()">🔗 공유하기</button>
+              <button class="util-btn report" onclick="reportPost()">🚨 신고하기</button>
+            </div>
+
+            <div class="author-card">
+              <div class="author-info">
+                <img src="" id="authorImg" class="author-img" alt="프로필">
+                <div class="author-detail">
+                  <span class="author-nick" id="authorName">닉네임</span>
+                  <span class="author-bio">주식과 경제를 분석하는 개인 투자자입니다.</span>
+                </div>
+              </div>
+              <button class="btn-subscribe" onclick="this.classList.toggle('active');">+ 구독하기</button>
+            </div>
+          </footer>
+        </article>
+
+        <div class="comment-container">
+          <div class="comment-header">
+            댓글 <span id="commentCountHeader" class="text-highlight">0</span>개
+          </div>
+          
+          <div class="comment-write-box">
+            <div class="anon-input-group" id="anonInputs">
+              <input type="text" class="input-mini" placeholder="닉네임">
+              <input type="password" class="input-mini" placeholder="비밀번호">
+            </div>
+            
+            <div id="loginProfile" class="login-user-info d-none">
+              내 프로필: <span class="text-highlight">로그인유저</span>
+            </div>
+            
+            <div class="write-row">
+              <textarea class="comment-textarea" placeholder="댓글을 입력하세요"></textarea>
+              <button class="btn-comment-submit">등록</button>
+            </div>
+          </div>
+          
+          <div id="commentList"></div>
+        </div>
+
+        <div class="board-below-wrap">
+          <div class="card">
+            <div class="hd"><h3 class="h3">게시판 글 목록</h3></div>
+            <table class="boardTable">
+              <thead>
+                <tr>
+                  <th class="colNo">번호</th>
+                  <th class="colTag">탭</th>
+                  <th>제목</th>
+                  <th class="colWriter">글쓴이</th>
+                  <th class="colVotes">추천</th>
+                  <th class="colViews mobile-hide">조회</th>
+                  <th class="colTime mobile-hide">날짜</th>
+                </tr>
+              </thead>
+              <tbody id="boardBelowRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <aside class="adTall">
+        <div class="ad-placeholder ad-skyscraper">
+          <span class="ad-label">AD</span>
+          <div class="ad-text-placeholder">300 x 600</div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div id="global-footer"></div>
+
+  <script src="../shared/js/data.js"></script>
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/post.js"></script>
+</body>
+</html>

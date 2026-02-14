@@ -31,18 +31,30 @@ const MOCK_DB = {
   ]
 };
 
-// [초기화] 데이터 로드 (버전 업그레이드: V2)
+// [초기화] 데이터 로드 (버전 업그레이드: V3로 변경)
 (function initData() {
-  const storedPosts = localStorage.getItem("MOCK_POSTS_V2");
+  // 👇 여기를 "MOCK_POSTS_V2" -> "MOCK_POSTS_V3" 로 변경!
+  const storedPosts = localStorage.getItem("MOCK_POSTS_V3"); 
+  let loadedData = null;
 
   if (storedPosts) {
-    MOCK_DB.POSTS = JSON.parse(storedPosts);
+    try {
+      loadedData = JSON.parse(storedPosts);
+    } catch (e) {
+      console.error("데이터 파싱 오류", e);
+    }
+  }
+
+  if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
+    MOCK_DB.POSTS = loadedData;
+    console.log("MOCK_DB: 데이터 로드 완료");
   } else {
+    // 데이터가 없으면 새로 생성
     generateAndSavePosts();
   }
 })();
 
-// [함수] 게시글 생성 및 저장 (날짜 최신순 정렬 보완)
+// [함수] 게시글 생성 및 저장
 function generateAndSavePosts() {
   const tags = ["실적", "거시", "분석", "잡담", "정보", "질문", "유머"];
   const titles = [
@@ -60,10 +72,8 @@ function generateAndSavePosts() {
     const votes = Math.floor(Math.random() * 300);
     const commentsCount = Math.floor(Math.random() * 30);
     
-    // [날짜 생성 로직 수정] 
-    // i가 커질수록 더 과거의 시간이 되도록 설정하여 자연스러운 흐름 생성
+    // 날짜 생성
     const d = new Date();
-    // 1번 글은 현재로부터 약 5분 전, 600번 글은 훨씬 과거가 됨
     d.setMinutes(d.getMinutes() - (i * 10) - Math.floor(Math.random() * 10)); 
     const dateStr = d.toISOString(); 
 
@@ -74,7 +84,7 @@ function generateAndSavePosts() {
         id: j,
         writer: j % 3 === 0 ? "익명" : `유동닉${j}`,
         content: `정말 좋은 글이네요! 주식 정보 감사합니다. ${j+1}번째 댓글입니다.`,
-        date: new Date(new Date(dateStr).getTime() + (j * 60000)).toISOString(), // 게시글 이후 시간에 작성됨
+        date: new Date(new Date(dateStr).getTime() + (j * 60000)).toISOString(),
         votes: isBest ? Math.floor(Math.random() * 50) + 10 : Math.floor(Math.random() * 10),
         isBest: isBest,
         profileImg: j % 3 === 0 ? null : `https://ui-avatars.com/api/?name=User+${j}&background=random&color=fff`
@@ -82,7 +92,7 @@ function generateAndSavePosts() {
     }).sort((a, b) => b.isBest - a.isBest);
 
     tempPosts.push({
-      no: 10000 + (601 - i), // 번호는 최신순으로 부여
+      no: 10000 + (601 - i),
       id: 10000 + (601 - i),
       tag: tags[i % tags.length], 
       title: titles[i % titles.length] + ` (${601 - i})`, 
@@ -98,9 +108,10 @@ function generateAndSavePosts() {
     });
   }
 
-  // [핵심] 날짜 기준 내림차순 정렬 (최신순이 배열의 0번으로)
+  // 날짜 기준 내림차순 정렬
   tempPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   MOCK_DB.POSTS = tempPosts;
-  localStorage.setItem("MOCK_POSTS_V2", JSON.stringify(MOCK_DB.POSTS));
+  localStorage.setItem("MOCK_POSTS_V3", JSON.stringify(MOCK_DB.POSTS));
+  console.log("MOCK_DB: 데이터 새로 생성 완료 (V3)");
 }

@@ -1,4 +1,4 @@
-/* shared/js/common.js */
+/* shared/js/common.js - 공통 유틸리티 함수 */
 
 // 1. [핵심] 페이지 로드 즉시 저장된 테마 적용
 (function applySavedTheme() {
@@ -12,58 +12,43 @@
   }
 })();
 
-/**
- * [추가된 핵심 함수] 날짜 포맷팅 로직
- * - 1시간 이내: 방금 전, 15분 전
- * - 오늘 (1시간 경과 후): 14:30
- * - 다음날부터: 2025.11.05
- * - 상세페이지 전용(isFull=true): 2025.11.05 14:30:53
- */
-function formatBoardDate(dateStr, isFull = false) {
+// 2. 날짜 포맷팅 함수
+function formatBoardDate(dateString, full = false) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
   const now = new Date();
-  const target = new Date(dateStr);
+  const diff = (now - date) / 1000;
+
+  if (!full) {
+    if (diff < 60) return "방금 전";
+    if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   
-  // 실제 게시글 상세용: 2025.11.05 14:30:53
-  if (isFull) {
-    const y = target.getFullYear();
-    const m = String(target.getMonth() + 1).padStart(2, '0');
-    const d = String(target.getDate()).padStart(2, '0');
-    const hh = String(target.getHours()).padStart(2, '0');
-    const mm = String(target.getMinutes()).padStart(2, '0');
-    const ss = String(target.getSeconds()).padStart(2, '0');
-    return `${y}.${m}.${d} ${hh}:${mm}:${ss}`;
+  if (full) {
+      const hour = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day} ${hour}:${min}`;
   }
-
-  const diffMS = now - target;
-  const diffMin = Math.floor(diffMS / (1000 * 60));
-
-  // 1시간 이내: 방금 전, 15분 전
-  if (diffMin < 60) {
-    if (diffMin <= 1) return "방금 전";
-    return `${diffMin}분 전`;
-  }
-
-  // 오늘 (1시간 경과 ~ 밤 11시 59분): HH:mm 표기
-  const isToday = now.toDateString() === target.toDateString();
-  if (isToday) {
-    const hh = String(target.getHours()).padStart(2, '0');
-    const mm = String(target.getMinutes()).padStart(2, '0');
-    return `${hh}:${mm}`;
-  }
-
-  // 다음날부터: 연.월.일 표기
-  const y = target.getFullYear();
-  const m = String(target.getMonth() + 1).padStart(2, '0');
-  const d = String(target.getDate()).padStart(2, '0');
-  return `${y}.${m}.${d}`;
+  return `${year}-${month}-${day}`;
 }
 
+// 3. 숫자 콤마 포맷팅
+function formatNumber(num) {
+  return (num || 0).toLocaleString();
+}
+
+// 4. 공통 초기화 (헤더/푸터/이벤트)
 document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderFooter();
   wireThemeToggle();
   wireLoginState();
-  wireGlobalSearch(); // [복구] 검색 기능 연결
+  wireGlobalSearch();
 });
 
 // 헤더 렌더링
@@ -154,15 +139,9 @@ function wireLoginState() {
   const nickName = localStorage.getItem("user_nick") || "내 정보";
 
   if(isLoggedIn) {
-    // 버튼 텍스트를 닉네임으로 변경
     btnLogin.textContent = nickName; 
-    
-    // 클릭 시 마이페이지로 이동
     btnLogin.href = "mypage.html"; 
-    
-    // 기존의 onclick 로그아웃 이벤트 제거 (마이페이지 내부에 존재)
     btnLogin.onclick = null; 
-
   } else {
     btnLogin.textContent = "로그인";
     btnLogin.href = "login.html";
@@ -170,7 +149,7 @@ function wireLoginState() {
   }
 }
 
-// [복구] 글로벌 검색 기능 (자동완성 포함)
+// 글로벌 검색 기능
 function wireGlobalSearch() {
   const input = document.getElementById("globalSearchInput");
   const suggestionsBox = document.getElementById("searchSuggestions");
@@ -178,34 +157,27 @@ function wireGlobalSearch() {
   
   if (!input || !suggestionsBox) return;
 
-  // 포커스 효과
   input.addEventListener("focus", () => {
     if(searchBox) searchBox.style.borderColor = "var(--primary)";
   });
   input.addEventListener("blur", () => {
     if(searchBox) searchBox.style.borderColor = "var(--line)";
-    // 클릭 씹힘 방지 딜레이
     setTimeout(() => suggestionsBox.classList.remove("active"), 200);
   });
 
-  // 입력 이벤트
   input.addEventListener("input", (e) => {
     const val = e.target.value.trim().toUpperCase();
-    
     if (!val) {
       suggestionsBox.classList.remove("active");
       return;
     }
 
-    // STOCK_DB가 있으면 검색 (없으면 빈 배열)
     const db = (typeof STOCK_DB !== 'undefined') ? STOCK_DB : [];
-    
-    // 검색 로직 (이름, 영어이름, 티커 매칭)
     const matched = db.filter(s => 
       s.name.includes(val) || 
       s.enName.toUpperCase().includes(val) || 
       s.ticker.includes(val)
-    ).slice(0, 5); // 5개만 제한
+    ).slice(0, 5);
 
     if (matched.length > 0) {
       suggestionsBox.innerHTML = matched.map(stock => `
@@ -226,10 +198,25 @@ function wireGlobalSearch() {
     }
   });
 
-  // 엔터키 처리
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter" && input.value.trim()) {
       location.href = `board.html?q=${encodeURIComponent(input.value.trim())}`;
     }
   });
 }
+
+// =========================================
+// [중요] 로그아웃 기능 (전역 함수)
+// =========================================
+function logout() {
+  if (confirm("로그아웃 하시겠습니까?")) {
+    localStorage.removeItem("is_logged_in");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("user_nick");
+    alert("로그아웃 되었습니다.");
+    location.href = "home.html"; // 홈으로 이동
+  }
+}
+
+// HTML의 onclick="logout()"에서 접근할 수 있도록 window 객체에 할당
+window.logout = logout;

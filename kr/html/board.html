@@ -1,99 +1,101 @@
 <!doctype html>
 <html lang="ko" data-theme="light">
 <head>
-  <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>MyValuePick · 주식 갤러리</title>
-  <link rel="stylesheet" href="../shared/css/common.css"/>
-  <link rel="stylesheet" href="../shared/css/board.css"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>MyValuePick · 주식 갤러리</title>
+    <link rel="stylesheet" href="../shared/css/common.css"/>
+    <link rel="stylesheet" href="../shared/css/board.css"/>
 </head>
 <body>
-  <div id="global-header"></div>
+    <div id="global-header"></div>
 
-  <div class="container boardWide" style="margin-top:24px; margin-bottom: 40px;">
+    <div class="container boardWide board-page-container">
     
-    <div class="boardLayoutCenter">
+        <div class="boardLayoutCenter">
       
-      <div class="adTall">
-        <div class="ad-placeholder ad-skyscraper">
-          <span class="ad-label">ADVERTISEMENT</span>
-          <div style="font-size: 20px; color: #cbd5e1; font-weight: 700;">300 x 600</div>
-        </div>
-      </div>
-
-      <div class="boardCardWrap">
-        <div class="card">
-          
-          <div class="boardHeader">
-            <div>
-              <h1 class="h2">주식 갤러리</h1>
-              <div class="p" style="font-size:13px; margin-top:4px">자유롭게 이야기하는 공간입니다.</div>
+            <div class="adTall">
+                <div class="ad-placeholder ad-skyscraper">
+                    <span class="ad-label">ADVERTISEMENT</span>
+                    <div class="ad-text-placeholder">300 x 600</div>
+                </div>
             </div>
-            <a href="write.html" class="btn primary small">✍️ 글쓰기</a>
-          </div>
 
-          <table class="boardTable">
-            <colgroup>
-              <col class="colNo" style="width: 60px;">
-              <col class="colTag" style="width: 80px;">
-              <col> <col class="colWriter" style="width: 100px;">
-              <col class="colVotes" style="width: 70px;">
-              <col class="colViews mobile-hide" style="width: 70px;">
-              <col class="colTime mobile-hide" style="width: 100px;">
-            </colgroup>
-            <thead>
-              <tr>
-                <th class="colNo">번호</th>
-                <th class="colTag">분류</th>
-                <th>제목</th>
-                <th class="colWriter">글쓴이</th>
-                <th class="colVotes">추천</th>
-                <th class="colViews mobile-hide">조회</th>
-                <th class="colTime mobile-hide">날짜</th>
-              </tr>
-            </thead>
-            <tbody id="boardRows"></tbody>
-          </table>
+            <div class="boardCardWrap">
+                <div class="card">
+          
+                    <div class="boardHeader hd board-header-flex">
+                        <div>
+                            <h1 class="h2">주식 갤러리</h1>
+                            <div class="p board-header-desc">자유롭게 이야기하는 공간입니다.</div>
+                        </div>
+                        <a href="write.html" class="btn primary small">✍️ 글쓰기</a>
+                    </div>
 
-          <div class="pagerWrap">
-            <div class="pager"></div>
-          </div>
+                    <table class="boardTable">
+                        <colgroup>
+                            <col class="colNo">
+                            <col class="colTag">
+                            <col>
+                            <col class="colWriter">
+                            <col class="colVotes">
+                            <col class="colViews mobile-hide">
+                            <col class="colTime mobile-hide">
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="colNo">번호</th>
+                                <th class="colTag">분류</th>
+                                <th>제목</th>
+                                <th class="colWriter">글쓴이</th>
+                                <th class="colVotes">추천</th>
+                                <th class="colViews mobile-hide">조회</th>
+                                <th class="colTime mobile-hide">날짜</th>
+                            </tr>
+                        </thead>
+                        <tbody id="boardRows"></tbody>
+                    </table>
 
-          <div class="boardSearchBelow">
-            <div class="boardSearchBar">
+                    <div class="pagerWrap">
+                        <div class="pager"></div>
+                    </div>
+
+                    <div class="boardSearchBelow">
+                        <div class="boardSearchBar">
               
-              <div id="boardSearchType" class="custom-select"></div>
+                            <div id="boardSearchType" class="custom-select"></div>
 
-              <div class="searchDivider"></div>
+                            <div class="searchDivider"></div>
 
-              <input id="boardSearchInput" placeholder="검색어를 입력하세요" autocomplete="off" />
+                            <input id="boardSearchInput" placeholder="검색어를 입력하세요" autocomplete="off" />
 
-              <button class="boardSearchBtn" id="boardSearchBtn" type="button">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/>
-                  <path d="M16.5 16.5 21 21"/>
-                </svg>
-              </button>
+                            <button class="boardSearchBtn" id="boardSearchBtn" type="button">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/>
+                                    <path d="M16.5 16.5 21 21"/>
+                                </svg>
+                            </button>
 
-            </div>
-          </div>
+                        </div>
+                    </div>
           
-        </div>
-      </div>
+                </div>
+            </div>
 
-      <div class="adTall">
-        <div class="ad-placeholder ad-skyscraper">
-          <span class="ad-label">ADVERTISEMENT</span>
-          <div style="font-size: 20px; color: #cbd5e1; font-weight: 700;">300 x 600</div>
-        </div>
-      </div>
+            <div class="adTall">
+                <div class="ad-placeholder ad-skyscraper">
+                    <span class="ad-label">ADVERTISEMENT</span>
+                    <div class="ad-text-placeholder">300 x 600</div>
+                </div>
+            </div>
 
+        </div>
     </div>
-  </div>
 
-  <div id="global-footer"></div>
+    <div id="global-footer"></div>
   
-  <script src="../shared/js/data.js"></script>
-  <script src="../shared/js/common.js"></script>
-  <script src="../shared/js/board.js"></script>
+    <script src="../shared/js/data.js"></script>
+    <script src="../shared/js/common.js"></script>
+    <script src="../shared/js/board.js"></script>
 </body>
 </html>

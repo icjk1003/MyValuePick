@@ -1,6 +1,0 @@
-.auth-card { box-shadow: 0 10px 40px rgba(0,0,0,0.08); max-width: 420px; margin: 60px auto; border: 1px solid var(--line); }
-.auth-divider { margin: 24px 0; text-align: center; position: relative; }
-.auth-divider::before { content: ""; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--line); }
-.auth-divider span { position: relative; background: var(--surface); padding: 0 12px; font-size: 12px; color: var(--muted); }
-.social-login { display: flex; flex-direction: column; gap: 10px; }
-.social-login .btn.social-kakao { background: #FEE500; border-color: #FEE500; color: #000; }

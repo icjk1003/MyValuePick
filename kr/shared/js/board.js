@@ -101,7 +101,7 @@ function renderList(posts) {
       <td class="colNo">${p.id || p.no}</td>
       <td class="colTag"><span class="chip">${p.tag}</span></td>
       <td style="text-align:left">
-        <a class="postTitle" href="post-detail.html?id=${p.id || p.no}">
+        <a class="postTitle" href="post.html?id=${p.id || p.no}">
           ${p.title} ${(p.comments) > 0 ? `<span style="color:var(--primary); font-size:12px; font-weight:700;">[${p.comments}]</span>` : ""}
         </a>
       </td>

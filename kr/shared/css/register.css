@@ -1,0 +1,102 @@
+/* register.css - 회원가입 화면 전용 스타일 */
+
+/* 1. 컨테이너 레이아웃 */
+.register-container {
+    max-width: 460px; /* 로그인(400px)보다 살짝 넓게 설정 */
+    margin: 60px auto 100px;
+    padding: 40px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. 로고 및 설명 텍스트 */
+.register-logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.register-desc {
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* 3. 폼 요소 스타일 */
+.register-form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.register-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text);
+}
+
+/* 필수 입력 표시 (*) */
+.required-mark {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.register-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    transition: 0.2s;
+}
+
+.register-input:focus {
+    border-color: var(--primary);
+}
+
+/* 4. 버튼 스타일 */
+.btn-register {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: filter 0.2s;
+}
+
+.btn-register:hover {
+    filter: brightness(1.1);
+}
+
+/* 5. 하단 링크 */
+.register-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.link-highlight {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 5px;
+}
+
+.link-highlight:hover {
+    text-decoration: underline;
+}

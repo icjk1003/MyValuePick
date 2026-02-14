@@ -1,140 +1,258 @@
 /* shared/css/mypage.css */
 
+/* =========================================
+   1. 레이아웃 & 컨테이너
+   ========================================= 
+*/
 .mypage-wrap {
-  background: var(--bg);
-  min-height: calc(100vh - 200px);
-  padding: 40px 0;
+    background: var(--bg);
+    min-height: calc(100vh - 200px);
+    padding: 40px 0;
 }
 
 .mypage-container {
-  width: 1000px;
-  max-width: 94vw;
-  margin: 0 auto;
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
+    width: 1000px;
+    max-width: 94vw;
+    margin: 0 auto;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
 }
 
 /* 모바일 대응: 세로 배치 */
 @media (max-width: 768px) {
-  .mypage-container { flex-direction: column; }
-  .mypage-sidebar, .mypage-content { width: 100%; }
+    .mypage-container {
+        flex-direction: column;
+    }
+    .mypage-sidebar,
+    .mypage-content {
+        width: 100%;
+    }
 }
 
 /* 카드 공통 */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
 }
 
-/* [좌측] 사이드바 */
+/* =========================================
+   2. 사이드바 (Sidebar)
+   ========================================= 
+*/
 .mypage-sidebar {
-  width: 260px;
-  flex-shrink: 0;
-  padding: 30px 20px;
-  text-align: center;
+    width: 260px;
+    flex-shrink: 0;
+    padding: 30px 20px;
+    text-align: center;
 }
 
-/* shared/css/mypage.css - 프로필 이미지 영역 수정 */
-
-/* shared/css/mypage.css - 프로필 이미지 영역 (전체 교체) */
-
+/* 프로필 이미지 영역 */
 .profile-img-area {
-  width: 110px; /* 크기 살짝 키움 */
-  height: 110px; 
-  margin: 0 auto 20px;
-  /* 기존 테두리나 radius 관련 스타일은 자식 요소로 이동 */
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 20px;
 }
 
-/* 클릭 가능한 레이블 컨테이너 */
 .profile-upload-label {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: relative; /* 오버레이 배치를 위한 기준 */
-  border-radius: 50%; /* 전체를 동그랗게 */
-  overflow: hidden;   /* 넘치는 부분 잘라냄 (중요) */
-  cursor: pointer;    /* 마우스 커서 손가락 모양 */
-  border: 2px solid var(--line); /* 테두리는 여기에 */
-  background: var(--surface);
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid var(--line);
+    background: var(--surface);
 }
 
-/* 실제 이미지 */
-.profile-upload-label img { 
-  width: 100%; 
-  height: 100%; 
-  object-fit: cover; 
-  display: block;
+.profile-upload-label img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-/* [핵심] 마우스 올렸을 때 나타나는 오버레이 */
+/* 프로필 오버레이 (Hover 효과) */
 .profile-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* 검은색 반투명 배경 */
-  
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  
-  color: white; /* 글씨색 흰색 */
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-  
-  opacity: 0; /* 평소엔 숨김 */
-  transition: opacity 0.3s ease; /* 부드럽게 나타나도록 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-/* [핵심] 호버 효과: 마우스 올리면 오버레이 표시 */
 .profile-upload-label:hover .profile-overlay {
-  opacity: 1;
+    opacity: 1;
 }
 
-.profile-summary h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--text); }
-.profile-summary p { margin: 4px 0 20px; font-size: 13px; color: var(--muted); }
+.profile-summary h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+}
 
-.mypage-menu { display: flex; flex-direction: column; text-align: left; margin-top: 20px; border-top: 1px solid var(--line); padding-top: 10px; }
+.profile-summary p {
+    margin: 4px 0 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* 사이드바 메뉴 */
+.mypage-menu {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-top: 20px;
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+}
+
 .mypage-menu a {
-  padding: 12px 16px; color: var(--text); text-decoration: none;
-  font-size: 14px; font-weight: 500; border-radius: 8px; transition: 0.2s;
+    padding: 12px 16px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: 0.2s;
 }
-.mypage-menu a:hover { background: var(--surface-hover); }
-.mypage-menu a.active { background: var(--primary-bg); color: var(--primary); font-weight: 700; }
-.menu-sep { height: 1px; background: var(--line); margin: 8px 0; }
 
+.mypage-menu a:hover {
+    background: var(--surface-hover);
+}
 
-/* [우측] 컨텐츠 */
+.mypage-menu a.active {
+    background: var(--primary-bg);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* 로그아웃 버튼 전용 스타일 */
+.mypage-menu a.menu-logout {
+    color: #ef4444;
+}
+
+.mypage-menu a.menu-logout:hover {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.menu-sep {
+    height: 1px;
+    background: var(--line);
+    margin: 8px 0;
+}
+
+/* =========================================
+   3. 메인 컨텐츠 영역 (Content)
+   ========================================= 
+*/
 .mypage-content {
-  flex: 1;
-  padding: 40px;
+    flex: 1;
+    padding: 40px;
 }
 
-.section-title { margin: 0 0 30px; font-size: 20px; font-weight: 700; border-bottom: 2px solid var(--line); padding-bottom: 16px; }
+.section-title {
+    margin: 0 0 30px;
+    font-size: 20px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 16px;
+}
 
-.form-row { margin-bottom: 24px; }
-.form-row label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
-.desc { margin-top: 6px; font-size: 12px; color: var(--muted); }
+/* =========================================
+   4. 폼 스타일 (Form)
+   ========================================= 
+*/
+.form-row {
+    margin-bottom: 24px;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.desc {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
 
 .input-readonly {
-  width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--line);
-  border-radius: 8px; color: var(--muted); cursor: not-allowed;
+    width: 100%;
+    padding: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: not-allowed;
 }
-.input-edit {
-  width: 100%; padding: 12px; background: var(--surface); border: 1px solid var(--line);
-  border-radius: 8px; color: var(--text); outline: none; transition: 0.2s;
-}
-.input-edit:focus { border-color: var(--primary); }
 
-.btn-area { margin-top: 40px; text-align: right; }
-.btn-save {
-  padding: 12px 24px; background: var(--primary); color: white;
-  border: none; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer;
+.input-edit {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    outline: none;
+    transition: 0.2s;
 }
-.btn-save:hover { filter: brightness(1.1); }
+
+.input-edit:focus {
+    border-color: var(--primary);
+}
+
+/* 버튼 영역 */
+.btn-area {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.btn-save {
+    padding: 12px 24px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    filter: brightness(1.1);
+}
+
+/* =========================================
+   5. 인라인 스타일 대체 유틸리티 (New)
+   ========================================= 
+*/
+
+/* 숨겨진 파일 입력창 */
+.file-input-hidden {
+    display: none;
+}
+
+/* 인풋 간격 (비밀번호 확인창용) */
+.input-gap-top {
+    margin-top: 8px;
+}

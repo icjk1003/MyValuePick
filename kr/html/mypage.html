@@ -25,7 +25,7 @@
                     </div>
                 </label>
                 
-                <input type="file" id="profileUpload" accept="image/*" style="display:none">
+                <input type="file" id="profileUpload" accept="image/*" class="file-input-hidden">
             </div>
 
           <h3 id="myNickDisplay">닉네임 로딩중</h3>
@@ -37,7 +37,7 @@
           <a href="#" onclick="alert('준비 중입니다.')">📝 내가 쓴 글</a>
           <a href="#" onclick="alert('준비 중입니다.')">💬 내가 쓴 댓글</a>
           <div class="menu-sep"></div>
-          <a href="#" onclick="logout()" style="color:#ef4444;">로그아웃</a>
+          <a href="#" onclick="logout()" class="menu-logout">로그아웃</a>
         </nav>
       </aside>
 
@@ -59,7 +59,7 @@
         <div class="form-row">
           <label>비밀번호 변경</label>
           <input type="password" id="myPwInput" class="input-edit" placeholder="새 비밀번호 (변경시에만 입력)">
-          <input type="password" id="myPwCheckInput" class="input-edit" placeholder="새 비밀번호 확인" style="margin-top:8px;">
+          <input type="password" id="myPwCheckInput" class="input-edit input-gap-top" placeholder="새 비밀번호 확인">
         </div>
 
         <div class="btn-area">
@@ -73,6 +73,7 @@
   <div id="global-footer"></div>
 
   <script src="../shared/js/common.js"></script>
-  <script src="../shared/js/auth.js"></script> <script src="../shared/js/mypage.js"></script>
+  <script src="../shared/js/auth.js"></script> 
+  <script src="../shared/js/mypage.js"></script>
 </body>
 </html>

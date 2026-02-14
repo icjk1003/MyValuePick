@@ -1,0 +1,81 @@
+/* login.css - 로그인 화면 전용 스타일 */
+
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 40px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.login-logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 30px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.login-form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.login-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.login-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.login-input:focus {
+    border-color: var(--primary);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.login-links {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.link-highlight {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+/* 테스트 계정 안내 문구 스타일 (인라인 제거용) */
+.test-account-hint {
+    margin-top: 10px;
+    color: var(--primary);
+    font-size: 12px;
+}
