@@ -342,7 +342,9 @@
     gap: 16px;
 }
 
-#nickCheckMsg {
+/* 1. 메시지 텍스트 공통 레이아웃 */
+#nickCheckMsg, 
+#pwCheckMsg {
     font-size: 12px;
     font-weight: 600;
     margin-top: 4px;
@@ -350,8 +352,24 @@
     transition: color 0.2s ease;
 }
 
-#nickCheckMsg.success { color: var(--good); }
-#nickCheckMsg.error { color: var(--bad); }
+/* 2. 상태별 색상 (닉네임 로직과 동일) */
+/* 성공 (일치/사용가능): 초록색 */
+#nickCheckMsg.success,
+#pwCheckMsg.success {
+    color: var(--good); 
+}
+
+/* 에러 (불일치/중복/입력미비): 빨간색 */
+#nickCheckMsg.error,
+#pwCheckMsg.error {
+    color: var(--bad);
+}
+
+/* 기본/안내: 회색 */
+#nickCheckMsg.info,
+#pwCheckMsg.info {
+    color: var(--muted);
+}
 
 /* 내가 쓴 글/댓글 리스트 스타일 */
 .my-content-list {
@@ -585,3 +603,15 @@ html[data-theme="dark"] .slider {
     margin: -4px -8px; /* 패딩만큼 마진 조정 */
     text-decoration: none;
 }
+
+/* 닉네임, 비밀번호 확인 메시지 공통 스타일 */
+.msg-mini {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    min-height: 18px;
+    transition: color 0.2s ease;
+}
+
+.msg-mini.success { color: var(--good); } /* 초록색 */
+.msg-mini.error { color: var(--bad); }    /* 빨간색 */

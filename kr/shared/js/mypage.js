@@ -36,12 +36,31 @@ function initMyPage() {
   initNicknameRealtimeCheck(myNick);
   initSocialLinking(); 
   initWithdrawal(); // [New] 탈퇴 기능 초기화
-
+  initPasswordCheck(); // [추가] 비밀번호 실시간 체크 초기화
   // 4. 전체 정보 저장 버튼
-  document.getElementById("btnSaveMyInfo")?.addEventListener("click", () => {
+document.getElementById("btnSaveMyInfo")?.addEventListener("click", () => {
     const newNick = document.getElementById("myNickInput").value.trim();
     const currentNick = localStorage.getItem("user_nick");
+    
+    // [추가] 비밀번호 유효성 검사
+    const newPw = document.getElementById("myPwInput").value;
+    const newPwCheck = document.getElementById("myPwCheckInput").value;
 
+    if (newPw !== "") {
+        if (newPw.length < 4) {
+            alert("비밀번호는 최소 4자 이상이어야 합니다.");
+            return;
+        }
+        if (newPw !== newPwCheck) {
+            alert("비밀번호가 일치하지 않습니다. 다시 확인해주세요.");
+            document.getElementById("myPwCheckInput").focus();
+            return;
+        }
+        // 실제로는 여기서 비밀번호 변경 API 호출
+        // localStorage.setItem("user_pw", newPw); (Mock)
+    }
+
+    // 닉네임 변경 로직 (기존 유지)
     if (newNick !== currentNick) {
         if (newNick.length < 2 || newNick.length > 10) {
             alert("닉네임은 2자 이상 10자 이하로 설정해주세요.");
@@ -346,4 +365,54 @@ function updateSocialUI(provider, isLinked) {
             statusEl.classList.remove("active");
         }
     }
+}
+
+// =========================================
+// [New] 비밀번호 실시간 일치 확인 (색상 적용)
+// =========================================
+function initPasswordCheck() {
+    const pwInput = document.getElementById("myPwInput");
+    const pwCheckInput = document.getElementById("myPwCheckInput");
+    const msgBox = document.getElementById("pwCheckMsg");
+
+    if (!pwInput || !pwCheckInput || !msgBox) return;
+
+    const checkPw = () => {
+        const pw = pwInput.value;
+        const pwCheck = pwCheckInput.value;
+
+        // 1. 둘 다 비어있으면 초기화
+        if (pw === "" && pwCheck === "") {
+            msgBox.textContent = "";
+            msgBox.className = ""; // 클래스 제거
+            return;
+        }
+
+        // 2. 비밀번호는 입력했으나 확인칸이 비었을 때
+        if (pw !== "" && pwCheck === "") {
+            msgBox.textContent = "비밀번호 확인을 입력해주세요.";
+            msgBox.className = "info"; // 회색
+            return;
+        }
+
+        // 3. 일치 여부 확인
+        if (pw !== pwCheck) {
+            // [불일치] 빨간색 (error)
+            msgBox.textContent = "비밀번호가 일치하지 않습니다.";
+            msgBox.className = "error"; 
+        } else {
+            // [일치] 초록색 (success)
+            // 추가조건: 비밀번호 길이 체크 (너무 짧으면 일치해도 경고)
+            if (pw.length < 4) {
+                msgBox.textContent = "비밀번호가 너무 짧습니다 (4자 이상).";
+                msgBox.className = "error";
+            } else {
+                msgBox.textContent = "비밀번호가 일치합니다.";
+                msgBox.className = "success";
+            }
+        }
+    };
+
+    pwInput.addEventListener("input", checkPw);
+    pwCheckInput.addEventListener("input", checkPw);
 }
