@@ -458,13 +458,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
-    font-weight: 800;
-    color: white;
+    
+    /* [변경] SVG 적용을 위해 폰트 속성 제거 및 그림자 추가 */
+    /* font-size: 18px; */
+    /* font-weight: 800; */
+    
+    color: white; /* SVG의 fill="currentColor"에 적용됨 */
     flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 약간의 입체감 추가 */
 }
 
-/* 브랜드별 컬러 */
+/* 브랜드별 컬러 (네이버 아이콘 위치 미세 조정) */
+.social-icon.naver svg {
+    transform: translateY(1px);
+}
+
 .social-icon.google {
     background-color: #fff;
     border: 1px solid var(--line);
@@ -478,7 +486,7 @@
 
 .social-icon.kakao {
     background-color: #FEE500;
-    color: #000;
+    color: #3C1E1E; /* 카카오 아이콘 갈색 */
 }
 
 .social-icon.apple {
