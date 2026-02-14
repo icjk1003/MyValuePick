@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+	<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>MyValuePick · 홈</title>
+	<link rel="stylesheet" href="../shared/css/common.css"/>
+  <link rel="stylesheet" href="../shared/css/home.css"/>
+  <link rel="stylesheet" href="../shared/css/board.css"/>
+</head>
+<body>
+	<div id="global-header"></div>
+
+  <div class="container" style="margin-top:24px; margin-bottom: 40px;">
+    
+    <div class="homeLayout">
+      
+      <div class="mainCol">
+        
+				<div class="card" style="margin-bottom: 24px;">
+					<div class="hd">
+						<h2 class="h3">📊 증시 현황</h2>
+					</div>
+					<div class="bd">
+						<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+							
+							<div style="background:var(--surface-hover); border-radius:12px; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+								<div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px">KOSPI</div>
+								<div style="font-size:20px; font-weight:800; color:#DC2626">2,650.45</div>
+								<div style="font-size:12px; color:#DC2626; font-weight:600">▲ 12.30 (+0.46%)</div>
+							</div>
+
+							<div style="background:var(--surface-hover); border-radius:12px; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+								<div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px">KOSDAQ</div>
+								<div style="font-size:20px; font-weight:800; color:#2563EB">850.12</div>
+								<div style="font-size:12px; color:#2563EB; font-weight:600">▼ 4.50 (-0.52%)</div>
+							</div>
+
+							<div style="background:var(--surface-hover); border-radius:12px; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+								<div style="font-size:12px; color:var(--muted); font-weight:600; margin-bottom:4px">USD/KRW</div>
+								<div style="font-size:20px; font-weight:800; color:var(--text)">1,340.50</div>
+								<div style="font-size:12px; color:#DC2626; font-weight:600">▲ 2.50 (+0.19%)</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="ad-container">
+					<div class="ad-placeholder ad-leaderboard">
+						<div class="ad-label">Advertisement</div>
+						<div style="text-align:center">
+							<div style="font-size:16px; font-weight:700;">Google Responsive Ad</div>
+							<div style="font-size:12px; margin-top:4px;">Auto Size (Full Width)</div>
+						</div>
+					</div>
+				</div>
+
+        <div class="card">
+          <div class="hd" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="h3">🔥 최신 글</h2>
+            <a href="board.html" class="btn small">더보기</a>
+          </div>
+          <table class="boardTable">
+            <colgroup><col class="colNo"><col class="colTag"><col><col class="colVotes"><col class="colViews mobile-hide"><col class="colTime mobile-hide"></colgroup>
+            <thead><tr><th>번호</th><th>분류</th><th>제목</th><th>추천</th><th class="mobile-hide">조회</th><th class="mobile-hide">날짜</th></tr></thead>
+            <tbody id="homeLatestRows"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="hd" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="h3" style="display:flex; align-items:center; gap:6px">
+              ⭐ 구독한 작가의 글 <span class="badge" style="background:var(--primary-bg); color:var(--primary)">MY</span>
+            </h2>
+            <a href="board.html" class="btn small" style="opacity:0.6">더보기</a>
+          </div>
+          <table class="boardTable">
+            <colgroup><col class="colNo"><col class="colTag"><col><col class="colVotes"><col class="colViews mobile-hide"><col class="colTime mobile-hide"></colgroup>
+            <thead><tr><th>번호</th><th>분류</th><th>제목</th><th>추천</th><th class="mobile-hide">조회</th><th class="mobile-hide">날짜</th></tr></thead>
+            <tbody id="homeSubscribedRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sideCol">
+        <div class="stickySide">
+          
+					<div class="card eventCalendar">
+						<div class="hd">
+							<div class="h3">📅 증시 캘린더</div>
+						</div>
+
+						<div class="bd" style="padding:16px">
+							<div class="calCtrl">
+								<div>
+									<div id="calYear" class="custom-select"></div>
+									<div id="calMonth" class="custom-select"></div>
+								</div>
+								<div>
+									<button id="calPrev" class="iconBtn">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+									</button>
+									<button id="calNext" class="iconBtn">
+									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+									</button>
+								</div>
+							</div>
+							<div id="calendar" class="cal"></div>
+							
+							<div id="eventSelected" class="eventSelectedBox"></div>
+
+							<div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--line)">
+								<div style="font-size:12px; font-weight:700; color:var(--muted); margin-bottom:8px">🔜 다가오는 일정</div>
+								<div id="eventUpcoming" class="eventList"></div>
+							</div>
+						</div>
+					</div>
+
+          <div class="card">
+            <div class="hd"><h2 class="h3">🔥 실시간 인기 글</h2></div>
+            <div class="bd" style="padding:0;">
+              <div class="sideList" id="homeTrendingList"></div>
+            </div>
+          </div>
+
+					<div class="ad-container">
+						<div class="ad-placeholder ad-rectangle">
+							<div class="ad-label">Ad</div>
+							<div style="text-align:center">
+								<div style="font-size:14px; font-weight:700;">Side Responsive</div>
+								<div style="font-size:11px; margin-top:4px;">Auto Width</div>
+							</div>
+						</div>
+					</div>
+          
+        </div>
+      </div>
+
+    </div>
+  </div>
+	<div id="global-footer"></div>
+	<script src="../shared/js/data.js"></script>
+	<script src="../shared/js/common.js"></script>
+	<script src="../shared/js/home.js"></script>
+</body>
+</html>

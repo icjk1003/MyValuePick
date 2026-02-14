@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>MyValuePick · 글쓰기</title>
+  <link rel="stylesheet" href="../shared/css/common.css"/>
+  <link rel="stylesheet" href="../shared/css/write.css"/>
+</head>
+<body>
+  <div id="global-header"></div>
+
+  <div class="container" style="max-width: 900px; margin-top: 40px; margin-bottom: 80px;">
+    
+    <div class="card write-card">
+      
+      <div class="bd" style="padding: 40px;">
+        
+        <div class="write-row split">
+          <div class="form-group" style="flex: 1;">
+            <label for="writeCategory">게시판 선택 <span class="req">*</span></label>
+            <select id="writeCategory" class="form-select">
+              <option value="" disabled selected>게시판을 선택하세요</option>
+              <option value="분석">📈 분석/칼럼</option>
+              <option value="실적">📊 실적발표</option>
+              <option value="잡담">💬 자유/잡담</option>
+              <option value="질문">❓ 질문/답변</option>
+              <option value="유머">😂 유머</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label for="writeTicker">관련 종목 (선택)</label>
+            <div class="ticker-input-box">
+              <span class="prefix">$</span>
+              <input type="text" id="writeTicker" placeholder="예: TSLA, 삼성전자" autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div class="write-row split" id="anonInputArea">
+          <div class="form-group" style="flex: 1;">
+            <label>닉네임 <span class="req">*</span></label>
+            <input type="text" id="writeNick" class="form-select" placeholder="닉네임">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>비밀번호 <span class="req">*</span></label>
+            <input type="password" id="writePw" class="form-select" placeholder="비밀번호 (수정/삭제용)">
+          </div>
+        </div>
+
+        <div class="form-group title-group">
+          <input type="text" id="writeTitle" class="form-input-title" placeholder="제목을 입력하세요" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <div class="editor-box">
+            <div class="editor-toolbar">
+              <button class="tool-btn" title="굵게"><b>B</b></button>
+              <button class="tool-btn" title="기울임"><i>I</i></button>
+              <button class="tool-btn" title="밑줄"><u>U</u></button>
+              <div class="tool-sep"></div>
+              <button class="tool-btn" title="제목1">H1</button>
+              <button class="tool-btn" title="제목2">H2</button>
+              <div class="tool-sep"></div>
+              <button class="tool-btn" title="링크">🔗</button>
+              <button class="tool-btn" title="인용">❝</button>
+              <div class="tool-sep"></div>
+              <button class="tool-btn" title="이미지 첨부">📷</button>
+            </div>
+            <textarea id="writeBody" class="editor-textarea" placeholder="내용을 입력하세요..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="file-drop-area">
+            <div class="icon">📂</div>
+            <div class="desc">
+              <span style="font-weight:600; color:var(--primary)">클릭하여 파일을 업로드</span> 하거나 여기로 드래그하세요.
+            </div>
+            <div class="meta">최대 10MB · JPG, PNG, GIF</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ft write-footer">
+        <button class="btn" onclick="history.back()">취소</button>
+        <button class="btn primary" id="btnPublish" style="padding: 10px 24px; font-size:15px;">등록하기</button>
+      </div>
+
+    </div>
+  </div>
+  <div id="global-footer"></div>
+
+  <script src="../shared/js/data.js"></script>
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/write.js"></script>
+</body>
+</html>

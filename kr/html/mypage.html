@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마이페이지 · MyValuePick</title>
+  <link rel="stylesheet" href="../shared/css/common.css">
+  <link rel="stylesheet" href="../shared/css/mypage.css">
+</head>
+<body>
+
+  <div id="global-header"></div>
+
+  <main class="mypage-wrap">
+    <div class="mypage-container">
+      
+      <aside class="mypage-sidebar card">
+        <div class="profile-summary">
+            <div class="profile-img-area">
+                <label for="profileUpload" class="profile-upload-label">
+                    <img src="" id="myProfileImg" alt="프로필">
+                    
+                    <div class="profile-overlay">
+                        <span>📷<br>사진 변경</span>
+                    </div>
+                </label>
+                
+                <input type="file" id="profileUpload" accept="image/*" style="display:none">
+            </div>
+
+          <h3 id="myNickDisplay">닉네임 로딩중</h3>
+          <p id="myIdDisplay">@userid</p>
+        </div>
+        
+        <nav class="mypage-menu">
+          <a href="#" class="active">⚙️ 내 정보 수정</a>
+          <a href="#" onclick="alert('준비 중입니다.')">📝 내가 쓴 글</a>
+          <a href="#" onclick="alert('준비 중입니다.')">💬 내가 쓴 댓글</a>
+          <div class="menu-sep"></div>
+          <a href="#" onclick="logout()" style="color:#ef4444;">로그아웃</a>
+        </nav>
+      </aside>
+
+      <section class="mypage-content card">
+        <h2 class="section-title">내 정보 수정</h2>
+        
+        <div class="form-row">
+          <label>아이디</label>
+          <input type="text" id="myIdInput" class="input-readonly" readonly>
+          <p class="desc">아이디는 변경할 수 없습니다.</p>
+        </div>
+
+        <div class="form-row">
+          <label>닉네임</label>
+          <input type="text" id="myNickInput" class="input-edit" placeholder="닉네임을 입력하세요">
+          <p class="desc">커뮤니티 활동 시 보여지는 이름입니다.</p>
+        </div>
+
+        <div class="form-row">
+          <label>비밀번호 변경</label>
+          <input type="password" id="myPwInput" class="input-edit" placeholder="새 비밀번호 (변경시에만 입력)">
+          <input type="password" id="myPwCheckInput" class="input-edit" placeholder="새 비밀번호 확인" style="margin-top:8px;">
+        </div>
+
+        <div class="btn-area">
+          <button id="btnSaveMyInfo" class="btn-save">변경사항 저장</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="global-footer"></div>
+
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/auth.js"></script> <script src="../shared/js/mypage.js"></script>
+</body>
+</html>

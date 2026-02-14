@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로그인 · MyValuePick</title>
+  <link rel="stylesheet" href="../shared/css/common.css">
+  <style>
+    .login-container {
+      max-width: 400px; margin: 100px auto; padding: 40px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--surface); text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .logo { 
+      font-size: 24px; font-weight: 800; color: var(--primary); 
+      margin-bottom: 30px; display: inline-block; text-decoration: none;
+    }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+    .form-input {
+      width: 100%; padding: 12px; border: 1px solid var(--line);
+      border-radius: 8px; font-size: 15px; outline: none;
+      background: var(--bg); color: var(--text);
+    }
+    .form-input:focus { border-color: var(--primary); }
+    .btn-login {
+      width: 100%; padding: 14px; background: var(--primary);
+      color: white; border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px;
+    }
+    .links { margin-top: 20px; font-size: 13px; color: var(--muted); }
+    .links a { color: var(--text); text-decoration: none; font-weight: 600; margin-left: 5px; }
+  </style>
+</head>
+<body>
+
+  <div id="global-header"></div>
+
+  <div class="login-container">
+    <a href="home.html" class="logo">MyValuePick</a>
+    
+    <form onsubmit="return false;">
+      <div class="form-group">
+        <label>아이디</label>
+        <input type="text" id="loginId" class="form-input" placeholder="아이디 입력" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="loginPw" class="form-input" placeholder="비밀번호 입력">
+      </div>
+      
+      <button type="button" id="btnLoginSubmit" class="btn-login">로그인</button>
+    </form>
+
+    <div class="links">
+      계정이 없으신가요? <a href="register.html">회원가입</a>
+      
+      <div style="margin-top: 10px; color:var(--primary); font-size:12px;">
+        (테스트 계정: user / 1234)
+      </div>
+    </div>
+  </div>
+
+  <div id="global-footer"></div>
+
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+/* board.css - !important 제거 및 우선순위 최적화 버전 */
+
+/* 1. 레이아웃 & 광고 영역 */
+/* .container 클래스와 결합하여 우선순위를 높임 (max-width 해제) */
+.container.boardWide { 
+  max-width: none; 
+  width: 100%; 
+  margin: 0 auto; 
+  padding: 20px 0; 
+}
+
+.boardLayoutCenter { display: flex; justify-content: center; align-items: flex-start; gap: 30px; }
+.boardCardWrap { width: 1000px; flex-shrink: 0; max-width: 96vw; }
+.adTall { position: sticky; top: 80px; width: 300px; height: 600px; flex-shrink: 0; z-index: 10;}
+
+@media (max-width: 1700px) { 
+  .adTall { display: none; } 
+  .boardCardWrap { width: 100%; max-width: 1000px; padding: 0 16px; flex-shrink: 1; } 
+}
+
+/* 2. 테이블 스타일 */
+/* .boardCardWrap 내부의 .card로 한정하여 우선순위 높임 (overflow 해제) */
+.boardCardWrap .card { 
+  background: var(--surface); 
+  border: 1px solid var(--line); 
+  border-radius: 16px; 
+  overflow: visible; 
+}
+
+.boardTable { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.boardTable th, .boardTable td { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.boardTable th { background: var(--surface-hover); color: var(--muted); font-weight: 600; font-size: 12px; }
+
+.colNo { width: 60px; }
+.colTag { width: 80px; }
+
+/* td.postTitle로 명시하여 일반 td 스타일보다 우선순위 확보 */
+.boardTable td.postTitle { 
+  text-align: left; 
+  padding-left: 15px; 
+  width: auto; 
+}
+
+a.postTitle { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; color: var(--text); text-decoration: none; }
+.colWriter { width: 120px; color: var(--muted); }
+.colVotes { width: 60px; }
+.colViews { width: 70px; }
+.colTime { width: 100px; }
+
+@media (max-width: 768px) { .colNo, .colViews, .colVotes { display: none; } .colTime { width: 70px; font-size: 11px; text-align: right; } }
+.boardTable tbody tr:hover { background-color: var(--surface-hover); }
+
+/* 활성 행 스타일 - tr.active-row로 구체화 */
+.boardTable tbody tr.active-row { background-color: var(--primary-bg); }
+.boardTable tbody tr.active-row .postTitle { color: var(--primary); font-weight: 800; }
+
+/* 3. 게시글 상세 페이지 */
+.post-view-header { padding: 30px 30px 20px; background-color: var(--surface); border-bottom: 1px solid var(--line); }
+.post-view-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 16px; line-height: 1.3; color: var(--text); }
+.post-meta-row { display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 13px; color: var(--muted); }
+.post-view-body { padding: 40px 30px 60px; min-height: 300px; font-size: 16px; line-height: 1.8; color: var(--text); background-color: var(--surface); white-space: pre-line; }
+
+/* [통합 하단 영역] */
+.post-content-footer { padding: 0 30px 40px; background: var(--surface); display: flex; flex-direction: column; align-items: center; gap: 32px; }
+.post-action-group { display: flex; align-items: center; gap: 16px; }
+.vote-btn { display: flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 100px; border: 1px solid var(--line); background: var(--surface); color: var(--text); font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; }
+.vote-btn.up:hover { border-color: #ef4444; background-color: #fef2f2; color: #ef4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); }
+.vote-btn.down:hover { border-color: #475569; background-color: #f8fafc; color: #475569; }
+.post-utils { display: flex; gap: 20px; }
+.util-link { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+
+/* [복구] 작가 프로필 카드 및 구독 버튼 원본 스타일 */
+.post-author-card { width: 100%; max-width: 600px; display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; background: var(--bg); border-radius: 12px; border: 1px solid var(--line); }
+.author-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); background: #fff; }
+.author-text h3 { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.author-text p { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+
+.btn-subscribe { 
+  padding: 8px 16px; 
+  border-radius: 20px; 
+  border: 1px solid var(--line); 
+  background: var(--surface); 
+  font-weight: 600; 
+  font-size: 13px; 
+  color: var(--text); 
+  cursor: pointer; 
+  transition: 0.2s; 
+}
+.btn-subscribe:hover { border-color: var(--primary); color: var(--primary); }
+.btn-subscribe.active { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); }
+
+/* 4. 원본 버튼 및 페이지네이션 */
+.post-top-btns { margin-bottom: 20px; display: flex; justify-content: flex-start; }
+.btn-list { padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; background: var(--surface); border: 1px solid var(--line); color: var(--text); text-decoration: none; cursor: pointer; }
+.pagerWrap { padding: 20px 0; display: flex; justify-content: center; }
+
+/* display: flex 중복 선언 제거 */
+.pager { display: flex; flex-direction: row; gap: 4px; align-items: center; }
+.pager a { min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; text-decoration: none; }
+.pager a.active { background: var(--primary); color: white; }
+
+/* 5. 검색창 및 드롭다운 */
+.boardSearchBelow { display: flex; justify-content: center; padding-bottom: 60px; margin-top: 20px; }
+.boardSearchBar { display: flex; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 0 12px; width: 100%; max-width: 420px; height: 44px; position: relative; }
+
+/* 상위 클래스를 명시하여 색상 오버라이드 */
+.boardSearchBar .boardSearchBtn { border: none; background: transparent; color: var(--muted); cursor: pointer; padding: 0 4px; display: flex; align-items: center; }
+.boardSearchBar .boardSearchBtn svg { stroke: var(--muted); }
+
+.searchDivider { width: 1px; height: 16px; background: var(--line); margin: 0; flex-shrink: 0; }
+.boardSearchBar input { border: none; background: transparent; padding: 0 12px; height: 100%; flex: 1; font-size: 13px; font-weight: 700; outline: none; color: var(--text); }
+.custom-select { position: relative; height: 100%; width: 100px; margin-left: -12px; flex-shrink: 0; font-size: 13px; font-weight: 700; }
+.select-styled { cursor: pointer; display: flex; align-items: center; justify-content: center; padding-left: 12px; padding-right: 15px; color: var(--text); width: 100%; height: 100%; position: relative; }
+.select-styled::after { content: ""; position: absolute; right: 12px; top: 50%; transform: translateY(-20%); border: 4.5px solid transparent; border-top-color: var(--muted); }
+
+/* 우선순위 자연스럽게 적용 */
+.select-options { display: none; position: absolute; top: calc(100% + 4px); left: 0; width: 100%; background-color: #ffffff; border: 1px solid var(--line); border-radius: 10px; z-index: 10000; padding: 4px 0; box-shadow: 0 8px 16px rgba(0,0,0,0.1); margin: 0; }
+
+/* [data-theme] 속성 선택자는 클래스보다 우선순위가 높지 않으므로, 상위 선택자 활용 */
+html[data-theme="dark"] .select-options { background-color: #2d3748; }
+
+.select-options li { padding: 10px 0; cursor: pointer; list-style: none; text-align: center; color: var(--text); font-weight: 600; font-size: 13px; }
+
+/* 6. 댓글 디자인 및 삭제 버튼 */
+.comment-wrap { margin-top: 20px; padding: 24px 30px; background: var(--surface); border-radius: 16px; border: 1px solid var(--line); }
+.comment-header { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 20px; }
+.comment-write-box { background: var(--bg); padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--line); }
+.anon-inputs { display: flex; gap: 10px; margin-bottom: 12px; }
+.anon-inputs input { width: 140px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; outline: none; background: var(--surface); color: var(--text); }
+.write-area { display: flex; gap: 12px; }
+.write-area textarea { flex: 1; min-height: 80px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; resize: none; outline: none; background: var(--surface); color: var(--text); font-size: 14px; }
+.btn-submit-cmt { width: 90px; background: var(--primary); color: white; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; }
+.comment-item { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.cmt-profile { width: 42px; height: 42px; border-radius: 50%; overflow: hidden; border: 1px solid var(--line); background: #eee; flex-shrink: 0; }
+.cmt-body { flex: 1; }
+.cmt-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cmt-nick { font-size: 14px; font-weight: 700; }
+.btn-delete-cmt { font-size: 11px; color: var(--muted); cursor: pointer; background: none; border: none; text-decoration: underline; padding: 0; margin-left: 8px; }
+.cmt-vote-btn { border: 1px solid var(--line); background: none; padding: 4px 10px; border-radius: 20px; font-size: 12px; cursor: pointer; color: var(--muted); }
