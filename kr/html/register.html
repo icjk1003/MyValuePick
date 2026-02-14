@@ -11,43 +11,48 @@
 
   <div id="global-header"></div>
 
-  <div class="register-container">
-    <a href="home.html" class="register-logo">MyValuePick</a>
-    <div class="register-desc">주식 투자의 가치를 함께 나누세요</div>
-    
-    <form onsubmit="return false;">
+  <main class="register-wrap">
+    <div class="register-card">
+      <h1 class="register-title">회원가입</h1>
       
-      <div class="register-form-group">
-        <label>이메일 <span class="required-mark">*</span></label>
-        <input type="email" id="regEmail" class="register-input" placeholder="이메일 주소를 입력하세요" autocomplete="email">
-      </div>
+      <form class="register-form">
+        
+        <div class="input-group">
+          <label>아이디</label>
+          <input type="text" id="regId" placeholder="아이디" required>
+          <p id="idCheckMsg" class="msg-mini"></p>
+        </div>
 
-      <div class="register-form-group">
-        <label>비밀번호 <span class="required-mark">*</span></label>
-        <input type="password" id="regPw" class="register-input" placeholder="비밀번호 입력">
-      </div>
+        <div class="input-group">
+          <label>닉네임</label>
+          <input type="text" id="regNick" placeholder="닉네임 (2~10자)" required>
+          <p id="nickCheckMsg" class="msg-mini"></p>
+        </div>
 
-      <div class="register-form-group">
-        <label>비밀번호 확인 <span class="required-mark">*</span></label>
-        <input type="password" id="regPwConfirm" class="register-input" placeholder="비밀번호 재입력">
-      </div>
+        <div class="input-group">
+          <label>비밀번호</label>
+          <input type="password" id="regPw" placeholder="비밀번호 (4자 이상)" required>
+          <p id="pwCheckMsg" class="msg-mini"></p> </div>
 
-      <div class="register-form-group">
-        <label>닉네임 <span class="required-mark">*</span></label>
-        <input type="text" id="regNick" class="register-input" placeholder="커뮤니티에서 사용할 이름" autocomplete="off">
-      </div>
+        <div class="input-group">
+          <label>비밀번호 확인</label>
+          <input type="password" id="regPwCheck" placeholder="비밀번호 재입력" required>
+          <p id="pwCheckMsgConfirm" class="msg-mini"></p> </div>
 
-      <button type="button" id="btnRegisterSubmit" class="btn-register">회원가입 완료</button>
-    </form>
-
-    <div class="register-links">
-      이미 계정이 있으신가요? <a href="login.html" class="link-highlight">로그인하기</a>
+        <button type="submit" class="btn-register">가입하기</button>
+        
+        <div class="register-utility">
+            <span>이미 계정이 있으신가요?</span>
+            <a href="login.html" class="link-login">로그인</a>
+        </div>
+      </form>
     </div>
-  </div>
+  </main>
 
   <div id="global-footer"></div>
 
   <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/data.js"></script>
   <script src="../shared/js/register.js"></script>
 </body>
 </html>
