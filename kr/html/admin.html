@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>관리자 모드 · MyValuePick</title>
+  <link rel="stylesheet" href="../shared/css/common.css">
+  <link rel="stylesheet" href="../shared/css/admin.css">
+</head>
+<body>
+
+  <div id="global-header"></div>
+
+  <div class="admin-container">
+    <aside class="admin-sidebar">
+      <div class="admin-profile">
+        <div class="admin-avatar">👑</div>
+        <h3>ROOT 관리자</h3>
+      </div>
+      <nav class="admin-nav">
+        <button class="nav-item active" data-target="section-calendar">📅 증시 캘린더 관리</button>
+        <button class="nav-item" data-target="section-posts">📝 게시글 관리</button>
+        <button class="nav-item" data-target="section-reports">🚨 신고 관리</button>
+        <button class="nav-item" data-target="section-users">👥 회원 관리</button>
+      </nav>
+    </aside>
+
+    <main class="admin-content">
+      
+      <section id="section-calendar" class="admin-section active">
+        <h2>증시 캘린더 이벤트 업로드</h2>
+        <div class="admin-card">
+          <form id="calendarForm">
+            <div class="form-group">
+              <label>이벤트 날짜</label>
+              <input type="date" id="calDate" required>
+            </div>
+            <div class="form-group">
+              <label>이벤트 구분</label>
+              <select id="calType">
+                <option value="ipo">공모주(IPO)</option>
+                <option value="dividend">배당락일</option>
+                <option value="earnings">실적발표</option>
+                <option value="policy">정책/지표</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>이벤트 제목</label>
+              <input type="text" id="calTitle" placeholder="예: 삼성전자 실적발표" required>
+            </div>
+            <div class="form-group">
+              <label>상세 내용</label>
+              <textarea id="calDesc" placeholder="상세 내용을 입력하세요"></textarea>
+            </div>
+            <button type="submit" class="btn-admin-action">이벤트 등록</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="section-posts" class="admin-section">
+        <h2>전체 게시글 관리</h2>
+        <div class="admin-card">
+          <div class="search-bar">
+            <input type="text" placeholder="제목 또는 작성자 검색" id="postSearch">
+            <button>검색</button>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody id="postListBody">
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="section-reports" class="admin-section">
+        <h2>신고된 내역 관리</h2>
+        <div class="admin-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>유형</th>
+                <th>내용(요약)</th>
+                <th>신고 사유</th>
+                <th>신고자</th>
+                <th>상태</th>
+                <th>처리</th>
+              </tr>
+            </thead>
+            <tbody id="reportListBody">
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="section-users" class="admin-section">
+        <h2>회원 제재 및 관리</h2>
+        <div class="admin-card">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID(이메일)</th>
+                <th>닉네임</th>
+                <th>가입일</th>
+                <th>상태</th>
+                <th>제재 관리</th>
+              </tr>
+            </thead>
+            <tbody id="userListBody">
+              </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="global-footer"></div>
+
+  <script src="../shared/js/data.js"></script>
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/admin.js"></script>
+</body>
+</html>

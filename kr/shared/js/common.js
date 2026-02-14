@@ -81,7 +81,7 @@ function renderHeader() {
           <div id="searchSuggestions" class="search-suggestions"></div>
         </div>
 
-        <div style="display:flex; align-items:center; gap:16px; flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:16px; flex-shrink:0;" id="headerRightGroup">
           <button id="themeBtn" style="background:none; border:none; cursor:pointer; font-size:20px; padding:4px; border-radius:50%; transition:0.2s;" title="다크모드 전환">
             ${isDark ? '🌙' : '☀️'}
           </button>
@@ -130,22 +130,54 @@ function wireThemeToggle() {
   };
 }
 
-// 로그인 상태 처리
+// [수정됨] 로그인 상태 처리 및 관리자 버튼 추가
 function wireLoginState() {
   const btnLogin = document.getElementById("btnLogin");
   if(!btnLogin) return;
 
   const isLoggedIn = localStorage.getItem("is_logged_in");
+  const userId = localStorage.getItem("user_id");
   const nickName = localStorage.getItem("user_nick") || "내 정보";
 
   if(isLoggedIn) {
     btnLogin.textContent = nickName; 
     btnLogin.href = "mypage.html"; 
     btnLogin.onclick = null; 
+
+    // [New] 관리자(root)일 경우 버튼 추가 로직
+    if (userId === 'root') {
+        // 이미 버튼이 있는지 확인 (중복 생성 방지)
+        if (!document.getElementById('btnAdminMode')) {
+            const adminBtn = document.createElement('a');
+            adminBtn.id = 'btnAdminMode';
+            adminBtn.href = 'admin.html';
+            adminBtn.textContent = '👑 관리자';
+            // 버튼 스타일 적용
+            adminBtn.style.cssText = `
+                font-size: 13px;
+                font-weight: 700;
+                color: #fff;
+                background-color: #333; /* 눈에 띄는 어두운 배경 */
+                padding: 6px 12px;
+                border-radius: 6px;
+                text-decoration: none;
+                margin-right: -8px; /* gap 보정 */
+            `;
+            
+            // 로그인 버튼(닉네임) 앞에 삽입
+            const parent = btnLogin.parentNode;
+            parent.insertBefore(adminBtn, btnLogin);
+        }
+    }
+
   } else {
     btnLogin.textContent = "로그인";
     btnLogin.href = "login.html";
     btnLogin.onclick = null;
+
+    // 로그아웃 상태라면 관리자 버튼 제거
+    const adminBtn = document.getElementById('btnAdminMode');
+    if (adminBtn) adminBtn.remove();
   }
 }
 
@@ -213,6 +245,9 @@ function logout() {
     localStorage.removeItem("is_logged_in");
     localStorage.removeItem("user_id");
     localStorage.removeItem("user_nick");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_role"); // 혹시 저장된 권한이 있다면 삭제
+    
     alert("로그아웃 되었습니다.");
     location.href = "home.html"; // 홈으로 이동
   }
