@@ -33,7 +33,10 @@ function initMyPage() {
   // 3. 기능 초기화
   initBioSection(myNick);
   initImageCropper(myNick);
-  initNicknameRealtimeCheck(myNick); // [New] 실시간 체크 활성화
+  initNicknameRealtimeCheck(myNick); 
+  
+  // [New] 소셜 연동 상태 초기화
+  initSocialLinking(); 
 
   // 4. 전체 정보 저장 버튼
   document.getElementById("btnSaveMyInfo")?.addEventListener("click", () => {
@@ -73,28 +76,23 @@ function initNicknameRealtimeCheck(currentNick) {
     const runCheck = () => {
         const val = input.value.trim();
         
-        // 1. 현재 내가 사용 중인 닉네임과 동일할 경우
-        // 사용자가 아무것도 안 바꿨거나, 수정한걸 다시 원래대로 돌렸을 때 메시지를 비웁니다.
         if (val === currentNick) {
             msgBox.textContent = ""; 
             return;
         }
 
-        // 2. 빈 값인 경우
         if (val === "") {
             msgBox.textContent = "변경할 닉네임을 입력해주세요.";
             msgBox.style.color = "var(--muted)";
             return;
         }
 
-        // 3. 길이 체크
         if (val.length < 2 || val.length > 10) {
             msgBox.textContent = "닉네임은 2~10자여야 합니다.";
             msgBox.style.color = "var(--bad)";
             return;
         }
 
-        // 4. 중복 체크 (본인 닉네임은 위 1번에서 이미 걸러졌으므로 순수 중복만 체크됨)
         if (checkNicknameDuplicate(val)) {
             msgBox.textContent = "이미 사용 중인 닉네임입니다.";
             msgBox.style.color = "var(--bad)";
@@ -104,13 +102,8 @@ function initNicknameRealtimeCheck(currentNick) {
         }
     };
 
-    // 누르자마자 체크 실행
     input.addEventListener("focus", runCheck);
-
-    // 입력할 때마다 실시간 업데이트
     input.addEventListener("input", runCheck);
-    
-    // 포커스가 나가도 문구는 유지됨 (별도의 blur 이벤트 처리 안함)
 }
 
 // =========================================
@@ -119,10 +112,8 @@ function initNicknameRealtimeCheck(currentNick) {
 function checkNicknameDuplicate(targetNick) {
     if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
 
-    // 전체 작성자 수집
     const allWriters = new Set(MOCK_DB.POSTS.map(p => p.writer));
     
-    // 댓글 작성자도 포함
     MOCK_DB.POSTS.forEach(p => {
         if(p.commentList) {
             p.commentList.forEach(c => allWriters.add(c.writer));
@@ -282,6 +273,9 @@ function showMypageSection(type) {
 
     if (type === 'posts') renderMyPosts();
     if (type === 'comments') renderMyComments();
+    
+    // [New] 소셜 탭일 경우 상태 재확인
+    if (type === 'social') initSocialLinking();
 }
 
 /* 내가 쓴 글 렌더링 */
@@ -289,7 +283,6 @@ function renderMyPosts() {
     const container = document.getElementById("myPostsList");
     const myNick = localStorage.getItem("user_nick");
     
-    // MOCK_DB에서 내 글만 필터링
     const myPosts = MOCK_DB.POSTS.filter(p => p.writer === myNick);
 
     if (myPosts.length === 0) {
@@ -315,7 +308,6 @@ function renderMyComments() {
     const container = document.getElementById("myCommentsList");
     const myNick = localStorage.getItem("user_nick");
     
-    // 모든 게시글의 댓글 목록을 뒤져서 내 댓글 찾기
     const myComments = [];
     MOCK_DB.POSTS.forEach(post => {
         if (post.commentList) {
@@ -345,4 +337,58 @@ function renderMyComments() {
             </div>
         </a>
     `).join("");
+}
+
+// =========================================
+// [New] 계정 연동 기능 (Social Linking)
+// =========================================
+function initSocialLinking() {
+    const providers = ['google', 'naver', 'kakao', 'apple'];
+
+    providers.forEach(provider => {
+        // Mock DB: 로컬스토리지에서 연동 여부 확인
+        const isLinked = localStorage.getItem(`social_link_${provider}`) === 'true';
+        updateSocialUI(provider, isLinked);
+    });
+}
+
+// 토글 버튼 핸들러
+window.toggleSocial = function(provider) {
+    const toggleEl = document.getElementById(`toggle-${provider}`);
+    const isChecked = toggleEl.checked;
+    
+    updateSocialUI(provider, isChecked);
+
+    // 실제 연동 로직이 들어갈 곳 (API 호출 등)
+    if (isChecked) {
+        // 연동 ON
+        localStorage.setItem(`social_link_${provider}`, 'true');
+    } else {
+        // 연동 OFF (확인 절차)
+        if(confirm(`${provider} 연동을 해제하시겠습니까?`)) {
+            localStorage.setItem(`social_link_${provider}`, 'false');
+        } else {
+            // 취소 시 스위치 원복
+            toggleEl.checked = true; 
+            updateSocialUI(provider, true);
+        }
+    }
+};
+
+// UI 상태 업데이트
+function updateSocialUI(provider, isLinked) {
+    const toggleEl = document.getElementById(`toggle-${provider}`);
+    const statusEl = document.getElementById(`status-${provider}`);
+    
+    if (toggleEl) toggleEl.checked = isLinked;
+    
+    if (statusEl) {
+        if (isLinked) {
+            statusEl.textContent = "연동 완료";
+            statusEl.classList.add("active");
+        } else {
+            statusEl.textContent = "연동 안됨";
+            statusEl.classList.remove("active");
+        }
+    }
 }

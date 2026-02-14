@@ -178,18 +178,18 @@
    ========================================= 
 */
 .form-row {
-    margin-bottom: 20px; /* [수정] 기존 24px에서 20px로 줄여 섹션 간격을 통일합니다 */
+    margin-bottom: 20px;
 }
 
 .form-row label {
     display: block;
-    margin-bottom: 6px;  /* [수정] 라벨과 입력박스 사이 간격도 살짝 줄여 일체감을 줍니다 */
+    margin-bottom: 6px;
     font-weight: 700;
     font-size: 14px;
 }
 
 .desc {
-    margin-top: 4px;     /* [수정] 설명 문구와의 간격 조정 */
+    margin-top: 4px;
     font-size: 12px;
     color: var(--muted);
 }
@@ -240,7 +240,7 @@
 }
 
 /* =========================================
-   5. 유틸리티 & 이미지 크롭 스타일 (New)
+   5. 유틸리티 & 이미지 크롭 스타일
    ========================================= 
 */
 
@@ -297,7 +297,6 @@
 .hidden { display: none !important; }
 
 /* [크롭 모달] */
-/* 배경: 은은한 반투명 검은색 */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -311,7 +310,6 @@
     align-items: center;
 }
 
-/* 박스: 완전 불투명 */
 .crop-container {
     background: var(--surface);
     padding: 24px;
@@ -324,7 +322,6 @@
     z-index: 10000;
 }
 
-/* 이미지 영역: 검은색 배경 */
 .crop-area {
     height: 400px;
     background-color: #000;
@@ -345,21 +342,16 @@
     gap: 16px;
 }
 
-/* 닉네임 중복 메시지 등 실시간 메시지 영역 간격 조정 */
 #nickCheckMsg {
     font-size: 12px;
     font-weight: 600;
-    margin-top: 4px;     /* [수정] 입력박스 바로 아래 붙도록 조정 */
+    margin-top: 4px;
     min-height: 18px;
     transition: color 0.2s ease;
 }
 
-#nickCheckMsg.success {
-    color: var(--good); /* 초록색 */
-}
-#nickCheckMsg.error {
-    color: var(--bad);  /* 빨간색 */
-}
+#nickCheckMsg.success { color: var(--good); }
+#nickCheckMsg.error { color: var(--bad); }
 
 /* 내가 쓴 글/댓글 리스트 스타일 */
 .my-content-list {
@@ -402,4 +394,159 @@
     padding: 40px 0;
     color: var(--muted);
     font-size: 14px;
+}
+
+/* =========================================
+   6. [New] 계정 연동 (Social Linking) 스타일
+   ========================================= 
+*/
+
+/* 리스트 컨테이너 */
+.social-link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 개별 아이템 박스 */
+.social-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    transition: 0.2s;
+}
+
+.social-item:hover {
+    border-color: var(--primary);
+    background: var(--surface-hover);
+}
+
+/* 좌측 정보 (아이콘 + 텍스트) */
+.social-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* 소셜 아이콘 공통 */
+.social-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* 브랜드별 컬러 */
+.social-icon.google {
+    background-color: #fff;
+    border: 1px solid var(--line);
+    color: #4285F4;
+}
+
+.social-icon.naver {
+    background-color: #03C75A;
+    color: #fff;
+}
+
+.social-icon.kakao {
+    background-color: #FEE500;
+    color: #000;
+}
+
+.social-icon.apple {
+    background-color: #000;
+    color: #fff;
+}
+
+html[data-theme="dark"] .social-icon.apple {
+    background-color: #fff;
+    color: #000;
+}
+
+/* 텍스트 정보 */
+.social-text .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.social-text .status {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.social-text .status.active {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* =========================================
+   7. [New] 토글 스위치 (Toggle Switch)
+   ========================================= 
+*/
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+/* 실제 체크박스는 숨김 */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* 슬라이더 트랙 */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--line); /* 기본: 회색 */
+    transition: .4s;
+    border-radius: 34px;
+}
+
+/* 슬라이더 핸들 (동그라미) */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* 체크 되었을 때 (ON) */
+input:checked + .slider {
+    background-color: var(--primary); /* 활성: 파란색 */
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px); /* 오른쪽으로 이동 */
+}
+
+/* 다크모드 대응 */
+html[data-theme="dark"] .slider {
+    background-color: rgba(255, 255, 255, 0.2);
 }

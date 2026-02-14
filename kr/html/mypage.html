@@ -35,6 +35,8 @@
           <a href="javascript:void(0)" onclick="showMypageSection('edit')" id="menu-edit" class="active">⚙️ 내 정보 수정</a>
           <a href="javascript:void(0)" onclick="showMypageSection('posts')" id="menu-posts">📝 내가 쓴 글</a>
           <a href="javascript:void(0)" onclick="showMypageSection('comments')" id="menu-comments">💬 내가 쓴 댓글</a>
+          <a href="javascript:void(0)" onclick="showMypageSection('social')" id="menu-social">🔗 계정 연동</a>
+          
           <div class="menu-sep"></div>
           <a href="#" onclick="logout()" class="menu-logout">로그아웃</a>
         </nav>
@@ -88,6 +90,74 @@
         <h2 class="section-title">내가 쓴 댓글</h2>
         <div id="myCommentsList" class="my-content-list">
             </div>
+      </section>
+
+      <section id="section-social" class="mypage-content card hidden">
+        <h2 class="section-title">계정 연동 관리</h2>
+        <p class="desc" style="margin-bottom: 30px;">
+            자주 사용하는 소셜 계정을 연동하여 간편하게 로그인할 수 있습니다.<br>
+            연동을 해제하면 해당 계정으로는 더 이상 로그인할 수 없습니다.
+        </p>
+        
+        <div class="social-link-list">
+            
+            <div class="social-item">
+                <div class="social-info">
+                    <div class="social-icon google">G</div>
+                    <div class="social-text">
+                        <div class="name">Google</div>
+                        <div class="status" id="status-google">연동 안됨</div>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-google" onchange="toggleSocial('google')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="social-item">
+                <div class="social-info">
+                    <div class="social-icon naver">N</div>
+                    <div class="social-text">
+                        <div class="name">Naver</div>
+                        <div class="status" id="status-naver">연동 안됨</div>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-naver" onchange="toggleSocial('naver')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="social-item">
+                <div class="social-info">
+                    <div class="social-icon kakao">K</div>
+                    <div class="social-text">
+                        <div class="name">Kakao</div>
+                        <div class="status" id="status-kakao">연동 안됨</div>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-kakao" onchange="toggleSocial('kakao')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="social-item">
+                <div class="social-info">
+                    <div class="social-icon apple">A</div>
+                    <div class="social-text">
+                        <div class="name">Apple</div>
+                        <div class="status" id="status-apple">연동 안됨</div>
+                    </div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="toggle-apple" onchange="toggleSocial('apple')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+        </div>
       </section>
 
     </div>
