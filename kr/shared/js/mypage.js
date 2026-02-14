@@ -70,32 +70,47 @@ function initNicknameRealtimeCheck(currentNick) {
 
     if(!input || !msgBox) return;
 
-    // 입력 이벤트 감지
-    input.addEventListener("input", () => {
+    const runCheck = () => {
         const val = input.value.trim();
         
-        // 1. 내 원래 닉네임과 같으면 메시지 클리어
+        // 1. 현재 내가 사용 중인 닉네임과 동일할 경우
+        // 사용자가 아무것도 안 바꿨거나, 수정한걸 다시 원래대로 돌렸을 때 메시지를 비웁니다.
         if (val === currentNick) {
-            msgBox.textContent = "";
+            msgBox.textContent = ""; 
             return;
         }
 
-        // 2. 길이 체크
+        // 2. 빈 값인 경우
+        if (val === "") {
+            msgBox.textContent = "변경할 닉네임을 입력해주세요.";
+            msgBox.style.color = "var(--muted)";
+            return;
+        }
+
+        // 3. 길이 체크
         if (val.length < 2 || val.length > 10) {
             msgBox.textContent = "닉네임은 2~10자여야 합니다.";
-            msgBox.style.color = "var(--bad)"; // 빨강 (#DC2626)
+            msgBox.style.color = "var(--bad)";
             return;
         }
 
-        // 3. 중복 체크
+        // 4. 중복 체크 (본인 닉네임은 위 1번에서 이미 걸러졌으므로 순수 중복만 체크됨)
         if (checkNicknameDuplicate(val)) {
             msgBox.textContent = "이미 사용 중인 닉네임입니다.";
-            msgBox.style.color = "var(--bad)"; // 빨강
+            msgBox.style.color = "var(--bad)";
         } else {
             msgBox.textContent = "사용 가능한 닉네임입니다.";
-            msgBox.style.color = "var(--good)"; // 초록 (#16A34A)
+            msgBox.style.color = "var(--good)";
         }
-    });
+    };
+
+    // 누르자마자 체크 실행
+    input.addEventListener("focus", runCheck);
+
+    // 입력할 때마다 실시간 업데이트
+    input.addEventListener("input", runCheck);
+    
+    // 포커스가 나가도 문구는 유지됨 (별도의 blur 이벤트 처리 안함)
 }
 
 // =========================================
@@ -252,4 +267,82 @@ function initBioSection(nickName) {
     currentBio = newBio;
     toggleEditMode(false);
   });
+}
+
+/* 섹션 전환 기능 */
+function showMypageSection(type) {
+    // 모든 섹션 숨기기
+    document.querySelectorAll('.mypage-content').forEach(sec => sec.classList.add('hidden'));
+    // 모든 메뉴 활성화 해제
+    document.querySelectorAll('.mypage-menu a').forEach(a => a.classList.remove('active'));
+
+    // 선택한 섹션 보이기
+    document.getElementById(`section-${type}`).classList.remove('hidden');
+    document.getElementById(`menu-${type}`).classList.add('active');
+
+    if (type === 'posts') renderMyPosts();
+    if (type === 'comments') renderMyComments();
+}
+
+/* 내가 쓴 글 렌더링 */
+function renderMyPosts() {
+    const container = document.getElementById("myPostsList");
+    const myNick = localStorage.getItem("user_nick");
+    
+    // MOCK_DB에서 내 글만 필터링
+    const myPosts = MOCK_DB.POSTS.filter(p => p.writer === myNick);
+
+    if (myPosts.length === 0) {
+        container.innerHTML = `<div class="empty-msg">작성한 게시글이 없습니다.</div>`;
+        return;
+    }
+
+    container.innerHTML = myPosts.map(p => `
+        <a href="post.html?id=${p.no}" class="my-item">
+            <span class="my-item-title">${p.title}</span>
+            <div class="my-item-meta">
+                <span>${p.tag}</span>
+                <span>조회 ${p.views}</span>
+                <span>추천 ${p.votes}</span>
+                <span>${window.formatBoardDate ? window.formatBoardDate(p.date) : p.date}</span>
+            </div>
+        </a>
+    `).join("");
+}
+
+/* 내가 쓴 댓글 렌더링 */
+function renderMyComments() {
+    const container = document.getElementById("myCommentsList");
+    const myNick = localStorage.getItem("user_nick");
+    
+    // 모든 게시글의 댓글 목록을 뒤져서 내 댓글 찾기
+    const myComments = [];
+    MOCK_DB.POSTS.forEach(post => {
+        if (post.commentList) {
+            post.commentList.forEach(cmt => {
+                if (cmt.writer === myNick) {
+                    myComments.push({
+                        ...cmt,
+                        postTitle: post.title,
+                        postId: post.no
+                    });
+                }
+            });
+        }
+    });
+
+    if (myComments.length === 0) {
+        container.innerHTML = `<div class="empty-msg">작성한 댓글이 없습니다.</div>`;
+        return;
+    }
+
+    container.innerHTML = myComments.map(c => `
+        <a href="post.html?id=${c.postId}" class="my-item">
+            <span class="my-item-title">${c.content}</span>
+            <div class="my-item-meta">
+                <span style="color:var(--primary)">원문: ${c.postTitle}</span>
+                <span>${window.formatBoardDate ? window.formatBoardDate(c.date) : c.date}</span>
+            </div>
+        </a>
+    `).join("");
 }
