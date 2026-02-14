@@ -550,3 +550,38 @@ input:checked + .slider:before {
 html[data-theme="dark"] .slider {
     background-color: rgba(255, 255, 255, 0.2);
 }
+
+/* =========================================
+   [New] 회원 탈퇴 영역 (Danger Zone)
+   ========================================= 
+*/
+.withdrawal-area {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.withdrawal-desc {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+#btnWithdrawal {
+    font-size: 13px;
+    text-decoration: underline;
+    opacity: 0.8;
+    transition: 0.2s;
+}
+
+#btnWithdrawal:hover {
+    opacity: 1;
+    background-color: #fef2f2; /* 연한 빨강 배경 */
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: -4px -8px; /* 패딩만큼 마진 조정 */
+    text-decoration: none;
+}

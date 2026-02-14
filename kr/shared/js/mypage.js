@@ -33,17 +33,15 @@ function initMyPage() {
   // 3. 기능 초기화
   initBioSection(myNick);
   initImageCropper(myNick);
-  initNicknameRealtimeCheck(myNick); 
-  
-  // [New] 소셜 연동 상태 초기화
+  initNicknameRealtimeCheck(myNick);
   initSocialLinking(); 
+  initWithdrawal(); // [New] 탈퇴 기능 초기화
 
   // 4. 전체 정보 저장 버튼
   document.getElementById("btnSaveMyInfo")?.addEventListener("click", () => {
     const newNick = document.getElementById("myNickInput").value.trim();
     const currentNick = localStorage.getItem("user_nick");
 
-    // 닉네임이 변경된 경우 최종 유효성 검사 후 저장
     if (newNick !== currentNick) {
         if (newNick.length < 2 || newNick.length > 10) {
             alert("닉네임은 2자 이상 10자 이하로 설정해주세요.");
@@ -53,8 +51,6 @@ function initMyPage() {
             alert("이미 사용 중인 닉네임입니다.");
             return;
         }
-        
-        // 데이터 마이그레이션 (기존 글 작성자명 변경)
         updateUserContentNickname(currentNick, newNick);
         localStorage.setItem("user_nick", newNick);
     }
@@ -65,34 +61,59 @@ function initMyPage() {
 }
 
 // =========================================
-// [New] 실시간 닉네임 검사 로직
+// [New] 회원 탈퇴 로직
 // =========================================
+function initWithdrawal() {
+    const btn = document.getElementById("btnWithdrawal");
+    if(!btn) return;
+
+    btn.addEventListener("click", () => {
+        // 1차 확인
+        if(!confirm("정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며 복구할 수 없습니다.")) {
+            return;
+        }
+        
+        // 2차 확인 (안전장치)
+        if(!confirm("작성하신 게시글과 댓글은 자동으로 삭제되지 않습니다.\n정말 탈퇴하시겠습니까?")) {
+            return;
+        }
+
+        // 데이터 삭제
+        localStorage.removeItem("is_logged_in");
+        localStorage.removeItem("user_nick");
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("user_bio");
+        localStorage.removeItem("user_img");
+        
+        // 연동 정보 삭제
+        ['google', 'naver', 'kakao', 'apple'].forEach(p => localStorage.removeItem(`social_link_${p}`));
+
+        alert("정상적으로 탈퇴되었습니다.\n이용해 주셔서 감사합니다.");
+        location.replace("home.html");
+    });
+}
+
+// ... [이하 기존 코드: initNicknameRealtimeCheck, checkNicknameDuplicate, updateUserContentNickname, initImageCropper, initBioSection 등 유지] ...
+
+// [기존 코드] 실시간 닉네임 체크
 function initNicknameRealtimeCheck(currentNick) {
     const input = document.getElementById("myNickInput");
     const msgBox = document.getElementById("nickCheckMsg");
-
     if(!input || !msgBox) return;
 
     const runCheck = () => {
         const val = input.value.trim();
-        
-        if (val === currentNick) {
-            msgBox.textContent = ""; 
-            return;
-        }
-
+        if (val === currentNick) { msgBox.textContent = ""; return; }
         if (val === "") {
             msgBox.textContent = "변경할 닉네임을 입력해주세요.";
             msgBox.style.color = "var(--muted)";
             return;
         }
-
         if (val.length < 2 || val.length > 10) {
             msgBox.textContent = "닉네임은 2~10자여야 합니다.";
             msgBox.style.color = "var(--bad)";
             return;
         }
-
         if (checkNicknameDuplicate(val)) {
             msgBox.textContent = "이미 사용 중인 닉네임입니다.";
             msgBox.style.color = "var(--bad)";
@@ -101,58 +122,33 @@ function initNicknameRealtimeCheck(currentNick) {
             msgBox.style.color = "var(--good)";
         }
     };
-
     input.addEventListener("focus", runCheck);
     input.addEventListener("input", runCheck);
 }
 
-// =========================================
-// 기능: 닉네임 중복 체크 (Mock DB)
-// =========================================
 function checkNicknameDuplicate(targetNick) {
     if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
-
     const allWriters = new Set(MOCK_DB.POSTS.map(p => p.writer));
-    
     MOCK_DB.POSTS.forEach(p => {
-        if(p.commentList) {
-            p.commentList.forEach(c => allWriters.add(c.writer));
-        }
+        if(p.commentList) p.commentList.forEach(c => allWriters.add(c.writer));
     });
-
     return allWriters.has(targetNick);
 }
 
-// =========================================
-// 기능: 기존 글/댓글 작성자명 업데이트
-// =========================================
 function updateUserContentNickname(oldNick, newNick) {
     if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return;
-
     let updateCount = 0;
     MOCK_DB.POSTS.forEach(post => {
-        if (post.writer === oldNick) {
-            post.writer = newNick;
-            updateCount++;
-        }
+        if (post.writer === oldNick) { post.writer = newNick; updateCount++; }
         if (post.commentList) {
             post.commentList.forEach(comment => {
-                if (comment.writer === oldNick) {
-                    comment.writer = newNick;
-                    updateCount++;
-                }
+                if (comment.writer === oldNick) { comment.writer = newNick; updateCount++; }
             });
         }
     });
-
-    if (updateCount > 0) {
-        localStorage.setItem("MOCK_POSTS_V3", JSON.stringify(MOCK_DB.POSTS));
-    }
+    if (updateCount > 0) localStorage.setItem("MOCK_POSTS_V3", JSON.stringify(MOCK_DB.POSTS));
 }
 
-// =========================================
-// 기능: 이미지 크롭 & 업로드
-// =========================================
 function initImageCropper(myNick) {
   const fileInput = document.getElementById("profileUpload");
   const modal = document.getElementById("cropModal");
@@ -169,11 +165,7 @@ function initImageCropper(myNick) {
         imageToCrop.src = ev.target.result;
         modal.classList.remove("hidden");
         if (cropper) cropper.destroy();
-        cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 0.8,
-        });
+        cropper = new Cropper(imageToCrop, { aspectRatio: 1, viewMode: 1, autoCropArea: 0.8 });
       };
       reader.readAsDataURL(file);
     }
@@ -189,7 +181,6 @@ function initImageCropper(myNick) {
     if (!cropper) return;
     const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
     const croppedBase64 = canvas.toDataURL("image/png");
-
     uploadProfileImage(croppedBase64).then(() => {
       profileImgDisplay.src = croppedBase64;
       modal.classList.add("hidden");
@@ -205,9 +196,6 @@ function uploadProfileImage(base64Data) {
   });
 }
 
-// =========================================
-// 기능: 자기소개글 관리
-// =========================================
 function initBioSection(nickName) {
   const bioInput = document.getElementById("myBioInput");
   const btnEdit = document.getElementById("btnEditBio");
@@ -244,52 +232,40 @@ function initBioSection(nickName) {
     bioInput.dataset.original = bioInput.value;
     toggleEditMode(true);
   });
-
   btnCancel.addEventListener("click", () => {
     bioInput.value = bioInput.dataset.original;
     toggleEditMode(false);
   });
-
   btnSave.addEventListener("click", () => {
     const newBio = bioInput.value.trim();
     if (!newBio) { alert("자기소개글을 입력해주세요."); return; }
-    
     localStorage.setItem("user_bio", newBio);
     currentBio = newBio;
     toggleEditMode(false);
   });
 }
 
-/* 섹션 전환 기능 */
 function showMypageSection(type) {
-    // 모든 섹션 숨기기
     document.querySelectorAll('.mypage-content').forEach(sec => sec.classList.add('hidden'));
-    // 모든 메뉴 활성화 해제
     document.querySelectorAll('.mypage-menu a').forEach(a => a.classList.remove('active'));
 
-    // 선택한 섹션 보이기
     document.getElementById(`section-${type}`).classList.remove('hidden');
     document.getElementById(`menu-${type}`).classList.add('active');
 
     if (type === 'posts') renderMyPosts();
     if (type === 'comments') renderMyComments();
-    
-    // [New] 소셜 탭일 경우 상태 재확인
     if (type === 'social') initSocialLinking();
 }
 
-/* 내가 쓴 글 렌더링 */
 function renderMyPosts() {
     const container = document.getElementById("myPostsList");
     const myNick = localStorage.getItem("user_nick");
-    
     const myPosts = MOCK_DB.POSTS.filter(p => p.writer === myNick);
 
     if (myPosts.length === 0) {
         container.innerHTML = `<div class="empty-msg">작성한 게시글이 없습니다.</div>`;
         return;
     }
-
     container.innerHTML = myPosts.map(p => `
         <a href="post.html?id=${p.no}" class="my-item">
             <span class="my-item-title">${p.title}</span>
@@ -303,21 +279,15 @@ function renderMyPosts() {
     `).join("");
 }
 
-/* 내가 쓴 댓글 렌더링 */
 function renderMyComments() {
     const container = document.getElementById("myCommentsList");
     const myNick = localStorage.getItem("user_nick");
-    
     const myComments = [];
     MOCK_DB.POSTS.forEach(post => {
         if (post.commentList) {
             post.commentList.forEach(cmt => {
                 if (cmt.writer === myNick) {
-                    myComments.push({
-                        ...cmt,
-                        postTitle: post.title,
-                        postId: post.no
-                    });
+                    myComments.push({ ...cmt, postTitle: post.title, postId: post.no });
                 }
             });
         }
@@ -327,7 +297,6 @@ function renderMyComments() {
         container.innerHTML = `<div class="empty-msg">작성한 댓글이 없습니다.</div>`;
         return;
     }
-
     container.innerHTML = myComments.map(c => `
         <a href="post.html?id=${c.postId}" class="my-item">
             <span class="my-item-title">${c.content}</span>
@@ -339,49 +308,35 @@ function renderMyComments() {
     `).join("");
 }
 
-// =========================================
-// [New] 계정 연동 기능 (Social Linking)
-// =========================================
 function initSocialLinking() {
     const providers = ['google', 'naver', 'kakao', 'apple'];
-
     providers.forEach(provider => {
-        // Mock DB: 로컬스토리지에서 연동 여부 확인
         const isLinked = localStorage.getItem(`social_link_${provider}`) === 'true';
         updateSocialUI(provider, isLinked);
     });
 }
 
-// 토글 버튼 핸들러
 window.toggleSocial = function(provider) {
     const toggleEl = document.getElementById(`toggle-${provider}`);
     const isChecked = toggleEl.checked;
-    
     updateSocialUI(provider, isChecked);
 
-    // 실제 연동 로직이 들어갈 곳 (API 호출 등)
     if (isChecked) {
-        // 연동 ON
         localStorage.setItem(`social_link_${provider}`, 'true');
     } else {
-        // 연동 OFF (확인 절차)
         if(confirm(`${provider} 연동을 해제하시겠습니까?`)) {
             localStorage.setItem(`social_link_${provider}`, 'false');
         } else {
-            // 취소 시 스위치 원복
             toggleEl.checked = true; 
             updateSocialUI(provider, true);
         }
     }
 };
 
-// UI 상태 업데이트
 function updateSocialUI(provider, isLinked) {
     const toggleEl = document.getElementById(`toggle-${provider}`);
     const statusEl = document.getElementById(`status-${provider}`);
-    
     if (toggleEl) toggleEl.checked = isLinked;
-    
     if (statusEl) {
         if (isLinked) {
             statusEl.textContent = "연동 완료";
