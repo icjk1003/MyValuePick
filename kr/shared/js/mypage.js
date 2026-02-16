@@ -3,6 +3,12 @@
 let cropper = null;
 let currentMsgTab = 'inbox'; 
 
+// [New] 페이징 및 검색 상태 관리 변수
+let msgCurrentPage = 1;
+const msgItemsPerPage = 10;
+let msgSearchKeyword = "";
+let msgSearchType = "all"; // all, sender, content
+
 document.addEventListener("DOMContentLoaded", () => {
     const isLogged = localStorage.getItem("is_logged_in");
     if (!isLogged) {
@@ -125,7 +131,6 @@ window.showMypageSection = function(type, updateHistory = true) {
     if (type === 'social') initSocialLinking();
     if (type === 'messages') {
         renderMessageList();
-        // 쪽지함 진입 시 애니메이션 효과
         triggerAnimation('msgListArea');
     }
 
@@ -134,28 +139,25 @@ window.showMypageSection = function(type, updateHistory = true) {
         const url = new URL(window.location);
         url.searchParams.set('section', type);
         
-        // 다른 섹션 이동 시 쪽지함 관련 파라미터 정리
         if (type !== 'messages') {
             url.searchParams.delete('tab');
             url.searchParams.delete('id');
         } else {
-            // 쪽지함 초기 진입 시 탭 정보 등 초기화 (필요 시)
             url.searchParams.delete('tab');
             url.searchParams.delete('id');
         }
-        
         window.history.pushState({}, '', url);
     }
 };
 
 // =========================================
-// [기능] 애니메이션 헬퍼 (강제 리플로우)
+// [기능] 애니메이션 헬퍼
 // =========================================
 function triggerAnimation(elementId) {
     const el = document.getElementById(elementId);
     if (el) {
         el.classList.remove('anim-fade');
-        void el.offsetWidth; // 브라우저가 변경사항을 인지하도록 강제 리플로우(Reflow) 발생
+        void el.offsetWidth; // Force Reflow
         el.classList.add('anim-fade');
     }
 }
@@ -182,13 +184,17 @@ function initMessageBox() {
 // 탭 전환
 window.switchMsgTab = function(tabName, updateHistory = true) {
     currentMsgTab = tabName;
+    
+    // [New] 탭 전환 시 검색/페이징 초기화
+    msgCurrentPage = 1;
+    msgSearchKeyword = "";
+    const searchInput = document.getElementById('msgSearchKeyword');
+    if(searchInput) searchInput.value = "";
 
     // 1. 탭 버튼 스타일 업데이트
     document.querySelectorAll('.msg-tab-btn').forEach(btn => btn.classList.remove('active'));
-    
     if (tabName !== 'write') {
         const btns = document.querySelectorAll('.msg-tab-btn');
-        // 순서: 0:받은, 1:보낸, 2:보관 (HTML 순서 의존)
         const tabMap = { 'inbox': 0, 'sent': 1, 'archive': 2 };
         if (btns[tabMap[tabName]]) btns[tabMap[tabName]].classList.add('active');
     }
@@ -204,15 +210,14 @@ window.switchMsgTab = function(tabName, updateHistory = true) {
 
     if (tabName === 'write') {
         writeArea.classList.remove('hidden');
-        triggerAnimation('msgWriteArea'); // 쓰기 영역 애니메이션
+        triggerAnimation('msgWriteArea');
         
-        // 입력창 초기화
         document.getElementById('msgReceiver').value = '';
         document.getElementById('msgContent').value = '';
     } else {
         listArea.classList.remove('hidden');
-        renderMessageList();
-        triggerAnimation('msgListArea'); // 리스트 영역 애니메이션 (탭 전환 시마다 발동)
+        renderMessageList(); // 여기서 초기화된 페이지/검색어로 렌더링
+        triggerAnimation('msgListArea');
     }
 
     // 3. URL 업데이트
@@ -220,15 +225,34 @@ window.switchMsgTab = function(tabName, updateHistory = true) {
         const url = new URL(window.location);
         url.searchParams.set('section', 'messages');
         url.searchParams.set('tab', tabName);
-        url.searchParams.delete('id'); // 탭 전환 시 보고 있던 쪽지 해제
+        url.searchParams.delete('id');
         window.history.replaceState({}, '', url);
     }
 };
 
-// 목록 렌더링
+// [New] 검색 기능 실행
+window.searchMessages = function() {
+    const input = document.getElementById('msgSearchKeyword');
+    const typeSelect = document.getElementById('msgSearchType');
+    
+    if (input) msgSearchKeyword = input.value.trim();
+    if (typeSelect) msgSearchType = typeSelect.value;
+    
+    msgCurrentPage = 1; // 검색 시 1페이지부터 다시 시작
+    renderMessageList();
+};
+
+// [New] 페이징 이동
+window.changeMsgPage = function(page) {
+    msgCurrentPage = page;
+    renderMessageList();
+};
+
+// 목록 렌더링 (검색 + 페이징 적용)
 function renderMessageList() {
     const tbody = document.getElementById('msgListBody');
     const emptyMsg = document.getElementById('msgEmpty');
+    const pagination = document.getElementById('msgPagination');
     const checkAll = document.getElementById('checkAllMsg');
     
     if (checkAll) checkAll.checked = false; 
@@ -238,7 +262,7 @@ function renderMessageList() {
     const myNick = localStorage.getItem("user_nick");
     let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
 
-    // 필터링
+    // 1. 탭 필터링
     let filtered = [];
     if (currentMsgTab === 'inbox') {
         filtered = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick);
@@ -248,17 +272,44 @@ function renderMessageList() {
         filtered = msgs.filter(m => m.box === 'archive' && (m.receiver === myNick || m.sender === myNick));
     }
 
+    // 2. [New] 검색 필터링
+    if (msgSearchKeyword) {
+        filtered = filtered.filter(m => {
+            const sender = (m.sender || "").toLowerCase();
+            const content = (m.content || "").toLowerCase();
+            const keyword = msgSearchKeyword.toLowerCase();
+            
+            if (msgSearchType === 'sender') return sender.includes(keyword);
+            if (msgSearchType === 'content') return content.includes(keyword);
+            return sender.includes(keyword) || content.includes(keyword); // 'all'
+        });
+    }
+
+    // 3. 정렬 (최신순)
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+    // 데이터 없음 처리
     if (filtered.length === 0) {
         tbody.innerHTML = "";
         if (emptyMsg) emptyMsg.classList.remove('hidden');
+        if (pagination) pagination.innerHTML = "";
         return;
     }
-
     if (emptyMsg) emptyMsg.classList.add('hidden');
 
-    tbody.innerHTML = filtered.map(m => `
+    // 4. [New] 페이징 계산
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / msgItemsPerPage);
+    
+    if (msgCurrentPage > totalPages) msgCurrentPage = totalPages;
+    if (msgCurrentPage < 1) msgCurrentPage = 1;
+
+    const startIndex = (msgCurrentPage - 1) * msgItemsPerPage;
+    const endIndex = startIndex + msgItemsPerPage;
+    const pageItems = filtered.slice(startIndex, endIndex);
+
+    // 5. 테이블 렌더링
+    tbody.innerHTML = pageItems.map(m => `
         <tr class="msg-row ${(!m.read && currentMsgTab === 'inbox') ? 'unread' : ''}" onclick="openMessage('${m.id}')">
             <td onclick="event.stopPropagation()" class="check-col">
                 <input type="checkbox" name="msgCheck" value="${m.id}">
@@ -270,6 +321,34 @@ function renderMessageList() {
             <td>${new Date(m.date).toLocaleDateString()}</td>
         </tr>
     `).join("");
+
+    // 6. [New] 페이지네이션 버튼 렌더링
+    renderPagination(totalPages);
+}
+
+// 페이지네이션 UI 생성 함수
+function renderPagination(totalPages) {
+    const pagination = document.getElementById('msgPagination');
+    if (!pagination) return;
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = "";
+        return;
+    }
+
+    let html = "";
+    // 이전 버튼
+    html += `<button class="page-btn" onclick="changeMsgPage(${msgCurrentPage - 1})" ${msgCurrentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
+
+    // 페이지 번호 (간단히 전체 표시, 복잡하면 범위 제한 로직 추가 필요)
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="page-btn ${i === msgCurrentPage ? 'active' : ''}" onclick="changeMsgPage(${i})">${i}</button>`;
+    }
+
+    // 다음 버튼
+    html += `<button class="page-btn" onclick="changeMsgPage(${msgCurrentPage + 1})" ${msgCurrentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
+
+    pagination.innerHTML = html;
 }
 
 // 쪽지 읽기
@@ -279,7 +358,6 @@ window.openMessage = function(msgId, updateHistory = true) {
 
     if (!msg) {
         alert("삭제되거나 없는 쪽지입니다.");
-        // URL 정리
         const url = new URL(window.location);
         if (url.searchParams.get('id') == msgId) {
             url.searchParams.delete('id');
@@ -288,28 +366,23 @@ window.openMessage = function(msgId, updateHistory = true) {
         return;
     }
 
-    // 읽음 처리
     if (msg.box === 'inbox' && !msg.read) {
         msg.read = true;
         localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
         updateMsgBadge();
     }
 
-    // 화면 전환
     document.getElementById('msgListArea').classList.add('hidden');
     document.getElementById('msgWriteArea').classList.add('hidden');
     document.getElementById('msgViewArea').classList.remove('hidden');
 
-    // 애니메이션 실행
     triggerAnimation('msgViewArea');
 
-    // 내용 채우기
     document.getElementById('viewSender').textContent = 
         currentMsgTab === 'sent' ? `받는사람: ${msg.receiver}` : `보낸사람: ${msg.sender}`;
     document.getElementById('viewDate').textContent = new Date(msg.date).toLocaleString();
     document.getElementById('viewBody').textContent = msg.content;
 
-    // 버튼 제어
     const btnReply = document.getElementById('btnMsgReply');
     const btnDel = document.getElementById('btnMsgDelete');
     const btnArch = document.getElementById('btnMsgArchive');
@@ -319,7 +392,7 @@ window.openMessage = function(msgId, updateHistory = true) {
             switchMsgTab('write');
             document.getElementById('msgReceiver').value = msg.sender;
         };
-        btnReply.style.display = (currentMsgTab === 'sent') ? 'none' : 'flex'; // flex or inline-flex (CSS .btn-action display와 일치)
+        btnReply.style.display = (currentMsgTab === 'sent') ? 'none' : 'flex';
     }
     if (btnDel) {
         btnDel.onclick = () => {
@@ -331,7 +404,6 @@ window.openMessage = function(msgId, updateHistory = true) {
         btnArch.style.display = (msg.box === 'archive') ? 'none' : 'flex';
     }
 
-    // URL 업데이트
     if (updateHistory) {
         const url = new URL(window.location);
         url.searchParams.set('id', msgId);
@@ -343,8 +415,9 @@ window.backToMsgList = function() {
     document.getElementById('msgViewArea').classList.add('hidden');
     document.getElementById('msgListArea').classList.remove('hidden');
     
+    // 목록으로 돌아올 때 현재 상태(페이지, 검색어) 유지하며 렌더링
     renderMessageList();
-    triggerAnimation('msgListArea'); // 목록으로 돌아올 때도 애니메이션
+    triggerAnimation('msgListArea');
 
     const url = new URL(window.location);
     url.searchParams.delete('id');

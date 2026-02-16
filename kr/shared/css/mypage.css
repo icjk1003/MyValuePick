@@ -625,107 +625,114 @@ html[data-theme="dark"] .slider {
 }
 
 /* =========================================
-   8. 쪽지함 (Message Box) 스타일 - 통합본
+   8. 쪽지함 (Message Box) 스타일 - 최종
    ========================================= 
 */
-
-/* 1. 상단 탭 영역 */
-.msg-tabs {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
-    border-bottom: 1px solid var(--line); padding-bottom: 12px;
-}
-.msg-tab-btn {
-    padding: 8px 16px; background: transparent; border: none; border-radius: 8px;
-    font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s ease;
-}
+/* ... (탭 스타일 등 기존 유지) ... */
+.msg-tabs { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+.msg-tab-btn { padding: 8px 16px; background: transparent; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: 0.2s; }
 .msg-tab-btn:hover { background: var(--surface-hover); color: var(--text); }
 .msg-tab-btn.active { background: var(--surface-hover); color: var(--primary); font-weight: 700; }
-
-/* 쪽지 쓰기 버튼 강조 */
-.msg-tab-btn.write-mode {
-    margin-left: auto; background: var(--primary); color: white !important;
-    padding: 8px 20px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); display: flex; align-items: center; gap: 6px;
-}
+.msg-tab-btn.write-mode { margin-left: auto; background: var(--primary); color: white !important; padding: 8px 20px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); display: flex; align-items: center; gap: 6px; }
 .msg-tab-btn.write-mode:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-/* 2. 관리 툴바 & 버튼 */
-.msg-toolbar { margin-bottom: 16px; display: flex; justify-content: flex-end; }
-.btn-group { display: flex; gap: 8px; }
-
-.btn-action {
-    display: flex; align-items: center; gap: 6px; padding: 8px 14px;
-    font-size: 13px; font-weight: 600; color: var(--text); background: var(--surface);
-    border: 1px solid var(--line); border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+/* [New] 검색바 & 툴바 레이아웃 */
+.msg-toolbar-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
-.btn-action:hover { background: var(--surface-hover); transform: translateY(-1px); border-color: var(--muted); }
 
-/* 삭제 버튼 스타일 */
-.btn-action.delete { color: var(--bad); border-color: rgba(220, 38, 38, 0.3); background: var(--surface); }
+.msg-search-group {
+    display: flex;
+    gap: 6px;
+}
+
+.search-select, .search-input {
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--text);
+}
+.search-input { width: 180px; }
+
+/* 버튼 그룹 */
+.btn-group { display: flex; gap: 6px; }
+.btn-action { display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.btn-action:hover { background: var(--surface-hover); transform: translateY(-1px); border-color: var(--muted); }
+.btn-action.delete { color: var(--bad); border-color: rgba(220, 38, 38, 0.3); }
 .btn-action.delete:hover { background: rgba(220, 38, 38, 0.05); border-color: var(--bad); }
 
-/* 3. 테이블 스타일 */
-.msg-table {
-    width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px;
-    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
-}
-.msg-table th {
-    background: var(--surface-hover); padding: 14px 10px; color: var(--muted);
-    font-weight: 700; text-align: center; border-bottom: 1px solid var(--line);
-}
-.msg-table td {
-    padding: 16px 10px; border-bottom: 1px solid var(--line);
-    text-align: center; color: var(--text); background: var(--surface);
-}
+/* 테이블 (기존 동일) */
+.msg-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.msg-table th { background: var(--surface-hover); padding: 14px 10px; color: var(--muted); font-weight: 700; text-align: center; border-bottom: 1px solid var(--line); }
+.msg-table td { padding: 16px 10px; border-bottom: 1px solid var(--line); text-align: center; color: var(--text); background: var(--surface); }
 .msg-table tr:last-child td { border-bottom: none; }
 .msg-table .check-col { width: 50px; }
 .msg-table .td-content { text-align: left; }
-
-.msg-content-preview {
-    max-width: 460px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); padding: 0 8px;
-}
-.msg-row.unread td { background-color: #f0f7ff; font-weight: 600; }
-.msg-row.unread .msg-content-preview { color: var(--primary); }
+.msg-content-preview { max-width: 460px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; }
 .msg-row:hover td { background-color: var(--surface-hover); cursor: pointer; }
+.msg-row.unread td { background-color: #f0f7ff; font-weight: 600; }
 
-/* 4. [New] 쪽지 읽기 화면 스타일 (이전 누락분 복구) */
-.msg-view-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px dashed var(--line);
+/* [New] 페이징 컨트롤 스타일 */
+.pagination-area {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 24px;
 }
-.msg-view-utils { display: flex; gap: 8px; }
-
-.msg-meta {
-    display: flex; justify-content: space-between; margin-bottom: 20px;
-    font-size: 14px; color: var(--muted); font-weight: 500;
+.page-btn {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: 0.2s;
 }
-.msg-body {
-    min-height: 300px; line-height: 1.7; white-space: pre-wrap;
-    background: var(--surface-hover); padding: 24px; border-radius: 12px;
-    color: var(--text); font-size: 15px; border: 1px solid var(--line);
-}
+.page-btn:hover { background: var(--surface-hover); color: var(--text); }
+.page-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 700; }
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* 5. [New] 쪽지 쓰기 화면 스타일 (이전 누락분 복구) */
-.msg-write-wrap { animation: fadeIn 0.2s ease-out; }
-
-
-/* [요청 3 해결] 취소 버튼 스타일 (보내기 버튼과 크기 통일, 색상은 회색) */
-.btn-cancel {
-    padding: 12px 24px;
-    background: var(--surface);       /* 배경: 흰색/어두운배경 */
-    border: 1px solid var(--line);    /* 테두리: 얇은 회색 */
+/* [New] '목록으로' 버튼 스타일 */
+.btn-back-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 8px;
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--text);               /* 글자: 기본 검정/흰색 */
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
     transition: 0.2s;
 }
-
-.btn-cancel:hover {
-    background: var(--surface-hover); /* 호버 시 약간 어두워짐 */
+.btn-back-list:hover {
+    background-color: var(--surface-hover);
     border-color: var(--muted);
 }
 
-.anim-fade {
-    animation: fadeIn 0.3s ease-out;
-}
+/* 읽기 화면 헤더 */
+.msg-view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px dashed var(--line); }
+.msg-view-utils { display: flex; gap: 8px; }
+.msg-body { min-height: 300px; line-height: 1.7; white-space: pre-wrap; background: var(--surface-hover); padding: 24px; border-radius: 12px; border: 1px solid var(--line); }
+
+/* 애니메이션 */
+.anim-fade { animation: fadeIn 0.3s ease-out; }
+.msg-table tbody tr { animation: fadeIn 0.3s ease-out; }
+
+/* 취소 버튼 */
+.btn-cancel { padding: 12px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-weight: 700; font-size: 15px; color: var(--text); cursor: pointer; transition: 0.2s; }
+.btn-cancel:hover { background: var(--surface-hover); border-color: var(--muted); }
