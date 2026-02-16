@@ -172,6 +172,7 @@
 .mypage-content {
     flex: 1;
     padding: 40px;
+    min-height: 600px; /* 최소 높이 확보 */
 }
 
 .section-title {
@@ -624,122 +625,105 @@ html[data-theme="dark"] .slider {
 }
 
 /* =========================================
-   8. 쪽지함 (Message Box) 스타일
+   8. [New] 쪽지함 (Message Box) 스타일
    ========================================= 
 */
-/* 메뉴 배지 */
-.menu-badge {
-    background: var(--bad);
-    color: white;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 6px;
-    vertical-align: middle;
-}
-
-/* 상단 탭 */
+/* 탭 영역 */
 .msg-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 10px;
+    display: flex; gap: 8px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--line); padding-bottom: 10px;
 }
-
 .msg-tab-btn {
-    padding: 8px 16px;
-    background: none;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--muted);
-    cursor: pointer;
-    transition: 0.2s;
+    padding: 8px 16px; background: none; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: 0.2s;
 }
-
 .msg-tab-btn:hover { background: var(--surface-hover); color: var(--text); }
 .msg-tab-btn.active { background: var(--primary-bg); color: var(--primary); }
 .msg-tab-btn.write-mode { margin-left: auto; background: var(--text); color: var(--surface); }
-.msg-tab-btn.write-mode:hover { opacity: 0.9; }
 
-/* 쪽지 목록 테이블 */
+/* [New] 툴바 영역 */
+.msg-toolbar {
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+.btn-group {
+    display: flex; gap: 6px;
+}
+
+/* 테이블 스타일 */
 .msg-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+    width: 100%; border-collapse: collapse; font-size: 14px;
+    table-layout: fixed; /* 셀 너비 고정 */
 }
 
 .msg-table th {
+    /* 헤더 색상 */
     background: var(--surface-hover);
-    padding: 10px;
+    padding: 12px 10px;
     color: var(--muted);
     font-weight: 600;
     text-align: center;
+    border-bottom: 2px solid var(--line); /* 구분선 강조 */
 }
 
 .msg-table td {
-    padding: 12px 10px;
+    padding: 14px 10px;
     border-bottom: 1px solid var(--line);
     text-align: center;
     color: var(--text);
+    vertical-align: middle;
 }
 
-/* 읽지 않은 쪽지 강조 */
+.msg-table .check-col { width: 40px; }
+.msg-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; vertical-align: middle; }
+
+/* [요청 3 해결] Row 호버 시 색상 구분 */
+.msg-row { transition: background-color 0.1s; }
+.msg-row:hover {
+    /* 헤더(--surface-hover)와 명확히 다른 색상 */
+    background-color: #f1f5f9; /* Light mode tint */
+    cursor: pointer;
+}
+html[data-theme="dark"] .msg-row:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 읽지 않은 쪽지 */
 .msg-row.unread td {
     font-weight: 700;
-    background-color: rgba(37, 99, 235, 0.03);
+    color: var(--primary);
 }
 
-.msg-row:hover { background-color: var(--surface-hover); cursor: pointer; }
-
-/* 내용 셀 (말줄임) */
+/* 내용 말줄임 */
 .msg-content-preview {
     text-align: left;
-    max-width: 300px;
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin: 0 auto;
+    padding-left: 8px;
+}
+
+.badge-sent {
+    font-size: 10px; background: var(--line); padding: 2px 4px; border-radius: 4px; color: var(--muted);
 }
 
 /* 쪽지 읽기 화면 */
 .msg-view-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed var(--line);
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dashed var(--line);
 }
-
-.msg-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: var(--muted);
-}
-
 .msg-body {
-    min-height: 200px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    background: var(--bg);
-    padding: 20px;
-    border-radius: 8px;
+    min-height: 200px; line-height: 1.6; white-space: pre-wrap;
+    background: var(--bg); padding: 20px; border-radius: 8px;
 }
 
-/* 관리 버튼 */
+/* 버튼 유틸 */
 .btn-small {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 4px;
-    border: 1px solid var(--line);
-    background: var(--surface);
-    cursor: pointer;
+    padding: 6px 12px; font-size: 12px; border-radius: 6px;
+    border: 1px solid var(--line); background: var(--surface); cursor: pointer;
 }
 .btn-small:hover { background: var(--surface-hover); }
-.btn-small.btn-bad { color: var(--bad); border-color: var(--bad); }
+.btn-small.btn-bad { color: var(--bad); border-color: rgba(220,38,38,0.3); }
 .btn-small.btn-bad:hover { background: #fef2f2; }
