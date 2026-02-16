@@ -572,3 +572,193 @@ main,
     justify-content: flex-end;
     opacity: 0.7;
 }
+
+/* =========================================
+   9. [New] 알림 센터 (수정됨)
+   ========================================= */
+
+/* 알림 버튼 래퍼 */
+.noti-btn-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background 0.2s;
+    margin-right: 12px;
+}
+
+.noti-btn-wrap:hover,
+.noti-btn-wrap.active {
+    background-color: var(--surface-hover);
+}
+
+.noti-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--muted);
+}
+
+/* 읽지 않은 알림 배지 */
+.noti-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--bad);
+    border-radius: 50%;
+    border: 1px solid var(--header-bg);
+}
+
+/* [중요] 드롭다운 컨테이너 (위치 및 배경 수정) */
+.noti-dropdown {
+    position: absolute;
+    top: 50px;
+    /* 1. 위치 수정: 왼쪽 쏠림 방지를 위해 right 값을 마이너스로 주어 오른쪽으로 이동 */
+    right: -130px; 
+    width: 320px;
+    
+    /* 2. 배경 투명 문제 해결: 테마별 불투명 배경색 지정 */
+    background-color: #ffffff; 
+    
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10005;
+    display: none;
+    flex-direction: column;
+    overflow: hidden; /* 내부 코너 둥글기 유지 */
+}
+
+/* 다크모드 대응: 배경색을 짙은 회색(불투명)으로 설정 */
+:root[data-theme="dark"] .noti-dropdown {
+    background-color: #1e293b; 
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.noti-dropdown.show {
+    display: flex;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* 드롭다운 헤더 */
+.noti-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: inherit; /* 부모 배경색 상속 */
+}
+
+.noti-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.noti-read-all {
+    font-size: 11px;
+    color: var(--primary);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+/* [중요] 알림 리스트 영역 (스크롤 체이닝 방지) */
+.noti-list {
+    max-height: 320px; /* 높이 제한 */
+    overflow-y: auto;  /* 내부 스크롤 활성화 */
+    overscroll-behavior: contain; /* 스크롤 체이닝 방지 */
+
+    /* --- 스크롤바 스타일링 시작 --- */
+
+    /* Firefox 전용 */
+    scrollbar-width: thin; /* 얇게 */
+    scrollbar-color: #ccc transparent; /* [Thumb색상] [Track색상] */
+}
+
+/* 다크모드 Firefox 스크롤바 색상 변경 */
+:root[data-theme="dark"] .noti-list {
+    scrollbar-color: #555 transparent;
+}
+
+/* Webkit 브라우저 (Chrome, Edge, Safari) 전용 */
+.noti-list::-webkit-scrollbar {
+    width: 6px; /* 스크롤바 너비 얇게 설정 */
+}
+
+.noti-list::-webkit-scrollbar-track {
+    background: transparent; /* 스크롤바 뒷배경 투명하게 */
+}
+
+.noti-list::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* 스크롤바 막대 색상 (라이트 모드: 연한 회색) */
+    border-radius: 3px; /* 둥글게 */
+}
+
+/* 다크모드 Webkit 스크롤바 막대 색상 변경 */
+:root[data-theme="dark"] .noti-list::-webkit-scrollbar-thumb {
+    background-color: #555; /* 스크롤바 막대 색상 (다크 모드: 어두운 회색) */
+}
+
+/* (선택사항) 스크롤바 호버 효과 */
+.noti-list::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+}
+:root[data-theme="dark"] .noti-list::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+/* 개별 알림 아이템 */
+.noti-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: flex-start;
+}
+
+.noti-item:last-child {
+    border-bottom: none;
+}
+
+.noti-item:hover {
+    background-color: var(--surface-hover);
+}
+
+/* 읽지 않은 알림 강조 */
+.noti-item.unread {
+    background-color: var(--primary-bg);
+}
+
+/* 텍스트 스타일 */
+.noti-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.noti-msg {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+}
+
+.noti-time {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.noti-empty {
+    padding: 40px 0;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+}

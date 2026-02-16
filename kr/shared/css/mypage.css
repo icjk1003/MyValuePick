@@ -1,4 +1,4 @@
-/* shared/css/mypage.css */
+@charset "utf-8";
 
 /* =========================================
    1. 레이아웃 & 컨테이너
@@ -353,23 +353,14 @@
 }
 
 /* 2. 상태별 색상 (닉네임 로직과 동일) */
-/* 성공 (일치/사용가능): 초록색 */
 #nickCheckMsg.success,
-#pwCheckMsg.success {
-    color: var(--good); 
-}
+#pwCheckMsg.success { color: var(--good); }
 
-/* 에러 (불일치/중복/입력미비): 빨간색 */
 #nickCheckMsg.error,
-#pwCheckMsg.error {
-    color: var(--bad);
-}
+#pwCheckMsg.error { color: var(--bad); }
 
-/* 기본/안내: 회색 */
 #nickCheckMsg.info,
-#pwCheckMsg.info {
-    color: var(--muted);
-}
+#pwCheckMsg.info { color: var(--muted); }
 
 /* 내가 쓴 글/댓글 리스트 스타일 */
 .my-content-list {
@@ -415,18 +406,15 @@
 }
 
 /* =========================================
-   6. [New] 계정 연동 (Social Linking) 스타일
+   6. 계정 연동 (Social Linking) 스타일
    ========================================= 
 */
-
-/* 리스트 컨테이너 */
 .social-link-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* 개별 아이템 박스 */
 .social-item {
     display: flex;
     align-items: center;
@@ -443,14 +431,12 @@
     background: var(--surface-hover);
 }
 
-/* 좌측 정보 (아이콘 + 텍스트) */
 .social-info {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-/* 소셜 아이콘 공통 */
 .social-icon {
     width: 44px;
     height: 44px;
@@ -458,20 +444,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* [변경] SVG 적용을 위해 폰트 속성 제거 및 그림자 추가 */
-    /* font-size: 18px; */
-    /* font-weight: 800; */
-    
-    color: white; /* SVG의 fill="currentColor"에 적용됨 */
+    color: white; 
     flex-shrink: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 약간의 입체감 추가 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* 브랜드별 컬러 (네이버 아이콘 위치 미세 조정) */
-.social-icon.naver svg {
-    transform: translateY(1px);
-}
+.social-icon.naver svg { transform: translateY(1px); }
 
 .social-icon.google {
     background-color: #fff;
@@ -486,7 +464,7 @@
 
 .social-icon.kakao {
     background-color: #FEE500;
-    color: #3C1E1E; /* 카카오 아이콘 갈색 */
+    color: #3C1E1E;
 }
 
 .social-icon.apple {
@@ -499,7 +477,6 @@ html[data-theme="dark"] .social-icon.apple {
     color: #000;
 }
 
-/* 텍스트 정보 */
 .social-text .name {
     font-size: 15px;
     font-weight: 700;
@@ -518,7 +495,7 @@ html[data-theme="dark"] .social-icon.apple {
 }
 
 /* =========================================
-   7. [New] 토글 스위치 (Toggle Switch)
+   7. 토글 스위치 (Toggle Switch)
    ========================================= 
 */
 .toggle-switch {
@@ -529,14 +506,12 @@ html[data-theme="dark"] .social-icon.apple {
     flex-shrink: 0;
 }
 
-/* 실제 체크박스는 숨김 */
 .toggle-switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-/* 슬라이더 트랙 */
 .slider {
     position: absolute;
     cursor: pointer;
@@ -544,12 +519,11 @@ html[data-theme="dark"] .social-icon.apple {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--line); /* 기본: 회색 */
+    background-color: var(--line);
     transition: .4s;
     border-radius: 34px;
 }
 
-/* 슬라이더 핸들 (동그라미) */
 .slider:before {
     position: absolute;
     content: "";
@@ -563,22 +537,20 @@ html[data-theme="dark"] .social-icon.apple {
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-/* 체크 되었을 때 (ON) */
 input:checked + .slider {
-    background-color: var(--primary); /* 활성: 파란색 */
+    background-color: var(--primary);
 }
 
 input:checked + .slider:before {
-    transform: translateX(24px); /* 오른쪽으로 이동 */
+    transform: translateX(24px);
 }
 
-/* 다크모드 대응 */
 html[data-theme="dark"] .slider {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* =========================================
-   [New] 회원 탈퇴 영역 (Danger Zone)
+   [New] 회원 탈퇴 영역
    ========================================= 
 */
 .withdrawal-area {
@@ -605,21 +577,39 @@ html[data-theme="dark"] .slider {
 
 #btnWithdrawal:hover {
     opacity: 1;
-    background-color: #fef2f2; /* 연한 빨강 배경 */
+    background-color: #fef2f2;
     border-radius: 4px;
     padding: 4px 8px;
-    margin: -4px -8px; /* 패딩만큼 마진 조정 */
+    margin: -4px -8px;
     text-decoration: none;
 }
 
-/* 닉네임, 비밀번호 확인 메시지 공통 스타일 */
-.msg-mini {
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 4px;
-    min-height: 18px;
-    transition: color 0.2s ease;
+/* =========================================
+   [New] 인라인 스타일 대체용 클래스 (Refactored)
+   ========================================= 
+*/
+
+/* 1. 사이드바 이메일 텍스트 */
+.profile-email-text {
+    word-break: break-all;
+    color: var(--muted);
+    font-size: 13px;
 }
 
-.msg-mini.success { color: var(--good); } /* 초록색 */
-.msg-mini.error { color: var(--bad); }    /* 빨간색 */
+/* 2. 자기소개(Bio) 헤더 (Label + BtnGroup) */
+.bio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* 3. 자기소개 라벨 마진 제거 */
+.bio-header label {
+    margin-bottom: 0;
+}
+
+/* 4. 섹션 설명 텍스트 하단 여백 추가 */
+.section-desc-spaced {
+    margin-bottom: 30px;
+}

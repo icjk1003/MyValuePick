@@ -1,59 +1,59 @@
-/* shared/js/post.js - 게시글 상세 + 하단 목록 기능 포함 */
+/* shared/js/post.js - 게시글 상세 + 하단 목록 (검색/페이징 포함) */
 
-// 전역 변수 (하단 목록 페이징용)
-let currentPage = 1;
-const limit = 20;     // 한 페이지당 글 개수
-const pageCount = 10; // 페이징 단위
+// 전역 변수
+let currentPage = 1;        // 상세글 하단 목록의 현재 페이지
+const limit = 20;           // 페이지당 글 수
+const pageCount = 10;       // 페이징 그룹 크기
+let currentSearchType = "all"; // 검색 타입 (all, title, writer)
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 1. URL에서 글 번호(id) 가져오기
+  // 1. URL 파라미터 처리
   const urlParams = new URLSearchParams(window.location.search);
   const postIdParam = urlParams.get("id") || urlParams.get("no");
   const postId = parseInt(postIdParam);
   
-  // 페이지 파라미터가 있으면 적용
   if(urlParams.get("page")) currentPage = parseInt(urlParams.get("page"));
 
-  // 2. 데이터베이스 확인
-  if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS || MOCK_DB.POSTS.length === 0) {
-    console.error("데이터베이스가 로드되지 않았습니다.");
-    // data.js가 비동기로 로드될 수 있으므로 잠시 대기 후 리로드하거나 알림
+  // 2. DB 체크
+  if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) {
+    console.error("데이터베이스 로드 실패");
     return;
   }
   
-  // 3. 잘못된 접근 체크
+  // 3. 잘못된 접근 처리
   if (!postIdParam || isNaN(postId)) {
-    alert("잘못된 접근입니다. 게시판 목록에서 글을 선택해주세요.");
+    alert("잘못된 접근입니다.");
     location.href = "board.html";
     return;
   }
 
-  // 4. 해당 글 찾기
+  // 4. 현재 게시글 찾기
   const post = MOCK_DB.POSTS.find(p => p.no === postId || p.id === postId);
-
   if (!post) { 
-    alert("삭제되었거나 존재하지 않는 게시글입니다."); 
+    alert("존재하지 않는 게시글입니다."); 
     location.href = "board.html"; 
     return; 
   }
 
-  // 5. [상세] 화면에 데이터 뿌리기
+  // 5. 화면 렌더링
   renderPostContent(post);
   renderAuthorProfile(post);
   
-  // 6. [댓글] 댓글 기능 초기화
+  // 6. 댓글 기능
   window.currentCommentList = post.commentList || [];
   renderComments(window.currentCommentList);
   updateCommentInputState();
   wireCommentSubmit();
   wireActionButtons();
 
-  // 7. [목록] 하단 게시글 목록 렌더링 (추가된 부분)
-  renderBelowBoard(currentPage, postId);
+  // 7. [New] 하단 목록 초기화 (검색바, 데이터 로드)
+  initBelowSearchDropdown();
+  wireBelowSearchActions();
+  loadBelowBoardData(postId);
 });
 
 // =========================================
-// A. 게시글 본문 렌더링
+// A. 게시글 본문 렌더링 (기존 동일)
 // =========================================
 function renderPostContent(post) {
   const setContent = (id, value) => {
@@ -71,7 +71,7 @@ function renderPostContent(post) {
 
   const bodyEl = document.getElementById("postBody");
   if (bodyEl) {
-    const bodyText = post.body || "내용이 없습니다.";
+    const bodyText = post.body || "";
     bodyEl.innerHTML = bodyText.replace(/\n/g, "<br>");
   }
 
@@ -83,14 +83,11 @@ function renderPostContent(post) {
 function renderAuthorProfile(post) {
   const img = document.getElementById("authorImg");
   const name = document.getElementById("authorName");
-  const bio = document.querySelector(".author-bio") || document.querySelector(".author-desc"); 
+  const bio = document.querySelector(".author-bio"); 
 
-  // ★ 수정된 부분: getProfileImage 함수 사용
   if(img) img.src = getProfileImage(post.writer);
-  
   if(name) name.textContent = post.writer;
 
-  // (자기소개글 로직은 기존 유지)
   if (bio) {
     const myNick = localStorage.getItem("user_nick");
     if (post.writer === myNick || (post.writer === "익명" && post.isMyPost)) {
@@ -103,7 +100,7 @@ function renderAuthorProfile(post) {
 }
 
 // =========================================
-// B. 댓글 기능
+// B. 댓글 기능 (기존 동일)
 // =========================================
 function renderComments(list) {
   const el = document.getElementById("commentList");
@@ -126,7 +123,7 @@ function renderComments(list) {
             <span class="cmt-date">${formatBoardDate(c.date)}</span>
             <button class="btn-delete-cmt" onclick="deleteComment(${index})">삭제</button>
           </div>
-          <button class="cmt-vote-btn" onclick="alert('추천!')">👍 ${c.votes || 0}</button>
+          <button class="cmt-vote-btn">👍 ${c.votes || 0}</button>
         </div>
         <div class="cmt-content">${c.content}</div>
       </div>
@@ -144,26 +141,17 @@ function wireCommentSubmit() {
     if(!content) { alert("내용을 입력해주세요."); return; }
 
     const isLoggedIn = localStorage.getItem("is_logged_in");
-    let writer = "익명";
+    let writer = isLoggedIn ? localStorage.getItem("user_nick") : "익명";
     
-    if (isLoggedIn) {
-      writer = localStorage.getItem("user_nick");
-    } else {
+    if (!isLoggedIn) {
       const anonNick = document.querySelector(".anon-input-group input[type='text']")?.value;
       if(!anonNick) { alert("닉네임을 입력해주세요."); return; }
       writer = anonNick;
     }
 
-    const newComment = { 
-      writer, 
-      content, 
-      date: new Date().toISOString(), 
-      votes: 0, 
-      password: "1234",
-      profileImg: null 
-    };
-
-    window.currentCommentList.unshift(newComment);
+    window.currentCommentList.unshift({ 
+      writer, content, date: new Date().toISOString(), votes: 0 
+    });
     textarea.value = "";
     renderComments(window.currentCommentList);
   });
@@ -186,7 +174,7 @@ function updateCommentInputState() {
     if(anonInputs) anonInputs.classList.add("d-none");
     if(loginProfile) {
       loginProfile.classList.remove("d-none");
-      loginProfile.querySelector("span").textContent = myNick || "유저";
+      loginProfile.querySelector("span").textContent = myNick;
     }
   } else {
     if(anonInputs) anonInputs.classList.remove("d-none");
@@ -195,87 +183,181 @@ function updateCommentInputState() {
 }
 
 function wireActionButtons() {
-  document.getElementById("btnVoteUp")?.addEventListener("click", () => alert("추천되었습니다!"));
-  document.getElementById("btnVoteDown")?.addEventListener("click", () => alert("비추천되었습니다."));
+  document.getElementById("btnVoteUp")?.addEventListener("click", () => alert("추천!"));
+  document.getElementById("btnVoteDown")?.addEventListener("click", () => alert("비추천"));
 }
 
 window.sharePost = function() {
-  const url = window.location.href;
-  navigator.clipboard.writeText(url).then(() => alert("링크가 복사되었습니다!"));
+  navigator.clipboard.writeText(window.location.href).then(() => alert("링크 복사 완료!"));
 };
 
 window.reportPost = function() {
-  prompt("신고 사유를 입력해주세요.");
   alert("신고가 접수되었습니다.");
 };
 
 
 // =========================================
-// C. [복구됨] 하단 게시글 목록 (Below Board)
+// C. [New] 하단 게시글 목록 (검색 + 페이징)
 // =========================================
-function renderBelowBoard(page, currentId) {
-  const tbody = document.getElementById("boardBelowRows");
-  if(!tbody) return;
 
-  const allPosts = MOCK_DB.POSTS;
-  const start = (page - 1) * limit;
-  const pageData = allPosts.slice(start, start + limit);
+// 1. 드롭다운 초기화
+function initBelowSearchDropdown() {
+  const options = [
+    { val: "all", text: "전체" },
+    { val: "title", text: "제목" },
+    { val: "writer", text: "글쓴이" }
+  ];
+
+  setupBelowCustomSelect("belowSearchType", options, currentSearchType, (val) => {
+    currentSearchType = val;
+  });
+}
+
+function setupBelowCustomSelect(id, options, initialVal, onChange) {
+  const wrapper = document.getElementById(id);
+  if (!wrapper) return;
+  wrapper.innerHTML = "";
   
+  const trigger = document.createElement("div");
+  trigger.className = "select-styled";
+  trigger.textContent = options.find(o => o.val === initialVal)?.text || "전체";
+  
+  const list = document.createElement("ul");
+  list.className = "select-options";
+  
+  options.forEach(opt => {
+    const li = document.createElement("li");
+    li.textContent = opt.text;
+    li.onclick = (e) => {
+      e.stopPropagation();
+      trigger.textContent = opt.text;
+      onChange(opt.val);
+      list.style.display = "none";
+    };
+    list.appendChild(li);
+  });
+  
+  trigger.onclick = (e) => {
+    e.stopPropagation();
+    list.style.display = list.style.display === "block" ? "none" : "block";
+  };
+  
+  wrapper.appendChild(trigger);
+  wrapper.appendChild(list);
+  document.addEventListener("click", () => list.style.display = "none");
+}
+
+// 2. 데이터 로드 및 렌더링
+function loadBelowBoardData(currentId) {
+  const inputEl = document.getElementById("belowSearchInput");
+  const query = inputEl ? inputEl.value.trim() : "";
+  
+  // 데이터 복사 및 정렬
+  let targetData = [...MOCK_DB.POSTS];
+  targetData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // 검색 필터링
+  if (query) {
+    targetData = targetData.filter(p => {
+      const title = p.title || ""; 
+      const writer = p.writer || "";
+      if (currentSearchType === "title") return title.includes(query);
+      if (currentSearchType === "writer") return writer.includes(query);
+      return title.includes(query) || writer.includes(query);
+    });
+  }
+  
+  renderBelowList(targetData, currentId);
+  renderBelowPager(targetData.length, currentId);
+}
+
+function renderBelowList(posts, currentId) {
+  const tbody = document.getElementById("boardBelowRows");
+  if (!tbody) return;
+  
+  const start = (currentPage - 1) * limit;
+  const pageData = posts.slice(start, start + limit);
+  
+  if (pageData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px 0;">검색 결과가 없습니다.</td></tr>`;
+    return;
+  }
+
   tbody.innerHTML = pageData.map(p => `
     <tr class="${p.no === currentId ? 'active-row' : ''}">
       <td class="colNo">${p.no}</td>
       <td class="colTag"><span class="chip">${p.tag}</span></td>
-      <td class="postTitle">
-        <a href="post.html?id=${p.no}&page=${page}" style="color:inherit; text-decoration:none;">
-          ${p.title} <span style="color:var(--primary); font-size:12px;">[${p.comments || 0}]</span>
+      <td style="text-align:left">
+        <a class="postTitle" href="post.html?id=${p.no}&page=${currentPage}" style="color:inherit; text-decoration:none;">
+          ${p.title} ${(p.comments) > 0 ? `<span style="color:var(--primary); font-size:12px; font-weight:700;">[${p.comments}]</span>` : ""}
         </a>
       </td>
       <td class="colWriter">${p.writer}</td>
       <td class="colVotes">${p.votes}</td>
-      <td class="colViews mobile-hide">${(p.views || 0).toLocaleString()}</td>
-      <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td> 
+      <td class="colViews mobile-hide">${p.views.toLocaleString()}</td>
+      <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td>
     </tr>`).join("");
-
-  renderBelowPager(allPosts.length, page);
 }
 
-function renderBelowPager(totalCount, currPage) {
-  const pager = document.getElementById("belowPager"); // HTML ID 확인 필요
+// 3. 페이지네이션 (board.html 스타일)
+function renderBelowPager(totalCount, currentId) {
+  const pager = document.getElementById("belowPager");
   if (!pager) return;
 
   const totalPages = Math.ceil(totalCount / limit);
-  const pageGroup = Math.ceil(currPage / pageCount);
-  let startPage = (pageGroup - 1) * pageCount + 1;
-  let endPage = Math.min(startPage + pageCount - 1, totalPages);
-  
+  if (totalPages === 0) { pager.innerHTML = ""; return; }
+
+  const pageGroup = Math.ceil(currentPage / pageCount); 
+  let startPage = (pageGroup - 1) * pageCount + 1; 
+  let endPage = startPage + pageCount - 1;
+  if (endPage > totalPages) endPage = totalPages;
+
   let html = "";
   
-  // 이전 그룹
+  // 이전 버튼
   if (startPage > 1) {
-    html += `<a href="javascript:moveBelowPage(1)">«</a>`;
-    html += `<a href="javascript:moveBelowPage(${startPage - 1})">‹</a>`;
+    html += `<a class="pagerBtn" href="javascript:moveBelowPage(1, ${currentId})">«</a>`;
+    html += `<a class="pagerBtn" href="javascript:moveBelowPage(${startPage - 1}, ${currentId})">‹</a>`;
+  } else if (currentPage > 1) {
+    html += `<a class="pagerBtn" href="javascript:moveBelowPage(${currentPage - 1}, ${currentId})">‹</a>`;
   }
-
+  
   // 페이지 번호
   for (let i = startPage; i <= endPage; i++) {
-    html += `<a href="javascript:moveBelowPage(${i})" class="${i === currPage ? 'active' : ''}">${i}</a>`;
+    const activeClass = (i === currentPage) ? 'active' : '';
+    html += `<a href="javascript:moveBelowPage(${i}, ${currentId})" class="${activeClass}">${i}</a>`;
   }
-
-  // 다음 그룹
+  
+  // 다음 버튼
+  if (currentPage < totalPages) {
+    html += `<a class="pagerBtn" href="javascript:moveBelowPage(${currentPage + 1}, ${currentId})">›</a>`;
+  }
   if (endPage < totalPages) {
-    html += `<a href="javascript:moveBelowPage(${endPage + 1})">›</a>`;
-    html += `<a href="javascript:moveBelowPage(${totalPages})">»</a>`;
+    html += `<a class="pagerBtn" href="javascript:moveBelowPage(${endPage + 1}, ${currentId})">»</a>`;
   }
   
   pager.innerHTML = html;
 }
 
-// 하단 목록 페이지 이동 함수
-window.moveBelowPage = function(page) {
-  // 현재 보고 있는 글의 ID를 유지하며 목록만 갱신
+// 4. 이벤트 연결
+window.moveBelowPage = function(page, currentId) {
+  currentPage = page;
+  loadBelowBoardData(currentId);
+};
+
+function wireBelowSearchActions() {
+  const btn = document.getElementById("belowSearchBtn");
+  const input = document.getElementById("belowSearchInput");
   const urlParams = new URLSearchParams(window.location.search);
   const currentId = parseInt(urlParams.get("id") || urlParams.get("no"));
-  
-  currentPage = page;
-  renderBelowBoard(page, currentId);
-};
+
+  if (!btn || !input) return;
+
+  const doSearch = () => {
+    currentPage = 1; // 검색 시 1페이지로 리셋
+    loadBelowBoardData(currentId);
+  };
+
+  btn.onclick = doSearch;
+  input.onkeypress = (e) => { if (e.key === "Enter") doSearch(); };
+}
