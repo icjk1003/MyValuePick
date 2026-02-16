@@ -1,0 +1,216 @@
+@charset "utf-8";
+
+/* =========================================
+   [My Page] 내 정보 관리 모듈 (Info)
+   ========================================= */
+
+/* --- [Form] 공통 폼 스타일 --- */
+.form-row {
+    margin-bottom: 24px;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text, #333);
+}
+
+.desc {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted, #888);
+}
+
+/* 읽기 전용 인풋 */
+.input-readonly {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg, #f5f5f5);
+    border: 1px solid var(--line, #e0e0e0);
+    border-radius: 8px;
+    color: var(--muted, #888);
+    cursor: not-allowed;
+    box-sizing: border-box;
+}
+
+/* 수정 가능 인풋 */
+.input-edit {
+    width: 100%;
+    padding: 12px;
+    background: var(--surface, #fff);
+    border: 1px solid var(--line, #e0e0e0);
+    border-radius: 8px;
+    color: var(--text, #333);
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.input-edit:focus {
+    border-color: var(--primary, #007bff);
+}
+
+.input-gap-top {
+    margin-top: 8px;
+}
+
+/* --- [Bio] 자기소개 영역 --- */
+.bio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.input-bio {
+    width: 100%;
+    min-height: 100px;
+    resize: none;
+    line-height: 1.6;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.input-bio.input-readonly {
+    border-color: transparent;
+    background: var(--bg, #f5f5f5);
+    color: var(--muted, #888);
+    cursor: default;
+}
+
+.input-bio.editable {
+    border: 1px solid var(--primary, #007bff);
+    background: var(--surface, #fff);
+    color: var(--text, #333);
+}
+
+/* --- [Buttons] 버튼 그룹 --- */
+.btn-area {
+    margin-top: 40px;
+    text-align: right;
+}
+
+.btn-save {
+    padding: 12px 24px;
+    background: var(--primary, #007bff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.btn-save:hover {
+    filter: brightness(1.1);
+}
+
+/* 텍스트 액션 버튼 (수정/취소 등) */
+.btn-text-action {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted, #888);
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0 4px;
+}
+
+.btn-text-action:hover { color: var(--text, #333); }
+.btn-text-action.primary { color: var(--primary, #007bff); text-decoration: none; }
+.btn-text-action.bad { color: var(--bad, #dc3545); text-decoration: none; }
+
+.bio-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* --- [Messages] 유효성 메시지 --- */
+.msg-mini {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+    min-height: 18px;
+}
+
+.msg-mini.success { color: var(--good, #28a745); }
+.msg-mini.error { color: var(--bad, #dc3545); }
+.msg-mini.info { color: var(--muted, #888); }
+
+/* --- [Withdrawal] 회원 탈퇴 --- */
+.withdrawal-area {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--line, #e0e0e0);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+.withdrawal-desc {
+    font-size: 13px;
+    color: var(--muted, #888);
+}
+
+#btnWithdrawal {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+#btnWithdrawal:hover {
+    opacity: 1;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: -4px -8px;
+}
+
+/* --- [Modal] 이미지 크롭 모달 --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.crop-container {
+    background: var(--surface, #fff);
+    padding: 24px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.crop-area {
+    height: 400px;
+    background-color: #000;
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.crop-area img {
+    display: block;
+    max-width: 100%;
+}
+
+.crop-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+}
+
+.hidden { display: none !important; }

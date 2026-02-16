@@ -1,0 +1,136 @@
+@charset "utf-8";
+
+/* =========================================
+   [My Page] 내가 쓴 글 모듈 (Post)
+   ========================================= */
+
+/* --- [Header] 헤더 영역 --- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--line, #e0e0e0);
+    padding-bottom: 16px;
+}
+
+.section-header .section-title {
+    margin: 0;
+    border-bottom: none; /* 기존 공통 스타일 덮어쓰기 */
+    padding-bottom: 0;
+}
+
+.btn-small-primary {
+    font-size: 13px;
+    padding: 6px 12px;
+    background-color: var(--primary, #007bff);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-small-primary:hover {
+    background-color: var(--primary-dark, #0056b3);
+}
+
+/* --- [Summary] 요약 바 --- */
+.post-summary-bar {
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--muted, #666);
+}
+
+.post-summary-bar strong {
+    color: var(--primary, #007bff);
+}
+
+/* --- [List] 리스트 스타일 (mypage-comments와 공유 가능하지만 독립성 보장) --- */
+.my-content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* --- [Item] 개별 게시글 카드 --- */
+.my-item {
+    display: block;
+    padding: 18px;
+    border: 1px solid var(--line, #e0e0e0);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    background-color: var(--surface, #fff);
+    transition: all 0.2s ease;
+}
+
+.my-item:hover {
+    background: var(--surface-hover, #f9f9f9);
+    border-color: var(--primary, #007bff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 제목 */
+.my-item-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--text, #333);
+    line-height: 1.4;
+    
+    /* 긴 제목 말줄임 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* 메타 정보 (태그, 조회수, 날짜 등) */
+.my-item-meta {
+    font-size: 12px;
+    color: var(--muted, #888);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* 태그 뱃지 */
+.meta-tag {
+    background-color: var(--bg-secondary, #f1f3f5);
+    color: var(--text-secondary, #495057);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* 통계 (조회/추천) */
+.meta-stats {
+    display: flex;
+    gap: 8px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* 날짜 (우측 정렬을 위해 auto margin) */
+.meta-date {
+    margin-left: auto;
+    font-family: var(--font-mono, monospace); /* 숫자 가독성 */
+}
+
+/* --- [State] 상태 메시지 --- */
+.empty-msg {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted, #888);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.hidden { display: none !important; }

@@ -1,0 +1,160 @@
+@charset "utf-8";
+
+/* =========================================
+   [My Page] 계정 연동 모듈 (Social)
+   ========================================= */
+
+/* --- [Container] 설명 및 리스트 --- */
+.section-desc-spaced {
+    margin-bottom: 30px;
+}
+
+.social-link-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* --- [Item] 개별 소셜 카드 --- */
+.social-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 1px solid var(--line, #e0e0e0);
+    border-radius: 12px;
+    background: var(--surface, #fff);
+    transition: all 0.2s ease;
+}
+
+.social-item:hover {
+    border-color: var(--primary, #007bff);
+    background: var(--surface-hover, #f9f9f9);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.social-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* --- [Icon] 소셜 브랜드 아이콘 --- */
+.social-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; 
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* 브랜드별 컬러 */
+.social-icon.google {
+    background-color: #fff;
+    border: 1px solid var(--line, #e0e0e0);
+    color: #4285F4;
+}
+
+.social-icon.naver {
+    background-color: #03C75A;
+    color: #fff;
+}
+.social-icon.naver svg { transform: translateY(1px); }
+
+.social-icon.kakao {
+    background-color: #FEE500;
+    color: #3C1E1E;
+}
+
+.social-icon.apple {
+    background-color: #000;
+    color: #fff;
+}
+
+/* 다크모드 대응 (Apple 아이콘 반전) */
+html[data-theme="dark"] .social-icon.apple {
+    background-color: #fff;
+    color: #000;
+}
+
+/* --- [Text] 텍스트 정보 --- */
+.social-text .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text, #333);
+    margin-bottom: 2px;
+}
+
+.social-text .status {
+    font-size: 13px;
+    color: var(--muted, #888);
+}
+
+.social-text .status.active {
+    color: var(--primary, #007bff);
+    font-weight: 600;
+}
+
+/* --- [Toggle] 토글 스위치 --- */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--line, #ccc);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Checked 상태 */
+input:checked + .slider {
+    background-color: var(--primary, #007bff);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* 다크모드 슬라이더 배경 */
+html[data-theme="dark"] .slider {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"] input:checked + .slider {
+    background-color: var(--primary, #007bff);
+}
+
+.hidden { display: none !important; }

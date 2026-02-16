@@ -1,0 +1,80 @@
+@charset "utf-8";
+
+/* =========================================
+   [My Page] 댓글 모듈 (Comments)
+   ========================================= */
+
+/* 목록 컨테이너 */
+.my-content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 개별 아이템 (카드 형태) */
+.my-item {
+    padding: 16px;
+    border: 1px solid var(--line, #e0e0e0);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    display: block;
+    background-color: var(--surface, #fff);
+}
+
+.my-item:hover {
+    background: var(--surface-hover, #f9f9f9);
+    border-color: var(--primary, #007bff);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 댓글 내용 (제목 역할) */
+.my-item-title {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 8px;
+    display: block;
+    line-height: 1.4;
+    color: var(--text, #333);
+}
+
+/* 메타 정보 (원글 제목, 날짜) */
+.my-item-meta {
+    font-size: 12px;
+    color: var(--muted, #888);
+    display: flex;
+    justify-content: space-between; /* 양끝 정렬로 변경하여 가독성 확보 */
+    align-items: center;
+    gap: 12px;
+}
+
+/* 원글 제목 강조 */
+.origin-post-link {
+    color: var(--primary, #007bff);
+    font-weight: 500;
+    background-color: var(--primary-bg, #eef6ff);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* 빈 상태 메시지 */
+.empty-msg {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted, #888);
+    font-size: 14px;
+}
+
+/* 상태 메시지 (로딩 등) */
+.status-msg {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+}
+
+/* 다크모드 대응 (변수 기반이라 자동 적용되지만 명시적 확인) */
+html[data-theme="dark"] .origin-post-link {
+    background-color: rgba(0, 123, 255, 0.2);
+}
