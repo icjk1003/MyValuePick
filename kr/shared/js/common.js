@@ -139,36 +139,47 @@ function wireLoginState() {
   const userId = localStorage.getItem("user_id");
   const nickName = localStorage.getItem("user_nick") || "내 정보";
 
-  if(isLoggedIn) {
-    btnLogin.textContent = nickName; 
-    btnLogin.href = "mypage.html"; 
-    btnLogin.onclick = null; 
+if(isLoggedIn) {
+  btnLogin.textContent = nickName; 
+  btnLogin.href = "mypage.html"; 
+  btnLogin.onclick = null; 
 
-    // [New] 관리자(root)일 경우 버튼 추가 로직
-    if (userId === 'root') {
-        // 이미 버튼이 있는지 확인 (중복 생성 방지)
-        if (!document.getElementById('btnAdminMode')) {
-            const adminBtn = document.createElement('a');
-            adminBtn.id = 'btnAdminMode';
-            adminBtn.href = 'admin.html';
-            adminBtn.textContent = '👑 관리자';
-            // 버튼 스타일 적용
-            adminBtn.style.cssText = `
-                font-size: 13px;
-                font-weight: 700;
-                color: #fff;
-                background-color: #333; /* 눈에 띄는 어두운 배경 */
-                padding: 6px 12px;
-                border-radius: 6px;
-                text-decoration: none;
-                margin-right: -8px; /* gap 보정 */
-            `;
-            
-            // 로그인 버튼(닉네임) 앞에 삽입
-            const parent = btnLogin.parentNode;
-            parent.insertBefore(adminBtn, btnLogin);
-        }
-    }
+  // [변경 및 추가된 코드]
+  // [New] 관리자(root)일 경우 버튼 추가 로직
+  if (userId === 'root') {
+      // 이미 버튼이 있는지 확인 (중복 생성 방지)
+      if (!document.getElementById('btnAdminMode')) {
+          const parent = btnLogin.parentNode;
+
+          // [핵심] 기존 아이콘과 닉네임 위치가 밀리지 않도록 부모 기준점 설정
+          parent.style.position = 'relative';
+
+          const adminBtn = document.createElement('a');
+          adminBtn.id = 'btnAdminMode';
+          adminBtn.href = 'admin.html';
+          adminBtn.textContent = '👑 관리자 모드'; // 요청사항: 이름 변경
+
+          // 버튼 스타일 적용 (Absolute Positioning으로 기존 레이아웃 영향 제거)
+          adminBtn.style.cssText = `
+              position: absolute;       /* 흐름에서 제거하여 형제 요소 밀림 방지 */
+              left: 100%;               /* 부모 요소(닉네임 그룹)의 오른쪽 끝에 배치 */
+              top: 50%;
+              transform: translateY(-50%); /* 수직 중앙 정렬 */
+              margin-left: 12px;        /* 닉네임과의 간격 */
+              font-size: 13px;
+              font-weight: 700;
+              color: #fff;
+              background-color: #333; 
+              padding: 6px 12px;
+              border-radius: 6px;
+              text-decoration: none;
+              white-space: nowrap;      /* 텍스트 줄바꿈 방지 */
+          `;
+
+          // 부모 컨테이너에 추가 (absolute이므로 닉네임 뒤 허공에 배치됨)
+          parent.appendChild(adminBtn); 
+      }
+  }
 
   } else {
     btnLogin.textContent = "로그인";
