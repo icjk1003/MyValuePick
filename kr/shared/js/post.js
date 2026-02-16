@@ -4,7 +4,7 @@
 let currentPage = 1;        // 상세글 하단 목록의 현재 페이지
 const limit = 20;           // 페이지당 글 수
 const pageCount = 10;       // 페이징 그룹 크기
-let currentSearchType = "all"; // 검색 타입 (all, title, writer)
+let currentSearchType = "all"; // 검색 타입
 
 document.addEventListener("DOMContentLoaded", () => {
   // 1. URL 파라미터 처리
@@ -46,14 +46,14 @@ document.addEventListener("DOMContentLoaded", () => {
   wireCommentSubmit();
   wireActionButtons();
 
-  // 7. [New] 하단 목록 초기화 (검색바, 데이터 로드)
+  // 7. 하단 목록 렌더링
   initBelowSearchDropdown();
   wireBelowSearchActions();
   loadBelowBoardData(postId);
 });
 
 // =========================================
-// A. 게시글 본문 렌더링 (기존 동일)
+// A. 게시글 본문 렌더링
 // =========================================
 function renderPostContent(post) {
   const setContent = (id, value) => {
@@ -100,7 +100,7 @@ function renderAuthorProfile(post) {
 }
 
 // =========================================
-// B. 댓글 기능 (기존 동일)
+// B. 댓글 기능 (수정됨: 스크롤 기능 추가)
 // =========================================
 function renderComments(list) {
   const el = document.getElementById("commentList");
@@ -111,8 +111,9 @@ function renderComments(list) {
     return;
   }
 
+  // [중요] 각 댓글에 고유 ID (cmt-인덱스) 부여하여 스크롤 타겟 생성
   el.innerHTML = list.map((c, index) => `
-    <div class="comment-item">
+    <div class="comment-item" id="cmt-${index}">
       <div class="cmt-profile">
         <img src="${getProfileImage(c.writer)}" alt="프사">
       </div>
@@ -128,6 +129,23 @@ function renderComments(list) {
         <div class="cmt-content">${c.content}</div>
       </div>
     </div>`).join("");
+
+  // [New] URL 해시(예: #cmt-0)가 있다면 해당 위치로 스크롤
+  if(window.location.hash) {
+      setTimeout(() => {
+          const targetId = window.location.hash; // #cmt-0
+          const targetEl = document.querySelector(targetId);
+          if(targetEl) {
+              // 부드럽게 스크롤
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              
+              // (선택사항) 강조 효과 (CSS class 필요 시 추가)
+              targetEl.style.transition = "background 0.5s";
+              targetEl.style.backgroundColor = "rgba(37, 99, 235, 0.1)"; // 잠시 파란색 배경
+              setTimeout(() => { targetEl.style.backgroundColor = "transparent"; }, 1500);
+          }
+      }, 300); // 렌더링 직후 약간의 딜레이
+  }
 }
 
 function wireCommentSubmit() {
@@ -197,7 +215,7 @@ window.reportPost = function() {
 
 
 // =========================================
-// C. [New] 하단 게시글 목록 (검색 + 페이징)
+// C. 하단 게시글 목록 (검색 + 페이징)
 // =========================================
 
 // 1. 드롭다운 초기화
@@ -252,11 +270,9 @@ function loadBelowBoardData(currentId) {
   const inputEl = document.getElementById("belowSearchInput");
   const query = inputEl ? inputEl.value.trim() : "";
   
-  // 데이터 복사 및 정렬
   let targetData = [...MOCK_DB.POSTS];
   targetData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // 검색 필터링
   if (query) {
     targetData = targetData.filter(p => {
       const title = p.title || ""; 
@@ -299,7 +315,7 @@ function renderBelowList(posts, currentId) {
     </tr>`).join("");
 }
 
-// 3. 페이지네이션 (board.html 스타일)
+// 3. 페이지네이션
 function renderBelowPager(totalCount, currentId) {
   const pager = document.getElementById("belowPager");
   if (!pager) return;
@@ -314,7 +330,6 @@ function renderBelowPager(totalCount, currentId) {
 
   let html = "";
   
-  // 이전 버튼
   if (startPage > 1) {
     html += `<a class="pagerBtn" href="javascript:moveBelowPage(1, ${currentId})">«</a>`;
     html += `<a class="pagerBtn" href="javascript:moveBelowPage(${startPage - 1}, ${currentId})">‹</a>`;
@@ -322,13 +337,11 @@ function renderBelowPager(totalCount, currentId) {
     html += `<a class="pagerBtn" href="javascript:moveBelowPage(${currentPage - 1}, ${currentId})">‹</a>`;
   }
   
-  // 페이지 번호
   for (let i = startPage; i <= endPage; i++) {
     const activeClass = (i === currentPage) ? 'active' : '';
     html += `<a href="javascript:moveBelowPage(${i}, ${currentId})" class="${activeClass}">${i}</a>`;
   }
   
-  // 다음 버튼
   if (currentPage < totalPages) {
     html += `<a class="pagerBtn" href="javascript:moveBelowPage(${currentPage + 1}, ${currentId})">›</a>`;
   }
@@ -339,7 +352,6 @@ function renderBelowPager(totalCount, currentId) {
   pager.innerHTML = html;
 }
 
-// 4. 이벤트 연결
 window.moveBelowPage = function(page, currentId) {
   currentPage = page;
   loadBelowBoardData(currentId);
@@ -354,7 +366,7 @@ function wireBelowSearchActions() {
   if (!btn || !input) return;
 
   const doSearch = () => {
-    currentPage = 1; // 검색 시 1페이지로 리셋
+    currentPage = 1;
     loadBelowBoardData(currentId);
   };
 

@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireGlobalSearch();
 });
 
-// 헤더 렌더링 (알림 버튼 HTML 구조 포함)
+// 헤더 렌더링
 function renderHeader() {
   const target = document.getElementById("global-header") || document.getElementById("header-placeholder");
   if (!target) return;
@@ -110,7 +110,6 @@ function renderHeader() {
     </div>
   `;
   
-  // 이벤트 재연결
   wireThemeToggle();
   wireLoginState();
   wireGlobalSearch();
@@ -147,7 +146,7 @@ function wireThemeToggle() {
   };
 }
 
-// [수정됨] 로그인 상태, 관리자 버튼, 알림 기능 통합
+// 로그인 상태 처리
 function wireLoginState() {
   const btnLogin = document.getElementById("btnLogin");
   if(!btnLogin) return;
@@ -156,7 +155,6 @@ function wireLoginState() {
   const userId = localStorage.getItem("user_id");
   const nickName = localStorage.getItem("user_nick") || "내 정보";
   
-  // 알림 버튼 요소
   const notiBtn = document.getElementById("notiBtnWrap");
 
   if(isLoggedIn) {
@@ -167,11 +165,11 @@ function wireLoginState() {
     // 1. 알림 버튼 활성화
     if(notiBtn) {
         notiBtn.style.display = "flex";
-        loadNotifications(); // 데이터 로드
+        initNotifications(); // 초기 데이터 설정
+        loadNotifications(); // 로드
 
-        // 토글 이벤트
         notiBtn.onclick = (e) => {
-            e.stopPropagation(); // 버블링 방지
+            e.stopPropagation();
             const dropdown = document.getElementById("notiDropdown");
             if(dropdown) {
                 dropdown.classList.toggle("show");
@@ -180,20 +178,16 @@ function wireLoginState() {
         };
     }
 
-    // 2. 관리자(root) 버튼 추가 (위치 고정)
+    // 2. 관리자 버튼
     if (userId === 'root') {
         if (!document.getElementById('btnAdminMode')) {
             const parent = btnLogin.parentNode;
-            
-            // 기준점 설정
             parent.style.position = 'relative';
 
             const adminBtn = document.createElement('a');
             adminBtn.id = 'btnAdminMode';
             adminBtn.href = 'admin.html';
             adminBtn.textContent = '👑 관리자 모드';
-            
-            // 스타일: 닉네임 오른쪽(100%) 위치에 고정 (Absolute)
             adminBtn.style.cssText = `
                 position: absolute;
                 left: 100%;
@@ -210,30 +204,26 @@ function wireLoginState() {
                 white-space: nowrap;
                 z-index: 10;
             `;
-            
             parent.appendChild(adminBtn); 
         }
     }
 
   } else {
-    // 로그아웃 상태
     btnLogin.textContent = "로그인";
     btnLogin.href = "login.html";
     btnLogin.onclick = null;
 
-    // 알림 버튼 숨김
     if(notiBtn) {
         notiBtn.style.display = "none";
         document.getElementById("notiDropdown")?.classList.remove("show");
     }
 
-    // 관리자 버튼 제거
     const adminBtn = document.getElementById('btnAdminMode');
     if (adminBtn) adminBtn.remove();
   }
 }
 
-// 글로벌 검색 기능
+// 글로벌 검색
 function wireGlobalSearch() {
   const input = document.getElementById("globalSearchInput");
   const suggestionsBox = document.getElementById("searchSuggestions");
@@ -255,12 +245,9 @@ function wireGlobalSearch() {
       suggestionsBox.classList.remove("active");
       return;
     }
-
     const db = (typeof STOCK_DB !== 'undefined') ? STOCK_DB : [];
     const matched = db.filter(s => 
-      s.name.includes(val) || 
-      s.enName.toUpperCase().includes(val) || 
-      s.ticker.includes(val)
+      s.name.includes(val) || s.enName.toUpperCase().includes(val) || s.ticker.includes(val)
     ).slice(0, 5);
 
     if (matched.length > 0) {
@@ -289,7 +276,6 @@ function wireGlobalSearch() {
   });
 }
 
-// 로그아웃 기능 (전역 함수)
 function logout() {
   if (confirm("로그아웃 하시겠습니까?")) {
     localStorage.removeItem("is_logged_in");
@@ -297,28 +283,23 @@ function logout() {
     localStorage.removeItem("user_nick");
     localStorage.removeItem("user_email");
     localStorage.removeItem("user_role");
-    
     alert("로그아웃 되었습니다.");
     location.href = "home.html";
   }
 }
 window.logout = logout;
 
-// 프로필 이미지 URL 가져오기
 function getProfileImage(nickname) {
   const myNick = localStorage.getItem("user_nick");
   const myCustomImg = localStorage.getItem("user_img");
-
-  if (nickname === myNick && myCustomImg) {
-    return myCustomImg;
-  }
+  if (nickname === myNick && myCustomImg) return myCustomImg;
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(nickname)}&background=random&color=fff&length=2`;
 }
 window.getProfileImage = getProfileImage;
 
 
 // =========================================
-// [New] 알림 시스템 로직 (추가됨)
+// [New] 알림 시스템 (수정됨: 삭제 및 이동 기능 포함)
 // =========================================
 
 // 외부 클릭 시 드롭다운 닫기
@@ -334,32 +315,41 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 더미 데이터 및 로드 함수
-const MOCK_NOTIFICATIONS = [
-    { id: 1, type: 'reply', user: '주식고수', text: '작성하신 글에 댓글을 남겼습니다.', time: '2024-05-20T10:30:00', read: false, link: '#' },
-    { id: 2, type: 'tag', user: '단타왕', text: '댓글에서 회원님을 언급했습니다: @MyValuePick', time: '2024-05-19T14:20:00', read: false, link: '#' },
-    { id: 3, type: 'comment', user: '관리자', text: '공지사항이 업데이트 되었습니다.', time: '2024-05-18T09:00:00', read: true, link: '#' },
-    { id: 4, type: 'like', user: '익명', text: '회원님의 게시글을 추천했습니다.', time: '2024-05-17T11:00:00', read: true, link: '#' },
-    { id: 5, type: 'system', user: 'System', text: '비밀번호 변경 완료 안내', time: '2024-05-10T12:00:00', read: true, link: '#' }
-];
+// 1. 초기 더미 데이터 설정 (최초 1회만 실행)
+function initNotifications() {
+    if (!localStorage.getItem('my_notifications')) {
+        // [중요] 링크에 #cmt-0 등 해시를 포함하여 스크롤 위치 지정
+        const initialData = [
+            { id: 1, type: 'reply', user: '주식고수', text: '댓글을 남겼습니다.', time: new Date().toISOString(), link: 'post.html?id=1#cmt-0' },
+            { id: 2, type: 'tag', user: '단타왕', text: '회원님을 언급했습니다.', time: new Date(Date.now() - 3600000).toISOString(), link: 'post.html?id=1#cmt-1' },
+            { id: 3, type: 'notice', user: '관리자', text: '공지사항: 서버 점검 안내', time: new Date(Date.now() - 86400000).toISOString(), link: 'post.html?id=2' },
+            { id: 4, type: 'like', user: '익명', text: '게시글을 추천했습니다.', time: new Date(Date.now() - 100000000).toISOString(), link: 'post.html?id=3' }
+        ];
+        localStorage.setItem('my_notifications', JSON.stringify(initialData));
+    }
+}
 
+// 2. 알림 로드 및 렌더링
 function loadNotifications() {
     const listContainer = document.getElementById("notiList");
     const badge = document.getElementById("notiBadge");
     if (!listContainer) return;
 
-    // 읽지 않은 개수 확인
-    const unreadCount = MOCK_NOTIFICATIONS.filter(n => !n.read).length;
+    // LocalStorage에서 가져오기
+    const notis = JSON.parse(localStorage.getItem('my_notifications') || '[]');
+
+    // 배지 업데이트
     if (badge) {
-        badge.style.display = unreadCount > 0 ? "block" : "none";
+        badge.style.display = notis.length > 0 ? "block" : "none";
     }
 
     // 리스트 렌더링
-    if (MOCK_NOTIFICATIONS.length === 0) {
+    if (notis.length === 0) {
         listContainer.innerHTML = `<div class="noti-empty">새로운 알림이 없습니다.</div>`;
     } else {
-        listContainer.innerHTML = MOCK_NOTIFICATIONS.map(n => `
-            <div class="noti-item ${n.read ? '' : 'unread'}" onclick="location.href='${n.link}'">
+        // [중요] onclick 이벤트에 handleNotiClick 연결
+        listContainer.innerHTML = notis.map(n => `
+            <div class="noti-item unread" onclick="handleNotiClick(${n.id}, '${n.link}')">
                 <div class="noti-content">
                     <div class="noti-msg">
                         <strong>${n.user}</strong>: ${n.text}
@@ -371,8 +361,20 @@ function loadNotifications() {
     }
 }
 
-// 모두 읽음 처리
+// 3. [New] 알림 클릭 처리 (삭제 + 이동)
+window.handleNotiClick = function(id, link) {
+    // 1. 데이터 삭제 (읽음 처리 대신 삭제로 구현)
+    let notis = JSON.parse(localStorage.getItem('my_notifications') || '[]');
+    notis = notis.filter(n => n.id !== id); // 해당 ID 제외
+    localStorage.setItem('my_notifications', JSON.stringify(notis));
+
+    // 2. 페이지 이동
+    // (삭제 상태 저장을 위해 location.href 사용)
+    location.href = link;
+};
+
+// 4. [New] 모두 읽음 (모두 삭제)
 window.markAllRead = function() {
-    MOCK_NOTIFICATIONS.forEach(n => n.read = true);
-    loadNotifications();
+    localStorage.setItem('my_notifications', '[]'); // 빈 배열 저장
+    loadNotifications(); // UI 갱신
 };
