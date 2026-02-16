@@ -625,105 +625,107 @@ html[data-theme="dark"] .slider {
 }
 
 /* =========================================
-   8. [New] 쪽지함 (Message Box) 스타일
+   8. 쪽지함 (Message Box) 스타일 - 통합본
    ========================================= 
 */
-/* 탭 영역 */
+
+/* 1. 상단 탭 영역 */
 .msg-tabs {
-    display: flex; gap: 8px; margin-bottom: 20px;
-    border-bottom: 1px solid var(--line); padding-bottom: 10px;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 24px;
+    border-bottom: 1px solid var(--line); padding-bottom: 12px;
 }
 .msg-tab-btn {
-    padding: 8px 16px; background: none; border: none; border-radius: 8px;
-    font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: 0.2s;
+    padding: 8px 16px; background: transparent; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s ease;
 }
 .msg-tab-btn:hover { background: var(--surface-hover); color: var(--text); }
-.msg-tab-btn.active { background: var(--primary-bg); color: var(--primary); }
-.msg-tab-btn.write-mode { margin-left: auto; background: var(--text); color: var(--surface); }
+.msg-tab-btn.active { background: var(--surface-hover); color: var(--primary); font-weight: 700; }
 
-/* [New] 툴바 영역 */
-.msg-toolbar {
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: flex-end;
+/* 쪽지 쓰기 버튼 강조 */
+.msg-tab-btn.write-mode {
+    margin-left: auto; background: var(--primary); color: white !important;
+    padding: 8px 20px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); display: flex; align-items: center; gap: 6px;
 }
-.btn-group {
-    display: flex; gap: 6px;
-}
+.msg-tab-btn.write-mode:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-/* 테이블 스타일 */
+/* 2. 관리 툴바 & 버튼 */
+.msg-toolbar { margin-bottom: 16px; display: flex; justify-content: flex-end; }
+.btn-group { display: flex; gap: 8px; }
+
+.btn-action {
+    display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+    font-size: 13px; font-weight: 600; color: var(--text); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+}
+.btn-action:hover { background: var(--surface-hover); transform: translateY(-1px); border-color: var(--muted); }
+
+/* 삭제 버튼 스타일 */
+.btn-action.delete { color: var(--bad); border-color: rgba(220, 38, 38, 0.3); background: var(--surface); }
+.btn-action.delete:hover { background: rgba(220, 38, 38, 0.05); border-color: var(--bad); }
+
+/* 3. 테이블 스타일 */
 .msg-table {
-    width: 100%; border-collapse: collapse; font-size: 14px;
-    table-layout: fixed; /* 셀 너비 고정 */
+    width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
 }
-
 .msg-table th {
-    /* 헤더 색상 */
-    background: var(--surface-hover);
-    padding: 12px 10px;
-    color: var(--muted);
-    font-weight: 600;
-    text-align: center;
-    border-bottom: 2px solid var(--line); /* 구분선 강조 */
+    background: var(--surface-hover); padding: 14px 10px; color: var(--muted);
+    font-weight: 700; text-align: center; border-bottom: 1px solid var(--line);
 }
-
 .msg-table td {
-    padding: 14px 10px;
-    border-bottom: 1px solid var(--line);
-    text-align: center;
-    color: var(--text);
-    vertical-align: middle;
+    padding: 16px 10px; border-bottom: 1px solid var(--line);
+    text-align: center; color: var(--text); background: var(--surface);
 }
+.msg-table tr:last-child td { border-bottom: none; }
+.msg-table .check-col { width: 50px; }
+.msg-table .td-content { text-align: left; }
 
-.msg-table .check-col { width: 40px; }
-.msg-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; vertical-align: middle; }
-
-/* [요청 3 해결] Row 호버 시 색상 구분 */
-.msg-row { transition: background-color 0.1s; }
-.msg-row:hover {
-    /* 헤더(--surface-hover)와 명확히 다른 색상 */
-    background-color: #f1f5f9; /* Light mode tint */
-    cursor: pointer;
-}
-html[data-theme="dark"] .msg-row:hover {
-    background-color: rgba(255, 255, 255, 0.08);
-}
-
-/* 읽지 않은 쪽지 */
-.msg-row.unread td {
-    font-weight: 700;
-    color: var(--primary);
-}
-
-/* 내용 말줄임 */
 .msg-content-preview {
-    text-align: left;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-left: 8px;
+    max-width: 460px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); padding: 0 8px;
 }
+.msg-row.unread td { background-color: #f0f7ff; font-weight: 600; }
+.msg-row.unread .msg-content-preview { color: var(--primary); }
+.msg-row:hover td { background-color: var(--surface-hover); cursor: pointer; }
 
-.badge-sent {
-    font-size: 10px; background: var(--line); padding: 2px 4px; border-radius: 4px; color: var(--muted);
-}
-
-/* 쪽지 읽기 화면 */
+/* 4. [New] 쪽지 읽기 화면 스타일 (이전 누락분 복구) */
 .msg-view-header {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px dashed var(--line);
+    margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px dashed var(--line);
+}
+.msg-view-utils { display: flex; gap: 8px; }
+
+.msg-meta {
+    display: flex; justify-content: space-between; margin-bottom: 20px;
+    font-size: 14px; color: var(--muted); font-weight: 500;
 }
 .msg-body {
-    min-height: 200px; line-height: 1.6; white-space: pre-wrap;
-    background: var(--bg); padding: 20px; border-radius: 8px;
+    min-height: 300px; line-height: 1.7; white-space: pre-wrap;
+    background: var(--surface-hover); padding: 24px; border-radius: 12px;
+    color: var(--text); font-size: 15px; border: 1px solid var(--line);
 }
 
-/* 버튼 유틸 */
-.btn-small {
-    padding: 6px 12px; font-size: 12px; border-radius: 6px;
-    border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+/* 5. [New] 쪽지 쓰기 화면 스타일 (이전 누락분 복구) */
+.msg-write-wrap { animation: fadeIn 0.2s ease-out; }
+
+
+/* [요청 3 해결] 취소 버튼 스타일 (보내기 버튼과 크기 통일, 색상은 회색) */
+.btn-cancel {
+    padding: 12px 24px;
+    background: var(--surface);       /* 배경: 흰색/어두운배경 */
+    border: 1px solid var(--line);    /* 테두리: 얇은 회색 */
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);               /* 글자: 기본 검정/흰색 */
+    cursor: pointer;
+    transition: 0.2s;
 }
-.btn-small:hover { background: var(--surface-hover); }
-.btn-small.btn-bad { color: var(--bad); border-color: rgba(220,38,38,0.3); }
-.btn-small.btn-bad:hover { background: #fef2f2; }
+
+.btn-cancel:hover {
+    background: var(--surface-hover); /* 호버 시 약간 어두워짐 */
+    border-color: var(--muted);
+}
+
+.anim-fade {
+    animation: fadeIn 0.3s ease-out;
+}

@@ -94,44 +94,60 @@
             <button class="msg-tab-btn active" onclick="switchMsgTab('inbox')">받은 쪽지</button>
             <button class="msg-tab-btn" onclick="switchMsgTab('sent')">보낸 쪽지</button>
             <button class="msg-tab-btn" onclick="switchMsgTab('archive')">보관함</button>
-            <button class="msg-tab-btn write-mode" onclick="switchMsgTab('write')">✍ 쪽지 쓰기</button>
+            
+            <button class="msg-tab-btn write-mode" onclick="switchMsgTab('write')">
+                <span style="font-size:16px">✍️</span> 쪽지 쓰기
+            </button>
         </div>
 
         <div id="msgListArea" class="msg-list-wrap">
-          <div class="msg-toolbar">
-              <div class="btn-group">
-                  <button class="btn-small btn-bad" onclick="handleBulkAction('delete')">🗑️ 삭제</button>
-                  <button class="btn-small" onclick="handleBulkAction('archive')">📦 보관</button>
-                  <button class="btn-small" onclick="handleBulkAction('report')">🚨 신고</button>
-                  <button class="btn-small" onclick="handleBulkAction('reply')">↩️ 답장</button>
-              </div>
-          </div>
+            <div class="msg-toolbar">
+                <div class="btn-group">
+                    <button class="btn-action delete" onclick="handleBulkAction('delete')">
+                        🗑️ 삭제
+                    </button>
+                    <button class="btn-action" onclick="handleBulkAction('archive')">
+                        📦 보관
+                    </button>
+                    <button class="btn-action" onclick="handleBulkAction('report')">
+                        🚨 신고
+                    </button>
+                    <button class="btn-action" onclick="handleBulkAction('reply')">
+                        ↩️ 답장
+                    </button>
+                </div>
+            </div>
 
-          <table class="msg-table">
-              <colgroup>
-                  <col width="5%">  <col width="10%"> <col width="*">   <col width="15%"> </colgroup>
-              <thead>
-                  <tr>
-                      <th>
-                          <input type="checkbox" id="checkAllMsg" onchange="toggleAllMessages(this)">
-                      </th>
-                      <th>보낸사람</th> <th>내용</th>
-                      <th>날짜</th>
-                  </tr>
-              </thead>
-              <tbody id="msgListBody">
-                  </tbody>
-          </table>
-          <div id="msgEmpty" class="empty-msg hidden">쪽지가 없습니다.</div>
+            <table class="msg-table">
+                <colgroup>
+                    <col width="5%">
+                    <col width="15%">
+                    <col width="*">
+                    <col width="20%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="checkAllMsg" onchange="toggleAllMessages(this)">
+                        </th>
+                        <th>보낸사람</th>
+                        <th>내용</th>
+                        <th>날짜</th>
+                    </tr>
+                </thead>
+                <tbody id="msgListBody">
+                    </tbody>
+            </table>
+            <div id="msgEmpty" class="empty-msg hidden">쪽지가 없습니다.</div>
         </div>
 
         <div id="msgViewArea" class="msg-view-wrap hidden">
             <div class="msg-view-header">
                 <button class="btn-text-action" onclick="backToMsgList()">← 목록으로</button>
                 <div class="msg-view-utils">
-                    <button class="btn-small" id="btnMsgReply">답장</button>
-                    <button class="btn-small btn-bad" id="btnMsgDelete">삭제</button>
-                    <button class="btn-small" id="btnMsgArchive">보관</button>
+                    <button class="btn-action" id="btnMsgReply">↩️ 답장</button>
+                    <button class="btn-action delete" id="btnMsgDelete">🗑️ 삭제</button>
+                    <button class="btn-action" id="btnMsgArchive">📦 보관</button>
                 </div>
             </div>
             <div class="msg-view-content">
@@ -139,9 +155,7 @@
                     <span class="sender" id="viewSender">보낸사람</span>
                     <span class="date" id="viewDate">2024.01.01</span>
                 </div>
-                <div class="msg-body" id="viewBody">
-                    내용...
-                </div>
+                <div class="msg-body" id="viewBody">내용...</div>
             </div>
         </div>
 
@@ -150,12 +164,15 @@
                 <label>받는 사람 (닉네임)</label>
                 <input type="text" id="msgReceiver" class="input-edit" placeholder="닉네임을 입력하세요">
             </div>
+            
             <div class="form-row">
                 <label>내용</label>
-                <textarea id="msgContent" class="input-bio" placeholder="내용을 입력하세요 (500자 이내)"></textarea>
+                <textarea id="msgContent" class="input-edit" style="height: 300px; resize: none; line-height: 1.6;" placeholder="내용을 입력하세요 (500자 이내)"></textarea>
             </div>
+            
             <div class="btn-area">
-                <button class="btn-text-action bad" onclick="switchMsgTab('inbox')">취소</button>
+                <button class="btn-cancel" onclick="switchMsgTab('inbox')">취소</button>
+                
                 <button class="btn-save" onclick="sendDirectMessage()">보내기</button>
             </div>
         </div>

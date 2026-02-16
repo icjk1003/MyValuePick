@@ -43,39 +43,37 @@ function initMyPage() {
     // 4. 쪽지함 초기화
     initMessageBox();
 
-    // 5. [수정] URL 파라미터에 따른 초기 화면 복구
-    // URL에서 section, tab, id 값을 읽어옵니다.
+    // 5. URL 파라미터 복구 (새로고침 시 상태 유지)
     const urlParams = new URLSearchParams(window.location.search);
     const section = urlParams.get('section');
     const tab = urlParams.get('tab');
     const msgId = urlParams.get('id');
 
     if (section) {
-        // history 업데이트 없이(false) 화면만 전환
-        showMypageSection(section, false);
+        showMypageSection(section, false); // 히스토리 추가 없이 전환
 
         if (section === 'messages') {
             if (tab) {
                 switchMsgTab(tab, false);
             }
             if (msgId) {
-                // 데이터 로드 시간 고려하여 약간의 지연 후 실행
+                // 데이터 로드 안정성을 위해 지연 실행
                 setTimeout(() => openMessage(msgId, false), 100);
             }
         }
     } else {
-        // 기본값: 내 정보 관리 (URL 파라미터가 없을 때)
+        // 기본값: 내 정보 관리
         showMypageSection('edit', false);
     }
 
     // 6. 전체 정보 저장 버튼
     document.getElementById("btnSaveMyInfo")?.addEventListener("click", () => {
-        // ... (기존 저장 로직 유지) ...
         const newNick = document.getElementById("myNickInput").value.trim();
         const currentNick = localStorage.getItem("user_nick");
         const newPw = document.getElementById("myPwInput").value;
         const newPwCheck = document.getElementById("myPwCheckInput").value;
 
+        // 비밀번호 변경 로직
         if (newPw !== "") {
             if (newPw.length < 4) {
                 alert("비밀번호는 최소 4자 이상이어야 합니다.");
@@ -88,6 +86,7 @@ function initMyPage() {
             }
         }
 
+        // 닉네임 변경 로직
         if (newNick !== currentNick) {
             if (newNick.length < 2 || newNick.length > 10) {
                 alert("닉네임은 2자 이상 10자 이하로 설정해주세요.");
@@ -107,7 +106,7 @@ function initMyPage() {
 }
 
 // =========================================
-// [기능] 섹션 전환 (URL 상태 관리 추가)
+// [기능] 섹션 전환 (URL 상태 관리)
 // =========================================
 window.showMypageSection = function(type, updateHistory = true) {
     // 1. UI 전환
@@ -124,19 +123,23 @@ window.showMypageSection = function(type, updateHistory = true) {
     if (type === 'posts') renderMyPosts();
     if (type === 'comments') renderMyComments();
     if (type === 'social') initSocialLinking();
-    if (type === 'messages') renderMessageList();
+    if (type === 'messages') {
+        renderMessageList();
+        // 쪽지함 진입 시 애니메이션 효과
+        triggerAnimation('msgListArea');
+    }
 
-    // 3. [New] URL 업데이트 (Push State)
+    // 3. URL 업데이트
     if (updateHistory) {
         const url = new URL(window.location);
         url.searchParams.set('section', type);
         
-        // 섹션 이동 시 하위 파라미터(tab, id)는 초기화하여 깔끔하게 만듦
+        // 다른 섹션 이동 시 쪽지함 관련 파라미터 정리
         if (type !== 'messages') {
             url.searchParams.delete('tab');
             url.searchParams.delete('id');
         } else {
-            // 쪽지함 진입 시 기본 탭(inbox)이므로 tab 파라미터도 제거 (또는 inbox로 명시 가능)
+            // 쪽지함 초기 진입 시 탭 정보 등 초기화 (필요 시)
             url.searchParams.delete('tab');
             url.searchParams.delete('id');
         }
@@ -145,6 +148,17 @@ window.showMypageSection = function(type, updateHistory = true) {
     }
 };
 
+// =========================================
+// [기능] 애니메이션 헬퍼 (강제 리플로우)
+// =========================================
+function triggerAnimation(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.classList.remove('anim-fade');
+        void el.offsetWidth; // 브라우저가 변경사항을 인지하도록 강제 리플로우(Reflow) 발생
+        el.classList.add('anim-fade');
+    }
+}
 
 // =========================================
 // [기능] 쪽지함 로직
@@ -165,50 +179,53 @@ function initMessageBox() {
     updateMsgBadge();
 }
 
-// 탭 전환 (URL 상태 관리 추가)
+// 탭 전환
 window.switchMsgTab = function(tabName, updateHistory = true) {
     currentMsgTab = tabName;
 
-    // UI 스타일 업데이트
+    // 1. 탭 버튼 스타일 업데이트
     document.querySelectorAll('.msg-tab-btn').forEach(btn => btn.classList.remove('active'));
+    
     if (tabName !== 'write') {
         const btns = document.querySelectorAll('.msg-tab-btn');
+        // 순서: 0:받은, 1:보낸, 2:보관 (HTML 순서 의존)
         const tabMap = { 'inbox': 0, 'sent': 1, 'archive': 2 };
         if (btns[tabMap[tabName]]) btns[tabMap[tabName]].classList.add('active');
     }
 
-    // 영역 전환
+    // 2. 영역 전환 및 애니메이션
     const listArea = document.getElementById('msgListArea');
     const viewArea = document.getElementById('msgViewArea');
     const writeArea = document.getElementById('msgWriteArea');
 
-    if (listArea) listArea.classList.add('hidden');
-    if (viewArea) viewArea.classList.add('hidden');
-    if (writeArea) writeArea.classList.add('hidden');
+    listArea.classList.add('hidden');
+    viewArea.classList.add('hidden');
+    writeArea.classList.add('hidden');
 
     if (tabName === 'write') {
-        if (writeArea) {
-            writeArea.classList.remove('hidden');
-            document.getElementById('msgReceiver').value = '';
-            document.getElementById('msgContent').value = '';
-        }
+        writeArea.classList.remove('hidden');
+        triggerAnimation('msgWriteArea'); // 쓰기 영역 애니메이션
+        
+        // 입력창 초기화
+        document.getElementById('msgReceiver').value = '';
+        document.getElementById('msgContent').value = '';
     } else {
-        if (listArea) {
-            listArea.classList.remove('hidden');
-            renderMessageList();
-        }
+        listArea.classList.remove('hidden');
+        renderMessageList();
+        triggerAnimation('msgListArea'); // 리스트 영역 애니메이션 (탭 전환 시마다 발동)
     }
 
-    // [New] URL 업데이트
+    // 3. URL 업데이트
     if (updateHistory) {
         const url = new URL(window.location);
-        url.searchParams.set('section', 'messages'); // 안전장치
+        url.searchParams.set('section', 'messages');
         url.searchParams.set('tab', tabName);
-        url.searchParams.delete('id'); // 탭 바꿀 땐 보고 있던 쪽지 해제
-        window.history.replaceState({}, '', url); // 탭 전환은 replace가 자연스러움
+        url.searchParams.delete('id'); // 탭 전환 시 보고 있던 쪽지 해제
+        window.history.replaceState({}, '', url);
     }
 };
 
+// 목록 렌더링
 function renderMessageList() {
     const tbody = document.getElementById('msgListBody');
     const emptyMsg = document.getElementById('msgEmpty');
@@ -255,14 +272,14 @@ function renderMessageList() {
     `).join("");
 }
 
-// 쪽지 읽기 (URL 상태 관리 추가)
+// 쪽지 읽기
 window.openMessage = function(msgId, updateHistory = true) {
     const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
     const msg = msgs.find(m => m.id == msgId);
 
     if (!msg) {
         alert("삭제되거나 없는 쪽지입니다.");
-        // URL에 잘못된 ID가 있다면 제거
+        // URL 정리
         const url = new URL(window.location);
         if (url.searchParams.get('id') == msgId) {
             url.searchParams.delete('id');
@@ -278,17 +295,21 @@ window.openMessage = function(msgId, updateHistory = true) {
         updateMsgBadge();
     }
 
-    // 뷰 전환
+    // 화면 전환
     document.getElementById('msgListArea').classList.add('hidden');
     document.getElementById('msgWriteArea').classList.add('hidden');
     document.getElementById('msgViewArea').classList.remove('hidden');
 
+    // 애니메이션 실행
+    triggerAnimation('msgViewArea');
+
+    // 내용 채우기
     document.getElementById('viewSender').textContent = 
         currentMsgTab === 'sent' ? `받는사람: ${msg.receiver}` : `보낸사람: ${msg.sender}`;
     document.getElementById('viewDate').textContent = new Date(msg.date).toLocaleString();
     document.getElementById('viewBody').textContent = msg.content;
 
-    // 버튼 이벤트
+    // 버튼 제어
     const btnReply = document.getElementById('btnMsgReply');
     const btnDel = document.getElementById('btnMsgDelete');
     const btnArch = document.getElementById('btnMsgArchive');
@@ -298,7 +319,7 @@ window.openMessage = function(msgId, updateHistory = true) {
             switchMsgTab('write');
             document.getElementById('msgReceiver').value = msg.sender;
         };
-        btnReply.style.display = (currentMsgTab === 'sent') ? 'none' : 'inline-block';
+        btnReply.style.display = (currentMsgTab === 'sent') ? 'none' : 'flex'; // flex or inline-flex (CSS .btn-action display와 일치)
     }
     if (btnDel) {
         btnDel.onclick = () => {
@@ -307,10 +328,10 @@ window.openMessage = function(msgId, updateHistory = true) {
     }
     if (btnArch) {
         btnArch.onclick = () => archiveMessage(msg.id);
-        btnArch.style.display = (msg.box === 'archive') ? 'none' : 'inline-block';
+        btnArch.style.display = (msg.box === 'archive') ? 'none' : 'flex';
     }
 
-    // [New] URL 업데이트
+    // URL 업데이트
     if (updateHistory) {
         const url = new URL(window.location);
         url.searchParams.set('id', msgId);
@@ -321,9 +342,10 @@ window.openMessage = function(msgId, updateHistory = true) {
 window.backToMsgList = function() {
     document.getElementById('msgViewArea').classList.add('hidden');
     document.getElementById('msgListArea').classList.remove('hidden');
+    
     renderMessageList();
+    triggerAnimation('msgListArea'); // 목록으로 돌아올 때도 애니메이션
 
-    // URL에서 ID 제거 (목록으로 돌아감)
     const url = new URL(window.location);
     url.searchParams.delete('id');
     window.history.pushState({}, '', url);
@@ -394,7 +416,7 @@ window.handleBulkAction = function(action) {
 };
 
 // =========================================
-// [기타] 기존 유틸리티 함수들
+// [기타] 쪽지 보내기/삭제/보관 함수들
 // =========================================
 window.sendDirectMessage = function() {
     const receiver = document.getElementById('msgReceiver').value.trim();
@@ -413,7 +435,7 @@ window.sendDirectMessage = function() {
     const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
     const newId = Date.now();
 
-    // 1. Sent
+    // 1. Sent 저장
     msgs.push({
         id: newId,
         sender: myNick,
@@ -482,7 +504,7 @@ function updateMsgBadge() {
     }
 }
 
-// 기존 로직들 (탈퇴, 닉네임, 크롭 등)
+// [기존 유지] 회원정보 관련 로직
 function initWithdrawal() {
     const btn = document.getElementById("btnWithdrawal");
     if (!btn) return;
