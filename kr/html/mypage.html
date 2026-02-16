@@ -28,11 +28,12 @@
             </div>
 
           <h3 id="myNickDisplay">닉네임 로딩중</h3>
-          <p id="myEmailDisplay" class="profile-email-text">user@email.com</p>
+          <p id="myEmailDisplay" style="word-break: break-all; color: var(--muted); font-size: 13px;">user@email.com</p>
         </div>
         
         <nav class="mypage-menu">
           <a href="javascript:void(0)" onclick="showMypageSection('edit')" id="menu-edit" class="active">⚙️ 내 정보 관리</a>
+          <a href="javascript:void(0)" onclick="showMypageSection('messages')" id="menu-messages"> 💌 쪽지함 <span id="msgBadge" class="menu-badge hidden">N</span></a>
           <a href="javascript:void(0)" onclick="showMypageSection('posts')" id="menu-posts">📝 내가 쓴 글</a>
           <a href="javascript:void(0)" onclick="showMypageSection('comments')" id="menu-comments">💬 내가 쓴 댓글</a>
           <a href="javascript:void(0)" onclick="showMypageSection('social')" id="menu-social">🔗 계정 연동</a>
@@ -58,8 +59,8 @@
         </div>
 
         <div class="form-row">
-          <div class="bio-header">
-            <label>자기소개</label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="margin-bottom:0;">자기소개</label>
             <div class="bio-btn-group">
               <button id="btnEditBio" class="btn-text-action">수정</button>
               <button id="btnSaveBio" class="btn-text-action primary hidden">저장</button>
@@ -86,6 +87,68 @@
         </div>
       </section>
 
+      <section id="section-messages" class="mypage-content card hidden">
+        <h2 class="section-title">내 쪽지함</h2>
+        
+        <div class="msg-tabs">
+            <button class="msg-tab-btn active" onclick="switchMsgTab('inbox')">받은 쪽지</button>
+            <button class="msg-tab-btn" onclick="switchMsgTab('sent')">보낸 쪽지</button>
+            <button class="msg-tab-btn" onclick="switchMsgTab('archive')">보관함</button>
+            <button class="msg-tab-btn write-mode" onclick="switchMsgTab('write')">✍ 쪽지 쓰기</button>
+        </div>
+
+        <div id="msgListArea" class="msg-list-wrap">
+            <table class="msg-table">
+                <thead>
+                    <tr>
+                        <th width="15%">보낸사람</th>
+                        <th>내용</th>
+                        <th width="20%">날짜</th>
+                        <th width="15%">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="msgListBody">
+                    </tbody>
+            </table>
+            <div id="msgEmpty" class="empty-msg hidden">쪽지가 없습니다.</div>
+        </div>
+
+        <div id="msgViewArea" class="msg-view-wrap hidden">
+            <div class="msg-view-header">
+                <button class="btn-text-action" onclick="backToMsgList()">← 목록으로</button>
+                <div class="msg-view-utils">
+                    <button class="btn-small" id="btnMsgReply">답장</button>
+                    <button class="btn-small btn-bad" id="btnMsgDelete">삭제</button>
+                    <button class="btn-small" id="btnMsgArchive">보관</button>
+                </div>
+            </div>
+            <div class="msg-view-content">
+                <div class="msg-meta">
+                    <span class="sender" id="viewSender">보낸사람</span>
+                    <span class="date" id="viewDate">2024.01.01</span>
+                </div>
+                <div class="msg-body" id="viewBody">
+                    내용...
+                </div>
+            </div>
+        </div>
+
+        <div id="msgWriteArea" class="msg-write-wrap hidden">
+            <div class="form-row">
+                <label>받는 사람 (닉네임)</label>
+                <input type="text" id="msgReceiver" class="input-edit" placeholder="닉네임을 입력하세요">
+            </div>
+            <div class="form-row">
+                <label>내용</label>
+                <textarea id="msgContent" class="input-bio" placeholder="내용을 입력하세요 (500자 이내)"></textarea>
+            </div>
+            <div class="btn-area">
+                <button class="btn-text-action bad" onclick="switchMsgTab('inbox')">취소</button>
+                <button class="btn-save" onclick="sendDirectMessage()">보내기</button>
+            </div>
+        </div>
+      </section>
+
       <section id="section-posts" class="mypage-content card hidden">
         <h2 class="section-title">내가 쓴 글</h2>
         <div id="myPostsList" class="my-content-list"></div>
@@ -98,7 +161,7 @@
 
       <section id="section-social" class="mypage-content card hidden">
         <h2 class="section-title">계정 연동 관리</h2>
-        <p class="desc section-desc-spaced">
+        <p class="desc" style="margin-bottom: 30px;">
             자주 사용하는 소셜 계정을 연동하여 간편하게 로그인할 수 있습니다.<br>
             연동을 해제하면 해당 계정으로는 더 이상 로그인할 수 없습니다.
         </p>

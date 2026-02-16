@@ -613,3 +613,124 @@ html[data-theme="dark"] .slider {
 .section-desc-spaced {
     margin-bottom: 30px;
 }
+
+/* =========================================
+   8. 쪽지함 (Message Box) 스타일
+   ========================================= 
+*/
+/* 메뉴 배지 */
+.menu-badge {
+    background: var(--bad);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* 상단 탭 */
+.msg-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+}
+
+.msg-tab-btn {
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.msg-tab-btn:hover { background: var(--surface-hover); color: var(--text); }
+.msg-tab-btn.active { background: var(--primary-bg); color: var(--primary); }
+.msg-tab-btn.write-mode { margin-left: auto; background: var(--text); color: var(--surface); }
+.msg-tab-btn.write-mode:hover { opacity: 0.9; }
+
+/* 쪽지 목록 테이블 */
+.msg-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.msg-table th {
+    background: var(--surface-hover);
+    padding: 10px;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: center;
+}
+
+.msg-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+    color: var(--text);
+}
+
+/* 읽지 않은 쪽지 강조 */
+.msg-row.unread td {
+    font-weight: 700;
+    background-color: rgba(37, 99, 235, 0.03);
+}
+
+.msg-row:hover { background-color: var(--surface-hover); cursor: pointer; }
+
+/* 내용 셀 (말줄임) */
+.msg-content-preview {
+    text-align: left;
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 auto;
+}
+
+/* 쪽지 읽기 화면 */
+.msg-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--line);
+}
+
+.msg-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.msg-body {
+    min-height: 200px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+/* 관리 버튼 */
+.btn-small {
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    cursor: pointer;
+}
+.btn-small:hover { background: var(--surface-hover); }
+.btn-small.btn-bad { color: var(--bad); border-color: var(--bad); }
+.btn-small.btn-bad:hover { background: #fef2f2; }

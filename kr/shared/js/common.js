@@ -1,10 +1,9 @@
-/* shared/js/common.js - 공통 유틸리티 함수 */
+/* shared/js/common.js - 공통 유틸리티 */
 
-// 1. [핵심] 페이지 로드 즉시 저장된 테마 적용
+// 1. 테마 적용
 (function applySavedTheme() {
   const savedTheme = localStorage.getItem("theme");
   const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  
   if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
     document.documentElement.setAttribute("data-theme", "dark");
   } else {
@@ -12,7 +11,7 @@
   }
 })();
 
-// 2. 날짜 포맷팅 함수
+// 2. 날짜 포맷팅
 function formatBoardDate(dateString, full = false) {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -24,7 +23,6 @@ function formatBoardDate(dateString, full = false) {
     if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
     if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
   }
-
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -37,12 +35,10 @@ function formatBoardDate(dateString, full = false) {
   return `${year}-${month}-${day}`;
 }
 
-// 3. 숫자 콤마 포맷팅
 function formatNumber(num) {
   return (num || 0).toLocaleString();
 }
 
-// 4. 공통 초기화 (헤더/푸터/이벤트)
 document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderFooter();
@@ -51,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   wireGlobalSearch();
 });
 
-// 헤더 렌더링
+// 헤더 렌더링 (쪽지 아이콘 제거됨)
 function renderHeader() {
   const target = document.getElementById("global-header") || document.getElementById("header-placeholder");
   if (!target) return;
@@ -115,11 +111,9 @@ function renderHeader() {
   wireGlobalSearch();
 }
 
-// 푸터 렌더링
 function renderFooter() {
   const target = document.getElementById("global-footer") || document.getElementById("footer-placeholder");
   if (!target) return;
-
   target.innerHTML = `
     <div style="padding:40px 0; text-align:center; color:var(--muted); font-size:13px; margin-top:60px; border-top:1px solid var(--line);">
       <div style="margin-bottom:8px; font-weight:700;">MyValuePick</div>
@@ -129,24 +123,20 @@ function renderFooter() {
   `;
 }
 
-// 테마 토글
 function wireThemeToggle() {
   const btn = document.getElementById("themeBtn");
   if (!btn) return;
-
   btn.onclick = null;
   btn.onclick = () => {
     const root = document.documentElement;
     const isDark = root.getAttribute("data-theme") === "dark";
     const newTheme = isDark ? "light" : "dark";
-    
     root.setAttribute("data-theme", newTheme);
     btn.textContent = newTheme === "dark" ? '🌙' : '☀️';
     localStorage.setItem("theme", newTheme);
   };
 }
 
-// 로그인 상태 처리
 function wireLoginState() {
   const btnLogin = document.getElementById("btnLogin");
   if(!btnLogin) return;
@@ -154,7 +144,6 @@ function wireLoginState() {
   const isLoggedIn = localStorage.getItem("is_logged_in");
   const userId = localStorage.getItem("user_id");
   const nickName = localStorage.getItem("user_nick") || "내 정보";
-  
   const notiBtn = document.getElementById("notiBtnWrap");
 
   if(isLoggedIn) {
@@ -162,11 +151,11 @@ function wireLoginState() {
     btnLogin.href = "mypage.html"; 
     btnLogin.onclick = null; 
 
-    // 1. 알림 버튼 활성화
+    // 알림 활성화
     if(notiBtn) {
         notiBtn.style.display = "flex";
-        initNotifications(); // 초기 데이터 설정
-        loadNotifications(); // 로드
+        initNotifications();
+        loadNotifications();
 
         notiBtn.onclick = (e) => {
             e.stopPropagation();
@@ -178,7 +167,7 @@ function wireLoginState() {
         };
     }
 
-    // 2. 관리자 버튼
+    // 관리자 버튼
     if (userId === 'root') {
         if (!document.getElementById('btnAdminMode')) {
             const parent = btnLogin.parentNode;
@@ -189,20 +178,10 @@ function wireLoginState() {
             adminBtn.href = 'admin.html';
             adminBtn.textContent = '👑 관리자 모드';
             adminBtn.style.cssText = `
-                position: absolute;
-                left: 100%;
-                top: 50%;
-                transform: translateY(-50%);
-                margin-left: 12px;
-                font-size: 13px;
-                font-weight: 700;
-                color: #fff;
-                background-color: #333; 
-                padding: 6px 12px;
-                border-radius: 6px;
-                text-decoration: none;
-                white-space: nowrap;
-                z-index: 10;
+                position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
+                margin-left: 12px; font-size: 13px; font-weight: 700; color: #fff;
+                background-color: #333; padding: 6px 12px; border-radius: 6px;
+                text-decoration: none; white-space: nowrap; z-index: 10;
             `;
             parent.appendChild(adminBtn); 
         }
@@ -217,13 +196,11 @@ function wireLoginState() {
         notiBtn.style.display = "none";
         document.getElementById("notiDropdown")?.classList.remove("show");
     }
-
     const adminBtn = document.getElementById('btnAdminMode');
     if (adminBtn) adminBtn.remove();
   }
 }
 
-// 글로벌 검색
 function wireGlobalSearch() {
   const input = document.getElementById("globalSearchInput");
   const suggestionsBox = document.getElementById("searchSuggestions");
@@ -297,16 +274,13 @@ function getProfileImage(nickname) {
 }
 window.getProfileImage = getProfileImage;
 
-
 // =========================================
-// [New] 알림 시스템 (수정됨: 삭제 및 이동 기능 포함)
+// [New] 알림 시스템 (쪽지 연동 포함)
 // =========================================
 
-// 외부 클릭 시 드롭다운 닫기
 document.addEventListener('click', (e) => {
     const notiBtn = document.getElementById("notiBtnWrap");
     const dropdown = document.getElementById("notiDropdown");
-    
     if (notiBtn && dropdown && dropdown.classList.contains('show')) {
         if (!notiBtn.contains(e.target)) {
             dropdown.classList.remove('show');
@@ -315,44 +289,59 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// 1. 초기 더미 데이터 설정 (최초 1회만 실행)
 function initNotifications() {
     if (!localStorage.getItem('my_notifications')) {
-        // [중요] 링크에 #cmt-0 등 해시를 포함하여 스크롤 위치 지정
         const initialData = [
+            // [수정] 1. 쪽지 알림 추가 (link 파라미터 중요: section=messages&id=쪽지ID)
+            { 
+                id: 999, 
+                type: 'message', 
+                user: '운영자', 
+                text: '환영합니다! 첫 쪽지를 확인해보세요.', 
+                time: new Date().toISOString(), 
+                link: 'mypage.html?section=messages&id=welcome_msg' 
+            },
+            // 기존 데이터...
             { id: 1, type: 'reply', user: '주식고수', text: '댓글을 남겼습니다.', time: new Date().toISOString(), link: 'post.html?id=1#cmt-0' },
-            { id: 2, type: 'tag', user: '단타왕', text: '회원님을 언급했습니다.', time: new Date(Date.now() - 3600000).toISOString(), link: 'post.html?id=1#cmt-1' },
-            { id: 3, type: 'notice', user: '관리자', text: '공지사항: 서버 점검 안내', time: new Date(Date.now() - 86400000).toISOString(), link: 'post.html?id=2' },
-            { id: 4, type: 'like', user: '익명', text: '게시글을 추천했습니다.', time: new Date(Date.now() - 100000000).toISOString(), link: 'post.html?id=3' }
+            // ...
         ];
         localStorage.setItem('my_notifications', JSON.stringify(initialData));
+        
+        // [New] 쪽지 더미 데이터 초기화 (최초 1회)
+        if(!localStorage.getItem("MOCK_MESSAGES")) {
+            const welcomeMsg = [{
+                id: "welcome_msg",
+                sender: "운영자",
+                receiver: "me",
+                content: "MyValuePick에 오신 것을 환영합니다.\n즐거운 커뮤니티 활동 되세요!",
+                date: new Date().toISOString(),
+                read: false,
+                box: "inbox" // inbox, sent, archive
+            }];
+            localStorage.setItem("MOCK_MESSAGES", JSON.stringify(welcomeMsg));
+        }
     }
 }
 
-// 2. 알림 로드 및 렌더링
 function loadNotifications() {
     const listContainer = document.getElementById("notiList");
     const badge = document.getElementById("notiBadge");
     if (!listContainer) return;
 
-    // LocalStorage에서 가져오기
     const notis = JSON.parse(localStorage.getItem('my_notifications') || '[]');
 
-    // 배지 업데이트
     if (badge) {
         badge.style.display = notis.length > 0 ? "block" : "none";
     }
 
-    // 리스트 렌더링
     if (notis.length === 0) {
         listContainer.innerHTML = `<div class="noti-empty">새로운 알림이 없습니다.</div>`;
     } else {
-        // [중요] onclick 이벤트에 handleNotiClick 연결
         listContainer.innerHTML = notis.map(n => `
             <div class="noti-item unread" onclick="handleNotiClick(${n.id}, '${n.link}')">
                 <div class="noti-content">
                     <div class="noti-msg">
-                        <strong>${n.user}</strong>: ${n.text}
+                        ${n.type === 'message' ? '💌 ' : ''}<strong>${n.user}</strong>: ${n.text}
                     </div>
                     <div class="noti-time">${formatBoardDate(n.time, true)}</div>
                 </div>
@@ -361,20 +350,14 @@ function loadNotifications() {
     }
 }
 
-// 3. [New] 알림 클릭 처리 (삭제 + 이동)
 window.handleNotiClick = function(id, link) {
-    // 1. 데이터 삭제 (읽음 처리 대신 삭제로 구현)
     let notis = JSON.parse(localStorage.getItem('my_notifications') || '[]');
-    notis = notis.filter(n => n.id !== id); // 해당 ID 제외
+    notis = notis.filter(n => n.id !== id);
     localStorage.setItem('my_notifications', JSON.stringify(notis));
-
-    // 2. 페이지 이동
-    // (삭제 상태 저장을 위해 location.href 사용)
     location.href = link;
 };
 
-// 4. [New] 모두 읽음 (모두 삭제)
 window.markAllRead = function() {
-    localStorage.setItem('my_notifications', '[]'); // 빈 배열 저장
-    loadNotifications(); // UI 갱신
+    localStorage.setItem('my_notifications', '[]');
+    loadNotifications();
 };
