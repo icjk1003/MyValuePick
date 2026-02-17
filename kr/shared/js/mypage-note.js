@@ -4,26 +4,19 @@
  */
 class MyPageNoteManager {
     constructor() {
-        // DOM Elements 캐싱
+        // [기존 DOM Elements 캐싱 코드 동일]
         this.els = {
-            // Containers
             listArea: document.getElementById('msgListArea'),
             viewArea: document.getElementById('msgViewArea'),
             writeArea: document.getElementById('msgWriteArea'),
             tbody: document.getElementById('msgListBody'),
             emptyMsg: document.getElementById('msgEmpty'),
             pagination: document.getElementById('msgPagination'),
-            
-            // Tabs
             tabButtons: document.querySelectorAll('.msg-tab-btn'),
-            
-            // Inputs & Controls
             checkAll: document.getElementById('checkAllMsg'),
             searchType: document.getElementById('msgSearchType'),
             searchInput: document.getElementById('msgSearchKeyword'),
             btnSearch: document.getElementById('btnMsgSearch'),
-            
-            // View Area
             viewSender: document.getElementById('viewSender'),
             viewDate: document.getElementById('viewDate'),
             viewBody: document.getElementById('viewBody'),
@@ -31,20 +24,18 @@ class MyPageNoteManager {
             btnViewReply: document.getElementById('btnViewReply'),
             btnViewDelete: document.getElementById('btnViewDelete'),
             btnViewArchive: document.getElementById('btnViewArchive'),
-
-            // Write Area
             inputReceiver: document.getElementById('msgReceiver'),
             inputContent: document.getElementById('msgContent'),
             btnWriteSend: document.getElementById('btnWriteSend'),
             btnWriteCancel: document.getElementById('btnWriteCancel'),
-
-            // Bulk Actions
             actionButtons: document.querySelectorAll('.btn-action[data-action]')
         };
 
-        // State
+        // [수정] State 초기화: localStorage에서 저장된 탭 불러오기
+        const savedTab = localStorage.getItem("mypage_note_tab") || 'inbox';
+
         this.state = {
-            currentTab: 'inbox', // inbox, sent, archive, write
+            currentTab: savedTab, // 저장된 탭 적용
             currentPage: 1,
             itemsPerPage: 10,
             searchKeyword: '',
@@ -61,10 +52,13 @@ class MyPageNoteManager {
     init() {
         this.initMockData();
         this.bindEvents();
-        this.updateBadge(); // 초기 배지 업데이트
+        this.updateBadge();
+        
+        // [추가] 초기 로드 시 저장된 탭으로 화면 전환 수행
+        this.switchTab(this.state.currentTab);
     }
 
-    // 1. Mock Data 초기화 (없을 경우)
+    // ... [initMockData, bindEvents 기존 코드 동일] ...
     initMockData() {
         if (!localStorage.getItem("MOCK_MESSAGES")) {
             const myNick = localStorage.getItem("user_nick") || "User";
@@ -81,7 +75,6 @@ class MyPageNoteManager {
         }
     }
 
-    // 2. 이벤트 바인딩
     bindEvents() {
         // 탭 전환
         this.els.tabButtons.forEach(btn => {
@@ -111,36 +104,35 @@ class MyPageNoteManager {
             });
         }
 
-        // 일괄 작업 (삭제, 보관 등)
+        // 일괄 작업
         this.els.actionButtons.forEach(btn => {
-            // view 화면 내부 버튼인지 체크
             if(btn.closest('#msgViewArea')) return; 
-
             btn.addEventListener('click', () => {
                 const action = btn.dataset.action;
                 this.handleBulkAction(action);
             });
         });
 
-        // 읽기 화면 이벤트
+        // 읽기/쓰기 화면 이벤트
         if(this.els.btnBack) this.els.btnBack.addEventListener('click', () => this.backToList());
         if(this.els.btnViewReply) this.els.btnViewReply.addEventListener('click', () => this.replyFromView());
         if(this.els.btnViewDelete) this.els.btnViewDelete.addEventListener('click', () => this.deleteFromView());
         if(this.els.btnViewArchive) this.els.btnViewArchive.addEventListener('click', () => this.archiveFromView());
-
-        // 쓰기 화면 이벤트
         if(this.els.btnWriteSend) this.els.btnWriteSend.addEventListener('click', () => this.sendMessage());
         if(this.els.btnWriteCancel) this.els.btnWriteCancel.addEventListener('click', () => this.switchTab('inbox'));
     }
 
-    // 3. 탭 전환 로직
+    // [수정] 탭 전환 로직: 상태 저장 추가
     switchTab(tabName) {
         this.state.currentTab = tabName;
+        
+        // [추가] 탭 상태를 localStorage에 저장
+        localStorage.setItem("mypage_note_tab", tabName);
         
         // 검색 초기화
         this.state.currentPage = 1;
         this.state.searchKeyword = "";
-        this.els.searchInput.value = "";
+        if(this.els.searchInput) this.els.searchInput.value = "";
 
         // UI 탭 활성화
         this.els.tabButtons.forEach(btn => {
@@ -156,8 +148,8 @@ class MyPageNoteManager {
         if (tabName === 'write') {
             this.els.writeArea.classList.remove('hidden');
             this.triggerAnim(this.els.writeArea);
-            this.els.inputReceiver.value = '';
-            this.els.inputContent.value = '';
+            if(this.els.inputReceiver) this.els.inputReceiver.value = '';
+            if(this.els.inputContent) this.els.inputContent.value = '';
         } else {
             this.els.listArea.classList.remove('hidden');
             this.renderList();
@@ -165,12 +157,13 @@ class MyPageNoteManager {
         }
     }
 
+    // ... [이하 renderList, openMessage 등 나머지 메소드는 기존과 동일] ...
+    
     // 4. 목록 렌더링
     renderList() {
         const myNick = localStorage.getItem("user_nick");
         let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
 
-        // 1) 탭 필터링
         let filtered = [];
         if (this.state.currentTab === 'inbox') {
             filtered = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick);
@@ -180,7 +173,6 @@ class MyPageNoteManager {
             filtered = msgs.filter(m => m.box === 'archive' && (m.receiver === myNick || m.sender === myNick));
         }
 
-        // 2) 검색 필터링
         if (this.state.searchKeyword) {
             const kw = this.state.searchKeyword.toLowerCase();
             filtered = filtered.filter(m => {
@@ -192,10 +184,8 @@ class MyPageNoteManager {
             });
         }
 
-        // 3) 정렬 (최신순)
         filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // 4) 빈 상태 처리
         if (filtered.length === 0) {
             this.els.tbody.innerHTML = "";
             this.els.emptyMsg.classList.remove('hidden');
@@ -205,7 +195,6 @@ class MyPageNoteManager {
         }
         this.els.emptyMsg.classList.add('hidden');
 
-        // 5) 페이지네이션 데이터 슬라이싱
         const totalItems = filtered.length;
         const totalPages = Math.ceil(totalItems / this.state.itemsPerPage);
         
@@ -215,7 +204,6 @@ class MyPageNoteManager {
         const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
         const pageItems = filtered.slice(startIndex, startIndex + this.state.itemsPerPage);
 
-        // 6) HTML 생성
         this.els.tbody.innerHTML = pageItems.map(m => {
             const isUnread = (!m.read && this.state.currentTab === 'inbox');
             const senderDisplay = this.state.currentTab === 'sent' 
@@ -236,10 +224,8 @@ class MyPageNoteManager {
             `;
         }).join("");
 
-        // 7) Row Click 이벤트 바인딩 (이벤트 위임 대신 직접 바인딩하여 확실하게 처리)
         this.els.tbody.querySelectorAll('.msg-row').forEach(row => {
             row.addEventListener('click', (e) => {
-                // 체크박스 클릭 시에는 상세 이동 안 함
                 if(e.target.tagName === 'INPUT') return;
                 this.openMessage(row.dataset.id);
             });
@@ -249,7 +235,6 @@ class MyPageNoteManager {
         this.renderPagination(totalPages);
     }
 
-    // 5. 페이지네이션 렌더링
     renderPagination(totalPages) {
         if (totalPages <= 1) {
             this.els.pagination.innerHTML = "";
@@ -257,18 +242,14 @@ class MyPageNoteManager {
         }
 
         let html = "";
-        // Prev
         html += `<button class="page-btn prev" ${this.state.currentPage === 1 ? 'disabled' : ''}>&lt;</button>`;
-        // Numbers
         for (let i = 1; i <= totalPages; i++) {
             html += `<button class="page-btn num ${i === this.state.currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
         }
-        // Next
         html += `<button class="page-btn next" ${this.state.currentPage === totalPages ? 'disabled' : ''}>&gt;</button>`;
 
         this.els.pagination.innerHTML = html;
 
-        // 이벤트 바인딩
         this.els.pagination.querySelectorAll('.page-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (btn.classList.contains('prev')) this.state.currentPage--;
@@ -279,7 +260,6 @@ class MyPageNoteManager {
         });
     }
 
-    // 6. 상세 보기
     openMessage(id) {
         const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         const msg = msgs.find(m => String(m.id) === String(id));
@@ -291,14 +271,12 @@ class MyPageNoteManager {
 
         this.state.currentViewId = id;
 
-        // 읽음 처리
         if (msg.box === 'inbox' && !msg.read) {
             msg.read = true;
             localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
             this.updateBadge();
         }
 
-        // 뷰 렌더링
         this.els.listArea.classList.add('hidden');
         this.els.viewArea.classList.remove('hidden');
         this.triggerAnim(this.els.viewArea);
@@ -308,7 +286,6 @@ class MyPageNoteManager {
         this.els.viewDate.textContent = new Date(msg.date).toLocaleString();
         this.els.viewBody.textContent = msg.content;
 
-        // 버튼 제어
         this.els.btnViewReply.style.display = (this.state.currentTab === 'sent') ? 'none' : 'flex';
         this.els.btnViewArchive.style.display = (msg.box === 'archive') ? 'none' : 'flex';
     }
@@ -316,12 +293,11 @@ class MyPageNoteManager {
     backToList() {
         this.els.viewArea.classList.add('hidden');
         this.els.listArea.classList.remove('hidden');
-        this.renderList(); // 읽음 상태 반영 등을 위해 리렌더링
+        this.renderList();
         this.triggerAnim(this.els.listArea);
         this.state.currentViewId = null;
     }
 
-    // 7. 쪽지 발송
     sendMessage() {
         const receiver = this.els.inputReceiver.value.trim();
         const content = this.els.inputContent.value.trim();
@@ -339,7 +315,6 @@ class MyPageNoteManager {
         const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         const newId = Date.now();
 
-        // SentBox에 저장
         msgs.push({
             id: newId,
             sender: myNick,
@@ -350,7 +325,6 @@ class MyPageNoteManager {
             box: "sent"
         });
 
-        // Inbox에 저장 (상대방 수신 시뮬레이션)
         msgs.push({
             id: newId + "_r",
             sender: myNick,
@@ -366,7 +340,6 @@ class MyPageNoteManager {
         this.switchTab('sent');
     }
 
-    // 8. 일괄 작업 핸들러
     handleBulkAction(action) {
         const checkboxes = document.getElementsByName('msgCheck');
         const ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
@@ -407,14 +380,12 @@ class MyPageNoteManager {
         this.updateBadge();
     }
 
-    // [Helper] 답장 폼 열기
     openReplyForm(msgId) {
         const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         const targetMsg = msgs.find(m => String(m.id) === String(msgId));
         
         if (targetMsg) {
             this.switchTab('write');
-            // 내가 보낸거면 받은사람에게, 받은거면 보낸사람에게
             const myNick = localStorage.getItem("user_nick");
             const replyTo = (targetMsg.sender === myNick) ? targetMsg.receiver : targetMsg.sender;
             this.els.inputReceiver.value = replyTo;
@@ -436,7 +407,6 @@ class MyPageNoteManager {
         this.backToList();
     }
 
-    // 실제 데이터 삭제 처리 (Helper)
     processDelete(ids) {
         let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         msgs = msgs.filter(m => !ids.includes(String(m.id)));
@@ -444,7 +414,6 @@ class MyPageNoteManager {
         this.updateBadge();
     }
 
-    // 실제 데이터 보관 처리 (Helper)
     processArchive(ids) {
         let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         msgs.forEach(m => {
@@ -459,7 +428,6 @@ class MyPageNoteManager {
         const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
         const unreadCount = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick && !m.read).length;
         
-        // 사이드바의 뱃지 엘리먼트 (mypage.html에 있다고 가정)
         const badge = document.getElementById('msgBadge');
         if (badge) {
             if (unreadCount > 0) {
