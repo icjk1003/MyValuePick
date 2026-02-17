@@ -1,0 +1,204 @@
+/* kr/shared/css/blog-scrap.css */
+
+/* =========================================
+   Blog Scrap List Style (Dark Mode Compatible)
+   ========================================= */
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* 1. 툴바 */
+.scrap-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    /* [수정] 배경색과 테두리를 변수로 변경 */
+    border-bottom: 1px solid var(--line);
+    background-color: var(--surface);
+    border-radius: 8px 8px 0 0;
+}
+
+.total-text {
+    font-size: 0.9rem;
+    color: var(--text); /* [수정] */
+}
+
+.search-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--line); /* [수정] */
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--surface); /* [수정] */
+}
+
+.search-input {
+    border: none;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    width: 180px;
+    outline: none;
+    color: var(--text); /* [수정] */
+    background: transparent;
+}
+
+.btn-search {
+    background-color: var(--surface); /* [수정] */
+    border: none;
+    border-left: 1px solid var(--line); /* [수정] */
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--muted); /* [수정] 아이콘 색상 */
+    transition: background 0.2s;
+}
+
+.btn-search:hover {
+    background-color: var(--surface-hover); /* [수정] */
+    color: var(--text);
+}
+
+/* 2. 스크랩 아이템 */
+.scrap-list-wrap {
+    min-height: 200px;
+}
+
+.scrap-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line); /* [수정] */
+    background-color: var(--surface); /* [수정] */
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.scrap-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.scrap-item:hover {
+    background-color: var(--surface-hover); /* [수정] */
+}
+
+.scrap-item:hover .origin-title {
+    color: var(--primary); /* [수정] */
+}
+
+.scrap-item:hover .btn-goto {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 좌측 아이콘 */
+.scrap-icon-col {
+    padding-right: 20px;
+    padding-top: 2px;
+}
+
+.scrap-icon {
+    font-size: 1.5rem;
+    color: #ffd700; /* 폴더 아이콘 색상은 유지 (노란색) */
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+/* 중앙 컨텐츠 */
+.scrap-content-col {
+    flex: 1;
+}
+
+.origin-title {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text); /* [수정] */
+    transition: color 0.2s;
+}
+
+.origin-meta {
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+    margin-bottom: 12px;
+}
+
+.origin-meta .writer {
+    color: var(--text); /* [수정] */
+    font-weight: 500;
+}
+
+.origin-meta .divider {
+    margin: 0 6px;
+    color: var(--line); /* [수정] */
+}
+
+/* 사용자 메모 (인용구 스타일) */
+.scrap-comment {
+    background-color: var(--surface-hover); /* [수정] */
+    padding: 10px 14px;
+    border-radius: 6px;
+    border-left: 3px solid var(--line); /* [수정] */
+    font-size: 0.9rem;
+    color: var(--muted); /* [수정] */
+    margin: 0 0 10px 0;
+    font-style: italic;
+}
+
+.scrap-date {
+    font-size: 0.75rem;
+    color: var(--muted); /* [수정] */
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* 우측 액션 버튼 */
+.scrap-action-col {
+    padding-left: 15px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    align-self: center;
+}
+
+.btn-goto {
+    background: none;
+    border: 1px solid var(--line); /* [수정] */
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: var(--muted); /* [수정] */
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0; /* 평소엔 숨김 */
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-goto:hover {
+    background-color: var(--primary); /* [수정] */
+    border-color: var(--primary);
+    color: #fff;
+}
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+    .scrap-item {
+        padding: 15px;
+    }
+    .scrap-icon-col {
+        padding-right: 15px;
+    }
+    .scrap-icon {
+        font-size: 1.2rem;
+    }
+    .scrap-action-col {
+        display: none; /* 모바일에서는 화살표 버튼 숨김 */
+    }
+    .origin-title {
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,28 @@
+<div class="blog-subscription-wrapper fade-in">
+    <div class="content-header-row">
+        <h2 class="h3">⭐ 구독한 작가</h2>
+        <span class="sub-text">새로운 글을 기다리는 작가님들의 목록입니다.</span>
+    </div>
+
+    <div class="card">
+        <div class="sub-toolbar">
+            <div class="toolbar-left">
+                <span class="total-text">구독중 <strong id="totalSubCount">0</strong>명</span>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-group">
+                    <input type="text" id="subSearchInput" class="search-input" placeholder="작가명 검색">
+                    <button type="button" id="btnSubSearch" class="btn-search">🔍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="blogSubList" class="sub-list-grid">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <div id="blogSubEmpty" class="empty-state hidden">
+            <p>아직 구독 중인 작가가 없습니다.<br>마음에 드는 블로그를 구독해보세요!</p>
+        </div>
+    </div>
+</div>

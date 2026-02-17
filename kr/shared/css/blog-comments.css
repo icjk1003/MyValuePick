@@ -1,0 +1,138 @@
+/* kr/shared/css/blog-comments.css */
+
+/* =========================================
+   Blog Comments List Style (Dark Mode Compatible)
+   ========================================= */
+
+/* 애니메이션 */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* 상단 유틸리티 (카운트 등) */
+.list-utils {
+    padding: 15px 20px;
+    /* [수정] 배경색과 테두리를 변수로 변경 */
+    border-bottom: 1px solid var(--line);
+    background-color: var(--surface);
+    border-radius: 8px 8px 0 0;
+}
+
+.total-count {
+    font-size: 0.9rem;
+    color: var(--muted); /* [수정] */
+}
+
+/* 댓글 리스트 컨테이너 */
+.comment-list-wrap {
+    min-height: 200px;
+}
+
+/* 개별 댓글 아이템 */
+.blog-comment-item {
+    padding: 20px;
+    border-bottom: 1px solid var(--line); /* [수정] */
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s;
+    background-color: var(--surface); /* [수정] */
+}
+
+.blog-comment-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+}
+
+.blog-comment-item:hover {
+    background-color: var(--surface-hover); /* [수정] */
+}
+
+.blog-comment-item:active {
+    transform: scale(0.995);
+}
+
+/* 댓글 헤더 (글 제목 + 날짜) */
+.comment-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.target-post {
+    font-size: 0.85rem;
+    color: var(--primary); /* [수정] */
+    font-weight: 600;
+    
+    /* 긴 제목 말줄임 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+}
+
+.meta-date {
+    font-size: 0.8rem;
+    color: var(--muted); /* [수정] */
+    white-space: nowrap;
+}
+
+/* 댓글 내용 */
+.comment-body {
+    font-size: 0.95rem;
+    color: var(--text); /* [수정] */
+    line-height: 1.5;
+    margin-bottom: 12px;
+    
+    /* 2줄 이상은 말줄임 처리 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 댓글 푸터 (답글 뱃지) */
+.comment-foot {
+    display: flex;
+    align-items: center;
+}
+
+.reply-badge {
+    font-size: 0.75rem;
+    color: var(--muted); /* [수정] */
+    background-color: var(--surface-hover); /* [수정] */
+    padding: 3px 8px;
+    border-radius: 12px;
+    transition: color 0.2s;
+    border: 1px solid var(--line); /* [수정] 테두리 추가 */
+}
+
+.reply-badge.active {
+    color: var(--primary); /* [수정] 활성화 시 프라이머리 컬러 */
+    background-color: var(--primary-bg); /* [수정] */
+    border-color: var(--primary);
+    font-weight: 500;
+}
+
+/* 로딩 및 Empty State */
+.loading-spinner {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+}
+.loading-spinner::after {
+    content: "Loading...";
+}
+
+.empty-state {
+    padding: 60px 0;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .target-post {
+        max-width: 60%;
+    }
+}

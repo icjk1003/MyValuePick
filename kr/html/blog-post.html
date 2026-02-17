@@ -1,0 +1,35 @@
+<div class="blog-post-wrapper fade-in">
+    <div class="content-header-row">
+        <h2 class="h3">📝 게시글</h2>
+        <span class="sub-text">투자와 관련된 다양한 기록들입니다.</span>
+    </div>
+
+    <div class="card">
+        <div class="post-toolbar">
+            <div class="toolbar-left">
+                <span class="total-text">Total <strong id="totalPostCount">0</strong></span>
+            </div>
+            <div class="toolbar-right">
+                <select id="postSortFilter" class="mini-select">
+                    <option value="latest">최신순</option>
+                    <option value="popular">조회순</option>
+                    <option value="comments">댓글순</option>
+                </select>
+                <div class="search-group">
+                    <input type="text" id="postSearchInput" class="search-input" placeholder="검색어를 입력하세요">
+                    <button type="button" id="btnPostSearch" class="btn-search">🔍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="blogPostList" class="blog-post-list">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <div id="blogPostEmpty" class="empty-state hidden">
+            <p>등록된 게시글이 없습니다.</p>
+        </div>
+
+        <div id="blogPostPagination" class="pagination-area hidden"></div>
+    </div>
+</div>

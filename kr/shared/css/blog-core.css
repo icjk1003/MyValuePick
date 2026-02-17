@@ -1,0 +1,362 @@
+/* kr/shared/css/blog-core.css */
+
+/* =========================================
+   1. [공통] 블로그 코어 레이아웃
+   ========================================= */
+
+/* 커버 이미지 영역 */
+.blog-header-bg {
+    height: 200px;
+    background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    margin-bottom: -30px; 
+}
+
+.blog-cover-content {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit-cover {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-edit-cover:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* 메인 컨테이너 */
+.blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    position: relative;
+    z-index: 2;
+}
+
+.blog-layout {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px; 
+}
+
+/* =========================================
+   2. 사이드바 (프로필 및 네비게이션)
+   ========================================= */
+
+.blog-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+}
+
+/* [프로필 카드] */
+.blog-sidebar .blog-profile-section {
+    /* [수정] common.css의 변수(--surface) 사용 */
+    background-color: var(--surface); 
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    /* [수정] common.css의 변수(--line) 사용 */
+    border: 1px solid var(--line);
+    
+    overflow: visible;
+    position: relative;
+}
+
+.profile-avatar-wrap {
+    width: 100px;
+    height: 100px;
+    margin: -50px auto 15px; 
+    position: relative;
+}
+
+.blog-avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* [수정] 프로필 테두리도 배경색과 동일하게 */
+    border: 4px solid var(--bg); 
+    object-fit: cover;
+    background-color: var(--line);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-nick {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin: 0 0 8px 0;
+    color: var(--text);
+}
+
+.blog-bio {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+
+/* 통계 (Posts / Followers) */
+.blog-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0 15px;
+}
+
+.stat-item .val {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+}
+
+.stat-item .lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 30px;
+    background-color: var(--line);
+}
+
+/* 버튼 그룹 */
+.blog-action-row {
+    margin-top: 10px;
+}
+
+.action-group {
+    display: flex;
+    gap: 8px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.btn-icon-only {
+    width: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.btn-icon-only:hover {
+    background: var(--surface-hover);
+}
+
+/* =========================================
+   3. 네비게이션 메뉴 (왼쪽 탭 영역)
+   ========================================= */
+
+.blog-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    overflow: hidden;
+    /* [수정] common.css 변수 적용으로 다크모드 자동 대응 */
+    background-color: var(--surface);
+    border: 1px solid var(--line); 
+    border-radius: 8px;
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+.nav-item.active {
+    background-color: var(--primary-bg);
+    color: var(--primary);
+    border-left-color: var(--primary);
+    font-weight: 700;
+}
+
+.nav-divider {
+    height: 1px;
+    background-color: var(--line);
+    margin: 8px 0;
+}
+
+/* =========================================
+   4. 메인 컨텐츠 영역 및 로더
+   ========================================= */
+
+.blog-content {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 50px;
+}
+
+/* 로딩 스피너 */
+.loader-box {
+    text-align: center;
+    padding: 100px 0;
+    width: 100%;
+    color: var(--muted);
+    background-color: transparent; 
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--line);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================================
+   5. 에러 및 상태 메시지
+   ========================================= */
+
+.error-state {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.error-state h3 {
+    color: var(--bad);
+    margin-bottom: 10px;
+}
+
+.error-state p {
+    color: var(--muted);
+    margin-bottom: 20px;
+}
+
+.btn-retry {
+    background-color: var(--text);
+    color: var(--bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* =========================================
+   6. 모바일 반응형
+   ========================================= */
+
+@media (max-width: 768px) {
+    .blog-header-bg {
+        height: 140px;
+        margin-bottom: -40px;
+    }
+    
+    .blog-layout {
+        flex-direction: column;
+        gap: 0;
+        margin-top: 0;
+    }
+
+    .blog-sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .blog-sidebar .blog-profile-section {
+        border-radius: 0 0 12px 12px;
+        border-top: none;
+    }
+
+    .profile-avatar-wrap {
+        margin-top: -50px;
+        width: 80px;
+        height: 80px;
+    }
+    
+    /* 모바일 네비게이션 (가로 스크롤) */
+    .blog-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 5px;
+        white-space: nowrap;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--line);
+        margin-top: 10px;
+    }
+    
+    .nav-item {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        flex-shrink: 0;
+    }
+    
+    .nav-item.active {
+        background: none;
+        border-left: none;
+        border-bottom-color: var(--primary);
+    }
+    
+    .nav-divider {
+        display: none;
+    }
+}

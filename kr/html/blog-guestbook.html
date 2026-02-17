@@ -1,0 +1,36 @@
+<div class="blog-guestbook-wrapper fade-in">
+    <div class="content-header-row">
+        <h2 class="h3">📖 방명록</h2>
+        <span class="sub-text">자유롭게 인사를 남겨주세요.</span>
+    </div>
+
+    <div class="card guest-write-card">
+        <div class="guest-form-wrap">
+            <div class="guest-input-area">
+                <textarea id="guestInput" class="guest-textarea" placeholder="주인장에게 따뜻한 한마디를 남겨주세요. (최대 300자)"></textarea>
+            </div>
+            <div class="guest-form-footer">
+                <span class="char-count"><span id="guestCharCount">0</span>/300</span>
+                <button type="button" id="btnSaveGuest" class="btn-save-guest">등록</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="list-header">
+            <span class="total-count">총 <strong id="totalGuestCount">0</strong>개의 글</span>
+        </div>
+
+        <div id="guestbookList" class="guestbook-list-wrap">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <div id="guestbookEmpty" class="empty-state hidden">
+            <p>아직 방명록이 없습니다.<br>첫 번째 방문자가 되어주세요!</p>
+        </div>
+
+        <div id="guestLoadMore" class="load-more-area hidden">
+            <button type="button" class="btn-more">더보기 ▾</button>
+        </div>
+    </div>
+</div>

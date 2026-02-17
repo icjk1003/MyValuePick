@@ -1,0 +1,277 @@
+/* kr/shared/css/blog-subscription.css */
+
+/* =========================================
+   Blog Subscription List Style (Dark Mode Compatible)
+   ========================================= */
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* 1. 툴바 */
+.sub-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    /* [수정] 배경색과 테두리를 변수로 변경 */
+    border-bottom: 1px solid var(--line);
+    background-color: var(--surface);
+    border-radius: 8px 8px 0 0;
+}
+
+.total-text {
+    font-size: 0.9rem;
+    color: var(--text); /* [수정] */
+}
+
+.search-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--line); /* [수정] */
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--surface); /* [수정] */
+}
+
+.search-input {
+    border: none;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    width: 140px;
+    outline: none;
+    color: var(--text); /* [수정] */
+    background: transparent;
+}
+
+.btn-search {
+    background-color: var(--surface); /* [수정] */
+    border: none;
+    border-left: 1px solid var(--line); /* [수정] */
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--muted); /* [수정] */
+}
+.btn-search:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+/* 2. 그리드 레이아웃 */
+.sub-list-grid {
+    display: grid;
+    /* 카드의 최소 너비를 220px로 설정하여 자동 줄바꿈 */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px;
+    padding: 24px;
+    min-height: 200px;
+    background-color: transparent; /* [수정] 그리드 배경은 투명하게 */
+}
+
+/* 3. 구독 카드 디자인 */
+.sub-card {
+    /* [수정] 카드 배경 및 테두리 변수 적용 */
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.sub-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    border-color: var(--primary);
+}
+
+/* 상단: 프로필 */
+.card-top {
+    width: 100%;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sub-profile-img {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    margin-bottom: 12px;
+}
+
+.sub-profile-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--line); /* [수정] */
+}
+
+.default-avatar-large {
+    width: 100%;
+    height: 100%;
+    background-color: var(--line); /* [수정] */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--muted); /* [수정] */
+    font-weight: bold;
+}
+
+/* 새 글 알림 뱃지 */
+.badge-new {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--bad); /* [수정] */
+    color: #fff;
+    font-size: 0.65rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--surface); /* [수정] 뱃지 테두리를 카드 배경색과 일치시킴 */
+    font-weight: bold;
+}
+
+.sub-nick {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: var(--text); /* [수정] */
+    cursor: pointer;
+}
+.sub-nick:hover {
+    text-decoration: underline;
+}
+
+.sub-bio {
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+    line-height: 1.4;
+    margin: 0;
+    width: 100%;
+    
+    /* 2줄 말줄임 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.8em;
+}
+
+/* 중간: 스탯 */
+.card-mid {
+    margin-bottom: 15px;
+    width: 100%;
+    border-top: 1px solid var(--line); /* [수정] */
+    border-bottom: 1px solid var(--line); /* [수정] */
+    padding: 8px 0;
+}
+
+.stat-text {
+    font-size: 0.8rem;
+    color: var(--muted); /* [수정] */
+}
+
+.stat-text strong {
+    color: var(--text); /* [수정] 숫자 강조 */
+}
+
+/* 하단: 버튼 */
+.card-bot {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.btn-visit {
+    flex: 1;
+    padding: 8px 0;
+    border: 1px solid var(--primary);
+    background-color: var(--surface); /* [수정] */
+    color: var(--primary);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+}
+
+.btn-visit:hover {
+    background-color: var(--primary);
+    color: #fff;
+}
+
+.btn-unsub {
+    flex: 1;
+    padding: 8px 0;
+    border: 1px solid var(--line); /* [수정] */
+    background-color: var(--surface-hover); /* [수정] */
+    color: var(--muted); /* [수정] */
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-unsub:hover {
+    background-color: var(--line);
+    color: var(--text);
+    border-color: var(--muted);
+}
+
+/* 로딩 및 Empty State */
+.loading-spinner {
+    grid-column: 1 / -1; /* 전체 너비 차지 */
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+}
+.empty-state {
+    padding: 60px 0;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* 모바일 대응 */
+@media (max-width: 480px) {
+    .sub-list-grid {
+        grid-template-columns: 1fr; /* 1열 */
+        padding: 15px;
+    }
+    .sub-card {
+        flex-direction: row;
+        align-items: flex-start;
+        text-align: left;
+    }
+    .card-top {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    .sub-profile-img {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 0;
+    }
+    .sub-bio {
+        min-height: auto;
+        -webkit-line-clamp: 1;
+    }
+    .card-mid {
+        display: none;
+    }
+}

@@ -1,0 +1,41 @@
+<div class="blog-home-wrapper fade-in">
+    
+    <section class="home-welcome-card card">
+        <div class="welcome-content">
+            <h3>👋 안녕하세요! <span class="highlight-nick" id="homeNickName">User</span>의 블로그입니다.</h3>
+            <p id="homeBioText">투자와 일상을 기록하는 공간입니다. 편하게 둘러보고 가세요!</p>
+        </div>
+    </section>
+
+    <section class="home-section">
+        <div class="section-header">
+            <h4>📌 주인장의 추천 글</h4>
+        </div>
+        <div id="homeFeaturedPost" class="featured-card card">
+            <div class="loading-spinner"></div>
+        </div>
+    </section>
+
+    <div class="home-grid-row">
+        <section class="home-section flex-2">
+            <div class="section-header-row">
+                <h4>📝 최신 글</h4>
+                <a href="javascript:void(0)" onclick="loadBlogSection('post')" class="more-link">더보기 &gt;</a>
+            </div>
+            <div id="homeLatestPosts" class="latest-post-list card">
+                <div class="loading-spinner"></div>
+            </div>
+        </section>
+
+        <section class="home-section flex-1">
+            <div class="section-header-row">
+                <h4>💬 최근 방명록</h4>
+                <a href="javascript:void(0)" onclick="loadBlogSection('guestbook')" class="more-link">더보기 &gt;</a>
+            </div>
+            <div id="homeGuestbookPreview" class="guest-preview-box card">
+                <div class="loading-spinner"></div>
+            </div>
+        </section>
+    </div>
+
+</div>

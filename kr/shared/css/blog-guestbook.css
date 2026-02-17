@@ -1,0 +1,218 @@
+/* kr/shared/css/blog-guestbook.css */
+
+/* =========================================
+   Blog Guestbook Layout (Dark Mode Compatible)
+   ========================================= */
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* 1. 방명록 작성 카드 */
+.guest-write-card {
+    padding: 20px;
+    margin-bottom: 24px;
+    /* [수정] 배경색과 테두리를 변수로 변경 */
+    background-color: var(--surface); 
+    border: 1px solid var(--line);
+    border-radius: 12px; /* 둥글게 */
+}
+
+.guest-form-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.guest-textarea {
+    width: 100%;
+    height: 100px;
+    /* [수정] 입력창 배경/테두리/글자색 변수 적용 */
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.95rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: var(--bg); /* 입력창은 배경보다 한 단계 뒤로 */
+    color: var(--text);
+}
+
+.guest-textarea:focus {
+    border-color: var(--primary);
+}
+
+.guest-form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.char-count {
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+}
+
+.btn-save-guest {
+    background-color: var(--primary); /* [수정] */
+    color: #fff; /* 버튼 글씨는 흰색 유지 */
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-save-guest:hover {
+    opacity: 0.9;
+}
+.btn-save-guest:disabled {
+    background-color: var(--line); /* [수정] */
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+/* 2. 리스트 헤더 */
+.list-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--line); /* [수정] */
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+/* 3. 방명록 아이템 */
+.guestbook-list-wrap {
+    min-height: 200px;
+}
+
+.guest-item {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid var(--line); /* [수정] */
+}
+
+.guest-item:last-child {
+    border-bottom: none;
+}
+
+/* 프로필 이미지 (아바타) */
+.guest-profile {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+}
+
+.guest-profile img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--line); /* [수정] */
+}
+
+.default-avatar {
+    width: 100%;
+    height: 100%;
+    background-color: var(--line); /* [수정] */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--muted); /* [수정] */
+    font-size: 1.2rem;
+}
+
+/* 방명록 내용 박스 */
+.guest-content-box {
+    flex: 1;
+}
+
+.guest-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.writer-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text); /* [수정] */
+}
+
+.write-date {
+    font-size: 0.8rem;
+    color: var(--muted); /* [수정] */
+}
+
+.btn-delete-mini {
+    font-size: 0.75rem;
+    color: var(--muted); /* [수정] */
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: auto;
+}
+.btn-delete-mini:hover {
+    color: var(--bad); /* [수정] 삭제는 빨간색(bad) 변수 */
+}
+
+.guest-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text); /* [수정] */
+    word-break: break-all;
+}
+
+/* 더보기 버튼 */
+.load-more-area {
+    text-align: center;
+    padding: 15px;
+    border-top: 1px solid var(--line); /* [수정] */
+}
+.btn-more {
+    background: none;
+    border: 1px solid var(--line); /* [수정] */
+    padding: 8px 24px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+    transition: all 0.2s;
+}
+.btn-more:hover {
+    background-color: var(--surface-hover); /* [수정] */
+    color: var(--text);
+}
+
+/* 로딩 스피너 및 유틸 */
+.loading-spinner {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+}
+.empty-state {
+    padding: 60px 0;
+    text-align: center;
+    color: var(--muted);
+}
+
+/* 모바일 대응 */
+@media (max-width: 480px) {
+    .guest-item {
+        padding: 15px;
+        gap: 12px;
+    }
+    .guest-profile {
+        width: 32px;
+        height: 32px;
+    }
+    .guest-text {
+        font-size: 0.9rem;
+    }
+}

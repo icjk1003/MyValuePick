@@ -1,0 +1,30 @@
+<div class="blog-scrap-wrapper fade-in">
+    <div class="content-header-row">
+        <h2 class="h3">📂 스크랩</h2>
+        <span class="sub-text">인상 깊게 읽은 글들을 보관하는 공간입니다.</span>
+    </div>
+
+    <div class="card">
+        <div class="scrap-toolbar">
+            <div class="toolbar-left">
+                <span class="total-text">Total <strong id="totalScrapCount">0</strong></span>
+            </div>
+            <div class="toolbar-right">
+                <div class="search-group">
+                    <input type="text" id="scrapSearchInput" class="search-input" placeholder="제목, 작성자 검색">
+                    <button type="button" id="btnScrapSearch" class="btn-search">🔍</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="blogScrapList" class="scrap-list-wrap">
+            <div class="loading-spinner"></div>
+        </div>
+        
+        <div id="blogScrapEmpty" class="empty-state hidden">
+            <p>스크랩한 글이 없습니다.</p>
+        </div>
+
+        <div id="blogScrapPagination" class="pagination-area hidden"></div>
+    </div>
+</div>

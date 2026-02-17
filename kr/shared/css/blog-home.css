@@ -1,0 +1,260 @@
+/* kr/shared/css/blog-home.css */
+
+/* =========================================
+   Blog Home Layout (Dark Mode Compatible)
+   ========================================= */
+
+/* 애니메이션 */
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 1. 웰컴 카드 */
+.home-welcome-card {
+    /* [수정] 다크모드 대응을 위해 변수 기반의 그라데이션 사용 */
+    background: linear-gradient(120deg, var(--surface) 0%, var(--surface-hover) 100%);
+    padding: 30px;
+    margin-bottom: 24px;
+    border-left: 5px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    /* [추가] 테두리를 추가하여 다크모드에서 경계 명확화 */
+    border: 1px solid var(--line);
+    border-left-width: 5px; /* 왼쪽 포인트 컬러 유지 */
+}
+
+.welcome-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.4rem;
+    color: var(--text); /* [수정] 텍스트 변수 사용 */
+}
+
+.highlight-nick {
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.welcome-content p {
+    margin: 0;
+    color: var(--muted); /* [수정] 뮤트 텍스트 변수 사용 */
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* 2. 섹션 헤더 공통 */
+.home-section {
+    margin-bottom: 30px;
+}
+
+.section-header, .section-header-row {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header h4, .section-header-row h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text); /* [수정] */
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.more-link {
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.more-link:hover {
+    color: var(--primary);
+}
+
+/* 3. 추천(Featured) 게시글 카드 */
+.featured-card {
+    padding: 25px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: var(--surface); /* [수정] 배경색 변수 사용 */
+    border: 1px solid var(--line); /* [수정] 테두리 변수 사용 */
+    border-radius: 12px; /* 둥글게 */
+}
+
+.featured-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border-color: var(--primary);
+}
+
+.feat-badge-row {
+    margin-bottom: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+.badge-hot {
+    background-color: var(--bad); /* [수정] 빨간색 변수 사용 */
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.badge-cat {
+    background-color: var(--surface-hover); /* [수정] */
+    color: var(--muted);
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--line); /* 테두리 추가 */
+}
+
+.feat-title {
+    font-size: 1.35rem;
+    margin: 0 0 10px 0;
+    color: var(--text); /* [수정] */
+    line-height: 1.3;
+}
+
+.feat-desc {
+    color: var(--muted); /* [수정] */
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.feat-meta {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    opacity: 0.8;
+}
+
+/* 4. 그리드 레이아웃 */
+.home-grid-row {
+    display: flex;
+    gap: 24px;
+}
+.flex-2 { flex: 2; }
+.flex-1 { flex: 1; }
+
+@media (max-width: 768px) {
+    .home-grid-row {
+        flex-direction: column;
+    }
+}
+
+/* 5. 최신 글 리스트 스타일 */
+.home-post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.home-post-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line); /* [수정] */
+    cursor: pointer;
+    transition: background-color 0.1s;
+    color: var(--text);
+}
+
+.home-post-list li:last-child {
+    border-bottom: none;
+}
+
+.home-post-list li:hover {
+    background-color: var(--surface-hover); /* [수정] */
+}
+
+.home-post-list .post-title {
+    font-size: 0.95rem;
+    color: var(--text); /* [수정] */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 75%;
+}
+
+.home-post-list .post-date {
+    font-size: 0.8rem;
+    color: var(--muted); /* [수정] */
+}
+
+/* 6. 방명록 미니 리스트 스타일 */
+.home-guest-list {
+    padding: 10px;
+}
+
+.mini-guest-item {
+    background-color: var(--surface-hover); /* [수정] 배경을 약간 밝게/어둡게 */
+    border: 1px solid var(--line); /* [수정] */
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.mini-guest-item:last-child {
+    margin-bottom: 0;
+}
+
+.mini-guest-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+}
+
+.mini-guest-head strong {
+    color: var(--text); /* [수정] */
+}
+.mini-guest-head .date {
+    color: var(--muted); /* [수정] */
+    font-size: 0.75rem;
+}
+
+.mini-guest-msg {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted); /* [수정] */
+    line-height: 1.4;
+    
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.empty-msg-mini {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+/* 로딩 스피너 및 유틸 */
+.loading-spinner {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+}
+.empty-placeholder {
+    padding: 40px;
+    text-align: center;
+    color: var(--muted);
+}

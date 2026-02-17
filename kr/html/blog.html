@@ -4,8 +4,17 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>MyValuePick · 개인 블로그</title>
+    
     <link rel="stylesheet" href="../shared/css/common.css"/>
-    <link rel="stylesheet" href="../shared/css/blog.css"/>
+    
+    <link rel="stylesheet" href="../shared/css/blog-core.css"/>
+    
+    <link rel="stylesheet" href="../shared/css/blog-home.css"/>
+    <link rel="stylesheet" href="../shared/css/blog-post.css"/>
+    <link rel="stylesheet" href="../shared/css/blog-scrap.css"/>
+    <link rel="stylesheet" href="../shared/css/blog-guestbook.css"/>
+    <link rel="stylesheet" href="../shared/css/blog-subscription.css"/>
+    <link rel="stylesheet" href="../shared/css/blog-comments.css"/>
 </head>
 <body>
     <div id="global-header"></div>
@@ -16,12 +25,10 @@
     </div>
 
     <div class="container blog-container">
-        
         <div class="blog-layout">
             
             <aside class="blog-sidebar">
-                
-                <div class="blog-profile-section">
+                <div class="blog-profile-section card">
                     <div class="profile-avatar-wrap">
                         <img src="" id="blogProfileImg" class="blog-avatar" alt="Profile">
                     </div>
@@ -51,10 +58,10 @@
                             </div>
 
                             <div id="ownerActions" class="action-group full-width hidden">
-                                <button onclick="location.href='mypage-info.html'" class="btn primary flex-1">
+                                <button onclick="location.href='mypage.html'" class="btn primary flex-1">
                                     ⚙️ 블로그 설정
                                 </button>
-                                <button onclick="location.href='mypage-note.html'" class="btn btn-icon-only" title="쪽지함">
+                                <button onclick="location.href='mypage.html?section=messages'" class="btn btn-icon-only" title="쪽지함">
                                     📬
                                 </button>
                             </div>
@@ -63,126 +70,57 @@
                 </div>
 
                 <nav class="blog-nav card">
-                    <button class="nav-item highlight owner-only hidden" onclick="location.href='write.html'">
-                        <span class="emoji">🖊️</span> 
-                        <span class="text">새 글 쓰기</span>
+                    <button class="nav-item owner-only hidden" onclick="location.href='write.html'">
+                        <span class="emoji">🖊️</span> <span class="text">새 글 쓰기</span>
                     </button>
 
                     <div class="nav-divider owner-only hidden"></div>
 
-                    <button class="nav-item active" data-tab="posts">
+                    <button class="nav-item" id="nav-home" onclick="loadBlogSection('home')">
+                        <span class="emoji">🏠</span> <span class="text">홈</span>
+                    </button>
+                    <button class="nav-item" id="nav-post" onclick="loadBlogSection('post')">
                         <span class="emoji">📝</span> <span class="text">게시글</span>
                     </button>
-                    <button class="nav-item" data-tab="scraps">
+                    <button class="nav-item" id="nav-scrap" onclick="loadBlogSection('scrap')">
                         <span class="emoji">📂</span> <span class="text">스크랩</span>
                     </button>
-                    <button class="nav-item" data-tab="guestbook">
+                    <button class="nav-item" id="nav-guestbook" onclick="loadBlogSection('guestbook')">
                         <span class="emoji">📖</span> <span class="text">방명록</span>
                     </button>
+                    
                     <div class="nav-divider"></div>
-                    <button class="nav-item" data-tab="subs">
+                    
+                    <button class="nav-item" id="nav-subscription" onclick="loadBlogSection('subscription')">
                         <span class="emoji">⭐</span> <span class="text">구독한 작가</span>
                     </button>
-                    <button class="nav-item" data-tab="comments">
+                    <button class="nav-item" id="nav-comments" onclick="loadBlogSection('comments')">
                         <span class="emoji">💬</span> <span class="text">댓글 활동</span>
                     </button>
                 </nav>
-
             </aside>
 
-            <main class="blog-content">
-                <div id="tab-posts" class="tab-pane active">
-                    <div class="content-header-row">
-                        <h2 class="h3">📝 작성한 게시글</h2>
-                        <div class="filter-group">
-                            <select class="mini-select">
-                                <option>최신순</option>
-                                <option>인기순</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <table class="boardTable">
-                            <thead>
-                                <tr>
-                                    <th>번호</th>
-                                    <th>제목</th>
-                                    <th>날짜</th>
-                                    <th>조회</th>
-                                </tr>
-                            </thead>
-                            <tbody id="blogPostList"></tbody>
-                        </table>
-                        <div id="blogPostEmpty" class="empty-state hidden">작성한 게시글이 없습니다.</div>
-                    </div>
-                </div>
-
-                <div id="tab-scraps" class="tab-pane hidden">
-                    <div class="content-header-row">
-                        <h2 class="h3">📂 스크랩한 글</h2>
-                    </div>
-                    <div class="card">
-                        <table class="boardTable">
-                            <thead>
-                                <tr>
-                                    <th>번호</th>
-                                    <th>제목</th>
-                                    <th>작성자</th>
-                                    <th>날짜</th>
-                                </tr>
-                            </thead>
-                            <tbody id="blogScrapList"></tbody>
-                        </table>
-                        <div id="blogScrapEmpty" class="empty-state hidden">스크랩한 글이 없습니다.</div>
-                    </div>
-                </div>
-
-                <div id="tab-guestbook" class="tab-pane hidden">
-                    <div class="content-header-row">
-                        <h2 class="h3">📖 방명록</h2>
-                        <span class="sub-text">자유롭게 인사를 남겨주세요.</span>
-                    </div>
-                    <div class="card padding-box mb-4">
-                        <div class="guestbook-form">
-                            <textarea id="guestInput" class="guest-input" placeholder="주인장에게 따뜻한 한마디를 남겨주세요."></textarea>
-                            <div class="guest-form-ft">
-                                <span class="text-limit">0/300</span>
-                                <button id="btnSaveGuest" class="btn primary">등록</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div id="guestbookList" class="guestbook-list"></div>
-                        <div id="guestbookEmpty" class="empty-state hidden">아직 방명록이 없습니다.</div>
-                    </div>
-                </div>
-
-                <div id="tab-subs" class="tab-pane hidden">
-                    <div class="content-header-row">
-                        <h2 class="h3">⭐ 구독한 작가</h2>
-                    </div>
-                    <div class="card padding-box">
-                        <div id="blogSubList" class="sub-list-grid"></div>
-                        <div id="blogSubEmpty" class="empty-state hidden">구독한 작가가 없습니다.</div>
-                    </div>
-                </div>
-
-                <div id="tab-comments" class="tab-pane hidden">
-                    <div class="content-header-row">
-                        <h2 class="h3">💬 댓글 활동</h2>
-                    </div>
-                    <div class="card">
-                        <div id="blogCommentList" class="comment-list-wrap"></div>
-                        <div id="blogCommentEmpty" class="empty-state hidden">작성한 댓글이 없습니다.</div>
-                    </div>
+            <main id="blog-main-view" class="blog-content">
+                <div class="loader-box">
+                    <div class="spinner"></div>
+                    <p>페이지 로딩중...</p>
                 </div>
             </main>
         </div>
     </div>
 
     <div id="global-footer"></div>
+
     <script src="../shared/js/data.js"></script>
     <script src="../shared/js/common.js"></script>
-    <script src="../shared/js/blog.js"></script>
+    
+    <script src="../shared/js/blog-home.js"></script>
+    <script src="../shared/js/blog-post.js"></script>
+    <script src="../shared/js/blog-scrap.js"></script>
+    <script src="../shared/js/blog-guestbook.js"></script>
+    <script src="../shared/js/blog-subscription.js"></script>
+    <script src="../shared/js/blog-comments.js"></script>
+    
+    <script src="../shared/js/blog-core.js"></script>
 </body>
 </html>
