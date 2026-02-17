@@ -37,9 +37,7 @@
     font-weight: 700;
 }
 
-/* 쓰기 버튼 특화 
-   (!important 제거를 위해 부모 선택자 .msg-tabs를 포함하여 우선순위 높임) 
-*/
+/* [수정] 쪽지 쓰기 버튼: 애니메이션 및 발광 효과 강화 */
 .msg-tabs .msg-tab-btn.write-mode {
     margin-left: auto;
     background: var(--primary, #007bff);
@@ -49,11 +47,16 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    
+    /* 부드러운 움직임 추가 */
+    transition: all 0.2s ease-in-out;
 }
 
+/* Hover 시: 더 높이 떠오르고 강한 발광 효과 */
 .msg-tabs .msg-tab-btn.write-mode:hover {
     filter: brightness(1.1);
-    transform: translateY(-1px);
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
     color: #fff;
 }
 
@@ -72,29 +75,31 @@
     gap: 6px;
 }
 
-/* 드롭다운 및 입력창 공통 스타일 */
+/* =========================================
+   [Fix] 드롭다운(Select) & 입력창 스타일 통합
+   ========================================= */
+
+/* 1. 기본 모양 및 색상 설정 */
 .search-select, 
 .search-input {
-    padding: 6px 10px;
+    height: 34px;
+    padding: 0 10px;
     border: 1px solid var(--line, #ccc);
     border-radius: 6px;
-    background: var(--surface, #fff);
+    background-color: var(--surface, #fff);
     font-size: 13px;
     color: var(--text, #333);
-    transition: border-color 0.2s, box-shadow 0.2s;
+    vertical-align: middle;
+    
+    /* [수정] 모든 상태 변화에 애니메이션 적용 */
+    transition: all 0.2s ease-in-out;
 }
 
-/* [수정] 검색창 포커스 시 은은한 발광 효과 추가 */
-.search-input:focus {
-    border-color: var(--primary, #007bff);
-    box-shadow: 0 0 0 3px var(--primary-bg, rgba(0, 123, 255, 0.15));
-    outline: none;
-}
-
-/* 드롭다운(Select) 커스텀 스타일 (각진 모양 제거 및 화살표 추가) */
+/* 2. 드롭다운(Select) 전용 스타일 */
 .search-select {
-    appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     padding-right: 30px;
     cursor: pointer;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -102,12 +107,31 @@
     background-position: right 10px center;
 }
 
-/* 다크모드에서의 드롭다운 화살표 변경 */
+/* [추가] 드롭다운 & 입력창 Hover 시: 살짝 떠오르고 테두리 강조 */
+.search-select:hover,
+.search-input:hover {
+    border-color: var(--primary, #007bff);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* 3. 포커스 시 스타일 (Hover보다 우선순위 높음) */
+.search-select:focus,
+.search-input:focus,
+.search-select:focus-visible,
+.search-input:focus-visible {
+    outline: none;
+    border-color: var(--primary, #007bff);
+    box-shadow: 0 0 0 3px var(--primary-bg, rgba(0, 123, 255, 0.15));
+    border-radius: 6px;
+    transform: translateY(-1px); /* 포커스 상태에서도 떠오름 유지 */
+}
+
+/* 4. 다크모드 대응 */
 :root[data-theme="dark"] .search-select {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
 
-/* 다크모드에서 드롭다운 옵션 배경색 지정 */
 :root[data-theme="dark"] .search-select option {
     background-color: #1e293b;
     color: var(--text);
@@ -117,20 +141,32 @@
     width: 180px; 
 }
 
-/* 검색 버튼 스타일 */
+/* [수정] 검색 버튼 스타일: 호버 애니메이션 추가 */
 .btn-small {
-    padding: 6px 12px;
+    padding: 0 12px;
+    height: 34px;
     border: 1px solid var(--line, #ccc);
     border-radius: 6px;
     background: var(--surface, #f8f9fa);
     cursor: pointer;
     font-size: 13px;
     color: var(--text, #333);
+    vertical-align: middle;
+    
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-small:hover {
+    background: var(--surface-hover, #f5f5f5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    border-color: var(--primary, #007bff);
 }
 
 /* 액션 버튼 그룹 */
 .btn-group { display: flex; gap: 6px; }
 
+/* [수정] 액션 버튼 (삭제/보관/신고/답장) 애니메이션 추가 */
 .btn-action {
     display: flex;
     align-items: center;
@@ -143,13 +179,18 @@
     border: 1px solid var(--line, #ddd);
     border-radius: 8px;
     cursor: pointer;
-    transition: 0.2s;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    
+    /* 부드러운 전환 효과 */
+    transition: all 0.2s ease-in-out;
 }
 
+/* Hover 시: 떠오름 + 그림자 + 테두리 발광 */
 .btn-action:hover {
     background: var(--surface-hover, #f5f5f5);
     transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border-color: var(--primary, #007bff);
 }
 
 .btn-action.delete {
@@ -159,6 +200,7 @@
 
 .btn-action.delete:hover {
     background: rgba(220, 53, 69, 0.05);
+    border-color: var(--bad, #dc3545); /* 삭제 버튼은 빨간색으로 발광 */
 }
 
 /* --- [Table] 목록 테이블 --- */
@@ -170,16 +212,13 @@
     border: 1px solid var(--line, #e0e0e0);
     border-radius: 12px;
     overflow: hidden;
-    
-    /* 고정 레이아웃 적용: 너비 계산을 콘텐츠가 아닌 지정된 width에 따르게 함 */
     table-layout: fixed; 
 }
 
-/* 컬럼 너비 재정의 (화면 줄임 시 찌그러짐 방지) */
-.msg-table th:nth-child(1) { width: 50px; }  /* 체크박스 고정 */
-.msg-table th:nth-child(2) { width: 120px; } /* 보낸사람 고정 */
-.msg-table th:nth-child(4) { width: 140px; } /* 날짜 고정 */
-/* 3번째(내용) 컬럼은 별도 width 지정 없음 -> 남은 공간 모두 차지하며 유동적으로 줄어듦 */
+/* 컬럼 너비 재정의 */
+.msg-table th:nth-child(1) { width: 50px; }  /* 체크박스 */
+.msg-table th:nth-child(2) { width: 120px; } /* 보낸사람 */
+.msg-table th:nth-child(4) { width: 140px; } /* 날짜 */
 
 .msg-table th {
     background: var(--surface-hover, #f8f9fa);
@@ -188,7 +227,7 @@
     font-weight: 700;
     text-align: center;
     border-bottom: 1px solid var(--line, #e0e0e0);
-    white-space: nowrap; /* 헤더 줄바꿈 방지 */
+    white-space: nowrap;
 }
 
 .msg-table td {
@@ -197,8 +236,6 @@
     text-align: center;
     color: var(--text, #333);
     background: var(--surface, #fff);
-    
-    /* 말줄임표(...) 처리를 위한 필수 속성 */
     white-space: nowrap;      
     overflow: hidden;         
     text-overflow: ellipsis;  
@@ -207,10 +244,7 @@
 .msg-table tr:last-child td { border-bottom: none; }
 .msg-table .check-col { width: 50px; }
 
-/* 내용 미리보기 (Table Cell 내부 래퍼) */
-.msg-table .td-content { 
-    text-align: left; 
-}
+.msg-table .td-content { text-align: left; }
 
 .msg-content-preview {
     display: block;
@@ -228,7 +262,6 @@
     cursor: pointer;
 }
 
-/* 안 읽은 메시지 강조 */
 .msg-row.unread td {
     background-color: #f0f7ff;
     font-weight: 600;
@@ -253,6 +286,7 @@
     border-bottom: 1px dashed var(--line, #e0e0e0);
 }
 
+/* [수정] 목록으로 버튼: 애니메이션 추가 */
 .btn-back-list {
     display: inline-flex;
     align-items: center;
@@ -265,10 +299,18 @@
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: 0.2s;
+    
+    /* 부드러운 전환 효과 */
+    transition: all 0.2s ease-in-out;
 }
 
-.btn-back-list:hover { background-color: var(--surface-hover, #f5f5f5); }
+/* Hover 시: 떠오름 + 그림자 + 테두리 발광 */
+.btn-back-list:hover {
+    background-color: var(--surface-hover, #f5f5f5);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border-color: var(--primary, #007bff);
+}
 
 .msg-view-utils { display: flex; gap: 8px; }
 
@@ -280,19 +322,17 @@
     color: var(--text-secondary, #666);
 }
 
-/* [수정] 쪽지 내용 영역: 다크모드 대응 및 배경색 변수화 */
 .msg-body {
     min-height: 300px;
     line-height: 1.7;
     white-space: pre-wrap;
-    background: var(--surface-hover, #fafafa); /* 기본 배경색 */
+    background: var(--surface-hover, #fafafa); 
     padding: 24px;
     border-radius: 12px;
     border: 1px solid var(--line, #e0e0e0);
     color: var(--text, #333);
 }
 
-/* [추가] 다크모드에서 msg-body 배경색 명시적 지정 */
 :root[data-theme="dark"] .msg-body {
     background-color: rgba(255, 255, 255, 0.05);
     border-color: var(--line);
@@ -316,9 +356,7 @@
 .anim-fade { animation: fadeIn 0.3s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* [Utility] Hidden 처리 
-    !important 사용 금지 원칙 준수 
-*/
+/* [Utility] Hidden 처리 */
 #section-messages.hidden,
 #msgEmpty.hidden,
 #msgViewArea.hidden,
