@@ -58,6 +58,7 @@ body {
 a {
     color: inherit;
     text-decoration: none;
+    transition: color 0.2s;
 }
 
 .container {
@@ -219,12 +220,10 @@ a {
     width: 100%;
 }
 
-/* [New] 광고 스타일 통합 */
+/* 광고 스타일 통합 */
 .ad-placeholder {
     background-color: var(--surface-hover);
-    /* 회색 배경 */
     border: 1px dashed var(--line);
-    /* 점선 테두리 */
     border-radius: 12px;
     display: flex;
     flex-direction: column;
@@ -356,32 +355,54 @@ a {
     flex-shrink: 0;
 }
 
-/* 검색창 중앙 정렬 레이아웃 */
-.searchWrap {
-    flex: 1;
-    max-width: 600px;
-    position: relative;
-    z-index: 10001;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
+/* [Fix] 헤더 요소별 Hover 애니메이션 (ID Selector 사용) */
+
+/* 1. 헤더 검색창 컨테이너 */
+#headerSearchBox {
+    transition: all 0.2s ease-in-out !important;
+}
+/* [수정] 검색창은 떠오르지 않음 (transform 제거) */
+#headerSearchBox:hover {
+    border-color: var(--primary) !important;
+    box-shadow: 0 4px 12px var(--primary-bg); /* 은은한 발광 */
 }
 
-.searchBox {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    width: 100%;
-    transition: all 0.2s ease-in-out;
-}
-
-.searchBox:focus-within {
-    border-color: var(--primary);
+/* 검색창 내부 입력 필드 */
+#headerSearchBox:focus-within {
+    border-color: var(--primary) !important;
     box-shadow: 0 0 0 2px var(--primary-bg);
+}
+
+/* 2. 다크모드 토글 버튼 */
+#themeBtn {
+    transition: all 0.2s ease-in-out !important;
+}
+#themeBtn:hover {
+    transform: translateY(-1px); /* 살짝 떠오름 */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* 해/달 아이콘 발광 */
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4));
+}
+
+/* 3. 로그인 / 닉네임 텍스트 */
+#btnLogin {
+    display: inline-block; /* Transform 적용을 위해 블록 속성 부여 */
+    transition: all 0.2s ease-in-out !important;
+}
+#btnLogin:hover {
+    color: var(--primary) !important;
+    text-shadow: 0 0 8px var(--primary-bg);
+    transform: translateY(-1px); /* 살짝 떠오름 */
+}
+
+/* 4. 관리자 모드 버튼 */
+#btnAdminMode {
+    transition: all 0.2s ease-in-out !important;
+}
+#btnAdminMode:hover {
+    background-color: #000 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    /* 수직 중앙 정렬(-50%)을 유지하면서 위로 1px 이동 */
+    transform: translateY(calc(-50% - 1px)) !important;
 }
 
 /* 검색 제안 */
@@ -421,15 +442,6 @@ html[data-theme="dark"] .search-suggestions {
 
 .suggestion-item:hover {
     background: var(--surface-hover);
-}
-
-/* 우측 도구 모음 정렬 */
-.right-group {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    flex-shrink: 0;
 }
 
 /* 6. Typography & Tables */
@@ -503,7 +515,7 @@ main,
 }
 
 /* =========================================
-   8. [New] 실시간 인기 글 리스트 스타일
+   8. 실시간 인기 글 리스트 스타일
    ========================================= 
 */
 /* 리스트 아이템 컨테이너 */
@@ -517,46 +529,41 @@ main,
     transition: background-color 0.2s;
 }
 
-/* 마지막 아이템 선 제거 */
 .searchItem:last-child {
     border-bottom: none;
 }
 
 .searchItem:hover {
     background-color: var(--surface-hover);
-    border-radius: 8px; /* 호버 시 살짝 둥글게 */
-    padding-left: 8px;  /* 호버 시 살짝 들여쓰기 효과 */
+    border-radius: 8px;
+    padding-left: 8px;
     padding-right: 8px;
-    margin: 0 -8px;     /* 패딩 늘어난 만큼 마진으로 보정 */
+    margin: 0 -8px;
 }
 
-/* 순위 숫자 (1, 2, 3...) */
 .rank-num {
     width: 24px;
     text-align: center;
     font-size: 16px;
     margin-right: 12px;
     flex-shrink: 0;
-    font-variant-numeric: tabular-nums; /* 숫자 너비 고정 */
+    font-variant-numeric: tabular-nums;
 }
 
-/* 내용 영역 (제목 + 메타) */
 .rank-content {
     flex: 1;
-    overflow: hidden; /* 말줄임표 위해 필수 */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-/* 제목 */
 .rank-title {
     font-size: 14px;
     font-weight: 600;
     color: var(--text);
 }
 
-/* 메타 정보 (조회수, 추천) */
 .rank-meta {
     font-size: 11px;
     color: var(--muted);
@@ -564,7 +571,6 @@ main,
     align-items: center;
 }
 
-/* 우측 화살표 아이콘 */
 .rank-icon {
     width: 24px;
     display: flex;
@@ -587,19 +593,28 @@ main,
     height: 36px;
     cursor: pointer;
     border-radius: 50%;
-    transition: background 0.2s;
     margin-right: 12px;
+    transition: all 0.2s ease-in-out;
 }
 
+/* 알림 아이콘 Hover 시: 떠오름(-1px) + 발광 효과 */
 .noti-btn-wrap:hover,
 .noti-btn-wrap.active {
     background-color: var(--surface-hover);
+    transform: translateY(-1px); /* 살짝 떠오름 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.noti-btn-wrap:hover .noti-icon {
+    color: var(--primary);
+    filter: drop-shadow(0 0 2px var(--primary));
 }
 
 .noti-icon {
     width: 20px;
     height: 20px;
     color: var(--muted);
+    transition: color 0.2s;
 }
 
 /* 읽지 않은 알림 배지 */
@@ -614,27 +629,22 @@ main,
     border: 1px solid var(--header-bg);
 }
 
-/* [중요] 드롭다운 컨테이너 (위치 및 배경 수정) */
+/* 드롭다운 컨테이너 */
 .noti-dropdown {
     position: absolute;
     top: 50px;
-    /* 1. 위치 수정: 왼쪽 쏠림 방지를 위해 right 값을 마이너스로 주어 오른쪽으로 이동 */
     right: -130px; 
     width: 320px;
-    
-    /* 2. 배경 투명 문제 해결: 테마별 불투명 배경색 지정 */
     background-color: #ffffff; 
-    
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     z-index: 10005;
     display: none;
     flex-direction: column;
-    overflow: hidden; /* 내부 코너 둥글기 유지 */
+    overflow: hidden; 
 }
 
-/* 다크모드 대응: 배경색을 짙은 회색(불투명)으로 설정 */
 :root[data-theme="dark"] .noti-dropdown {
     background-color: #1e293b; 
     border-color: #334155;
@@ -653,7 +663,7 @@ main,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: inherit; /* 부모 배경색 상속 */
+    background-color: inherit;
 }
 
 .noti-title {
@@ -670,44 +680,36 @@ main,
     padding: 0;
 }
 
-/* [중요] 알림 리스트 영역 (스크롤 체이닝 방지) */
+/* 알림 리스트 영역 */
 .noti-list {
-    max-height: 320px; /* 높이 제한 */
-    overflow-y: auto;  /* 내부 스크롤 활성화 */
-    overscroll-behavior: contain; /* 스크롤 체이닝 방지 */
-
-    /* --- 스크롤바 스타일링 시작 --- */
-
-    /* Firefox 전용 */
-    scrollbar-width: thin; /* 얇게 */
-    scrollbar-color: #ccc transparent; /* [Thumb색상] [Track색상] */
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #ccc transparent;
 }
 
-/* 다크모드 Firefox 스크롤바 색상 변경 */
 :root[data-theme="dark"] .noti-list {
     scrollbar-color: #555 transparent;
 }
 
-/* Webkit 브라우저 (Chrome, Edge, Safari) 전용 */
 .noti-list::-webkit-scrollbar {
-    width: 6px; /* 스크롤바 너비 얇게 설정 */
+    width: 6px;
 }
 
 .noti-list::-webkit-scrollbar-track {
-    background: transparent; /* 스크롤바 뒷배경 투명하게 */
+    background: transparent;
 }
 
 .noti-list::-webkit-scrollbar-thumb {
-    background-color: #ccc; /* 스크롤바 막대 색상 (라이트 모드: 연한 회색) */
-    border-radius: 3px; /* 둥글게 */
+    background-color: #ccc;
+    border-radius: 3px;
 }
 
-/* 다크모드 Webkit 스크롤바 막대 색상 변경 */
 :root[data-theme="dark"] .noti-list::-webkit-scrollbar-thumb {
-    background-color: #555; /* 스크롤바 막대 색상 (다크 모드: 어두운 회색) */
+    background-color: #555;
 }
 
-/* (선택사항) 스크롤바 호버 효과 */
 .noti-list::-webkit-scrollbar-thumb:hover {
     background-color: #bbb;
 }
@@ -733,12 +735,10 @@ main,
     background-color: var(--surface-hover);
 }
 
-/* 읽지 않은 알림 강조 */
 .noti-item.unread {
     background-color: var(--primary-bg);
 }
 
-/* 텍스트 스타일 */
 .noti-content {
     display: flex;
     flex-direction: column;

@@ -37,7 +37,7 @@
     font-weight: 700;
 }
 
-/* [수정] 쪽지 쓰기 버튼: 애니메이션 및 발광 효과 강화 */
+/* 쪽지 쓰기 버튼: 애니메이션 및 발광 효과 */
 .msg-tabs .msg-tab-btn.write-mode {
     margin-left: auto;
     background: var(--primary, #007bff);
@@ -48,14 +48,13 @@
     align-items: center;
     gap: 6px;
     
-    /* 부드러운 움직임 추가 */
     transition: all 0.2s ease-in-out;
 }
 
-/* Hover 시: 더 높이 떠오르고 강한 발광 효과 */
+/* [유지] 쓰기 버튼은 떠오르는 효과 유지 (-1px) */
 .msg-tabs .msg-tab-btn.write-mode:hover {
     filter: brightness(1.1);
-    transform: translateY(-2px); 
+    transform: translateY(-1px); 
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
     color: #fff;
 }
@@ -91,7 +90,6 @@
     color: var(--text, #333);
     vertical-align: middle;
     
-    /* [수정] 모든 상태 변화에 애니메이션 적용 */
     transition: all 0.2s ease-in-out;
 }
 
@@ -107,15 +105,15 @@
     background-position: right 10px center;
 }
 
-/* [추가] 드롭다운 & 입력창 Hover 시: 살짝 떠오르고 테두리 강조 */
+/* [수정] 드롭다운 & 입력창 Hover 시: 떠오르지 않고(고정), 은은한 빛(Glow)만 적용 */
 .search-select:hover,
 .search-input:hover {
     border-color: var(--primary, #007bff);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 3px var(--primary-bg, rgba(37, 99, 235, 0.1)); /* 은은한 발광 */
+    transform: none; /* 위치 고정 */
 }
 
-/* 3. 포커스 시 스타일 (Hover보다 우선순위 높음) */
+/* 3. 포커스 시 스타일 */
 .search-select:focus,
 .search-input:focus,
 .search-select:focus-visible,
@@ -124,7 +122,7 @@
     border-color: var(--primary, #007bff);
     box-shadow: 0 0 0 3px var(--primary-bg, rgba(0, 123, 255, 0.15));
     border-radius: 6px;
-    transform: translateY(-1px); /* 포커스 상태에서도 떠오름 유지 */
+    transform: none; /* 위치 고정 */
 }
 
 /* 4. 다크모드 대응 */
@@ -141,7 +139,7 @@
     width: 180px; 
 }
 
-/* [수정] 검색 버튼 스타일: 호버 애니메이션 추가 */
+/* 검색 버튼 스타일 */
 .btn-small {
     padding: 0 12px;
     height: 34px;
@@ -156,17 +154,18 @@
     transition: all 0.2s ease-in-out;
 }
 
+/* [수정] 검색 버튼 Hover 시: 떠오르지 않고(고정), 은은한 빛(Glow)만 적용 */
 .btn-small:hover {
     background: var(--surface-hover, #f5f5f5);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
     border-color: var(--primary, #007bff);
+    box-shadow: 0 0 0 3px var(--primary-bg, rgba(37, 99, 235, 0.1)); /* 은은한 발광 */
+    transform: none; /* 위치 고정 */
 }
 
 /* 액션 버튼 그룹 */
 .btn-group { display: flex; gap: 6px; }
 
-/* [수정] 액션 버튼 (삭제/보관/신고/답장) 애니메이션 추가 */
+/* 액션 버튼 (삭제/보관/신고/답장) - 여전히 떠오르는 효과 유지 (-1px) */
 .btn-action {
     display: flex;
     align-items: center;
@@ -181,11 +180,9 @@
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     
-    /* 부드러운 전환 효과 */
     transition: all 0.2s ease-in-out;
 }
 
-/* Hover 시: 떠오름 + 그림자 + 테두리 발광 */
 .btn-action:hover {
     background: var(--surface-hover, #f5f5f5);
     transform: translateY(-1px);
@@ -200,7 +197,7 @@
 
 .btn-action.delete:hover {
     background: rgba(220, 53, 69, 0.05);
-    border-color: var(--bad, #dc3545); /* 삭제 버튼은 빨간색으로 발광 */
+    border-color: var(--bad, #dc3545);
 }
 
 /* --- [Table] 목록 테이블 --- */
@@ -286,7 +283,7 @@
     border-bottom: 1px dashed var(--line, #e0e0e0);
 }
 
-/* [수정] 목록으로 버튼: 애니메이션 추가 */
+/* 목록으로 버튼 */
 .btn-back-list {
     display: inline-flex;
     align-items: center;
@@ -300,11 +297,10 @@
     font-size: 14px;
     cursor: pointer;
     
-    /* 부드러운 전환 효과 */
     transition: all 0.2s ease-in-out;
 }
 
-/* Hover 시: 떠오름 + 그림자 + 테두리 발광 */
+/* 목록으로 버튼도 떠오름 유지 (-1px) */
 .btn-back-list:hover {
     background-color: var(--surface-hover, #f5f5f5);
     transform: translateY(-1px);
