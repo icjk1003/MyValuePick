@@ -6,12 +6,13 @@
 
 /* 커버 이미지 영역 */
 .blog-header-bg {
-    height: 200px;
+    height: 220px; /* 커버 높이를 조금 더 시원하게 키움 */
     background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
     background-size: cover;
     background-position: center;
     position: relative;
-    margin-bottom: -30px; 
+    /* [수정] 메인 컨텐츠가 침범하지 않도록 마이너스 마진 제거 */
+    margin-bottom: 0; 
 }
 
 .blog-cover-content {
@@ -50,7 +51,10 @@
 .blog-layout {
     display: flex;
     gap: 24px;
-    margin-top: 20px; 
+    align-items: flex-start; /* 높이가 달라도 상단 정렬 유지 */
+    /* [수정] 프로필만 올리고, 전체 레이아웃은 커버 아래에서 시작 */
+    margin-top: 0;
+    padding-bottom: 40px;
 }
 
 /* =========================================
@@ -60,18 +64,21 @@
 .blog-sidebar {
     width: 280px;
     flex-shrink: 0;
+    
+    /* [핵심 수정] 사이드바(프로필)만 커버 영역 위로 60px 끌어올림 */
+    margin-top: -60px; 
+    position: relative;
+    z-index: 3; /* 커버보다 위에 오도록 */
 }
 
 /* [프로필 카드] */
 .blog-sidebar .blog-profile-section {
-    /* [수정] common.css의 변수(--surface) 사용 */
     background-color: var(--surface); 
     border-radius: 12px;
     padding: 20px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 20px;
-    /* [수정] common.css의 변수(--line) 사용 */
     border: 1px solid var(--line);
     
     overflow: visible;
@@ -81,7 +88,8 @@
 .profile-avatar-wrap {
     width: 100px;
     height: 100px;
-    margin: -50px auto 15px; 
+    /* [수정] 카드가 이미 올라갔으므로, 아바타는 카드 내부에서 적절히 배치 */
+    margin: -50px auto 15px; /* 아바타를 카드 위쪽 경계에 걸치게 함 */
     position: relative;
 }
 
@@ -89,8 +97,7 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* [수정] 프로필 테두리도 배경색과 동일하게 */
-    border: 4px solid var(--bg); 
+    border: 4px solid var(--surface); /* 테두리를 카드 배경색과 일치시킴 */
     object-fit: cover;
     background-color: var(--line);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -191,7 +198,6 @@
     flex-direction: column;
     padding: 10px 0;
     overflow: hidden;
-    /* [수정] common.css 변수 적용으로 다크모드 자동 대응 */
     background-color: var(--surface);
     border: 1px solid var(--line); 
     border-radius: 8px;
@@ -237,6 +243,8 @@
 .blog-content {
     flex: 1;
     min-width: 0;
+    /* [수정] 메인 컨텐츠는 커버 아래에서 시작하되, 상단 여백을 조금 줌 */
+    margin-top: 20px; 
     padding-bottom: 50px;
 }
 
@@ -304,7 +312,7 @@
 @media (max-width: 768px) {
     .blog-header-bg {
         height: 140px;
-        margin-bottom: -40px;
+        margin-bottom: 0;
     }
     
     .blog-layout {
@@ -315,20 +323,26 @@
 
     .blog-sidebar {
         width: 100%;
+        /* 모바일에서는 프로필을 덜 올림 */
+        margin-top: -40px;
         margin-bottom: 20px;
     }
 
     .blog-sidebar .blog-profile-section {
-        border-radius: 0 0 12px 12px;
-        border-top: none;
+        border-radius: 12px; /* 모바일에서도 카드 형태 유지 */
+        border-top: 1px solid var(--line);
     }
 
     .profile-avatar-wrap {
-        margin-top: -50px;
+        margin-top: -50px; /* 카드 안에서의 아바타 위치 */
         width: 80px;
         height: 80px;
     }
     
+    .blog-content {
+        margin-top: 0; /* 모바일은 바로 아래 붙임 */
+    }
+
     /* 모바일 네비게이션 (가로 스크롤) */
     .blog-nav {
         flex-direction: row;
@@ -340,7 +354,7 @@
         background: transparent;
         border: none;
         border-bottom: 1px solid var(--line);
-        margin-top: 10px;
+        margin-top: 0;
     }
     
     .nav-item {
