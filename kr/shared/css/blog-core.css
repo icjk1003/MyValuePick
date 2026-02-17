@@ -1,42 +1,45 @@
 /* kr/shared/css/blog-core.css */
 
 /* =========================================
-   1. [공통] 블로그 코어 레이아웃
+   1. [공통] 블로그 코어 레이아웃 (Trendy Style)
    ========================================= */
 
 /* 커버 이미지 영역 */
 .blog-header-bg {
-    height: 220px; /* 커버 높이를 조금 더 시원하게 키움 */
+    /* [수정] 높이를 줄여서 슬림하고 모던한 느낌 연출 */
+    height: 180px; 
     background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
     background-size: cover;
     background-position: center;
     position: relative;
-    /* [수정] 메인 컨텐츠가 침범하지 않도록 마이너스 마진 제거 */
     margin-bottom: 0; 
 }
 
 .blog-cover-content {
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .btn-edit-cover {
     position: absolute;
     bottom: 20px;
     right: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
     color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .btn-edit-cover:hover {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* 메인 컨테이너 */
@@ -50,11 +53,10 @@
 
 .blog-layout {
     display: flex;
-    gap: 24px;
-    align-items: flex-start; /* 높이가 달라도 상단 정렬 유지 */
-    /* [수정] 프로필만 올리고, 전체 레이아웃은 커버 아래에서 시작 */
-    margin-top: 0;
-    padding-bottom: 40px;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 30px; 
+    padding-bottom: 50px;
 }
 
 /* =========================================
@@ -64,32 +66,27 @@
 .blog-sidebar {
     width: 280px;
     flex-shrink: 0;
-    
-    /* [핵심 수정] 사이드바(프로필)만 커버 영역 위로 60px 끌어올림 */
-    margin-top: -60px; 
-    position: relative;
-    z-index: 3; /* 커버보다 위에 오도록 */
+    margin-top: 0; 
 }
 
-/* [프로필 카드] */
+/* [프로필 섹션 - 트렌디한 플랫 스타일] */
 .blog-sidebar .blog-profile-section {
-    background-color: var(--surface); 
-    border-radius: 12px;
-    padding: 20px;
+    background-color: transparent;
+    border-radius: 0;
+    padding: 0 0 20px 0;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: none;
     margin-bottom: 20px;
-    border: 1px solid var(--line);
+    border: none;
     
     overflow: visible;
     position: relative;
 }
 
 .profile-avatar-wrap {
-    width: 100px;
-    height: 100px;
-    /* [수정] 카드가 이미 올라갔으므로, 아바타는 카드 내부에서 적절히 배치 */
-    margin: -50px auto 15px; /* 아바타를 카드 위쪽 경계에 걸치게 함 */
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 20px; 
     position: relative;
 }
 
@@ -97,25 +94,27 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 4px solid var(--surface); /* 테두리를 카드 배경색과 일치시킴 */
+    border: none; 
     object-fit: cover;
     background-color: var(--line);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .blog-nick {
-    font-size: 1.3rem;
-    font-weight: 800;
-    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin: 0 0 10px 0;
     color: var(--text);
+    letter-spacing: -0.5px;
 }
 
 .blog-bio {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--muted);
-    margin-bottom: 20px;
-    line-height: 1.4;
+    margin-bottom: 24px;
+    line-height: 1.5;
     word-break: keep-all;
+    padding: 0 10px;
 }
 
 /* 통계 (Posts / Followers) */
@@ -123,21 +122,23 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 10px 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+    padding: 15px 0;
+    border-top: none;
+    border-bottom: none;
+    background-color: var(--surface);
+    border-radius: 12px;
 }
 
 .stat-item {
     display: flex;
     flex-direction: column;
-    padding: 0 15px;
+    padding: 0 20px;
 }
 
 .stat-item .val {
     font-weight: 800;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--text);
 }
 
@@ -145,12 +146,15 @@
     font-size: 0.75rem;
     color: var(--muted);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
 }
 
 .stat-divider {
     width: 1px;
-    height: 30px;
+    height: 24px;
     background-color: var(--line);
+    opacity: 0.5;
 }
 
 /* 버튼 그룹 */
@@ -160,7 +164,7 @@
 
 .action-group {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .full-width {
@@ -171,8 +175,13 @@
     flex: 1;
 }
 
+.btn {
+    border-radius: 8px; 
+}
+
 .btn-icon-only {
-    width: 40px;
+    width: 42px;
+    height: 42px;
     padding: 0;
     display: flex;
     align-items: center;
@@ -180,13 +189,15 @@
     font-size: 1.2rem;
     border: 1px solid var(--line);
     background: var(--surface);
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     color: var(--text);
+    transition: all 0.2s;
 }
 
 .btn-icon-only:hover {
     background: var(--surface-hover);
+    transform: translateY(-2px);
 }
 
 /* =========================================
@@ -196,26 +207,28 @@
 .blog-nav {
     display: flex;
     flex-direction: column;
-    padding: 10px 0;
+    padding: 8px;
     overflow: hidden;
     background-color: var(--surface);
     border: 1px solid var(--line); 
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 
 .nav-item {
     background: none;
     border: none;
     text-align: left;
-    padding: 14px 20px;
+    padding: 12px 16px;
     font-size: 0.95rem;
     color: var(--muted);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease-in-out;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-left: 3px solid transparent;
+    gap: 12px;
+    border-radius: 8px;
+    margin-bottom: 2px;
 }
 
 .nav-item:hover {
@@ -226,14 +239,14 @@
 .nav-item.active {
     background-color: var(--primary-bg);
     color: var(--primary);
-    border-left-color: var(--primary);
     font-weight: 700;
 }
 
 .nav-divider {
     height: 1px;
     background-color: var(--line);
-    margin: 8px 0;
+    margin: 8px 10px;
+    opacity: 0.7;
 }
 
 /* =========================================
@@ -243,8 +256,7 @@
 .blog-content {
     flex: 1;
     min-width: 0;
-    /* [수정] 메인 컨텐츠는 커버 아래에서 시작하되, 상단 여백을 조금 줌 */
-    margin-top: 20px; 
+    margin-top: 0; 
     padding-bottom: 50px;
 }
 
@@ -282,7 +294,7 @@
     background-color: var(--surface);
     border-radius: 12px;
     border: 1px solid var(--line);
-    margin-top: 20px;
+    margin-top: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
@@ -300,9 +312,14 @@
     background-color: var(--text);
     color: var(--bg);
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 10px 24px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+.btn-retry:hover {
+    opacity: 0.9;
 }
 
 /* =========================================
@@ -311,38 +328,33 @@
 
 @media (max-width: 768px) {
     .blog-header-bg {
+        /* [수정] 모바일에서도 높이를 줄여 비율 유지 */
         height: 140px;
-        margin-bottom: 0;
     }
     
     .blog-layout {
         flex-direction: column;
-        gap: 0;
-        margin-top: 0;
+        gap: 30px;
+        margin-top: 30px;
     }
 
     .blog-sidebar {
         width: 100%;
-        /* 모바일에서는 프로필을 덜 올림 */
-        margin-top: -40px;
-        margin-bottom: 20px;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     .blog-sidebar .blog-profile-section {
-        border-radius: 12px; /* 모바일에서도 카드 형태 유지 */
-        border-top: 1px solid var(--line);
+        padding-bottom: 0;
+        margin-bottom: 30px;
     }
 
     .profile-avatar-wrap {
-        margin-top: -50px; /* 카드 안에서의 아바타 위치 */
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
+        margin-bottom: 15px;
     }
     
-    .blog-content {
-        margin-top: 0; /* 모바일은 바로 아래 붙임 */
-    }
-
     /* 모바일 네비게이션 (가로 스크롤) */
     .blog-nav {
         flex-direction: row;
@@ -351,23 +363,25 @@
         white-space: nowrap;
         border-radius: 0;
         box-shadow: none;
-        background: transparent;
+        background: var(--surface);
         border: none;
         border-bottom: 1px solid var(--line);
-        margin-top: 0;
+        margin: 0 -16px;
+        padding: 10px 16px;
     }
     
     .nav-item {
-        padding: 10px 15px;
-        border-left: none;
-        border-bottom: 2px solid transparent;
+        padding: 8px 16px;
+        border-radius: 20px;
         flex-shrink: 0;
+        margin-right: 10px;
+        background-color: var(--bg);
+        margin-bottom: 0;
     }
     
     .nav-item.active {
-        background: none;
-        border-left: none;
-        border-bottom-color: var(--primary);
+        background-color: var(--primary);
+        color: #fff;
     }
     
     .nav-divider {
