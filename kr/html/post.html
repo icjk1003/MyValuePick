@@ -90,7 +90,12 @@
                   <span class="author-bio">주식과 경제를 분석하는 개인 투자자입니다.</span>
                 </div>
               </div>
-              <button class="btn-subscribe" onclick="this.classList.toggle('active');">+ 구독하기</button>
+              <div style="display:flex; gap:8px; align-items:center;">
+                  <button id="btnVisitBlog" style="padding: 6px 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='var(--surface)'">
+                    🏠 블로그
+                  </button>
+                  <button class="btn-subscribe" onclick="this.classList.toggle('active');">+ 구독하기</button>
+              </div>
             </div>
           </footer>
         </article>

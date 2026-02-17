@@ -39,6 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPostContent(post);
   renderAuthorProfile(post);
   
+  // [New] 블로그 방문 버튼 이벤트 연결
+  const btnVisitBlog = document.getElementById("btnVisitBlog");
+  if(btnVisitBlog) {
+      btnVisitBlog.onclick = () => {
+          // 작성자 닉네임을 파라미터로 블로그 페이지 이동
+          location.href = `blog.html?user=${encodeURIComponent(post.writer)}`;
+      };
+  }
+  
   // 6. 댓글 기능
   window.currentCommentList = post.commentList || [];
   renderComments(window.currentCommentList);
@@ -111,7 +120,7 @@ function renderComments(list) {
     return;
   }
 
-  // [중요] 각 댓글에 고유 ID (cmt-인덱스) 부여하여 스크롤 타겟 생성
+  // 각 댓글에 고유 ID (cmt-인덱스) 부여하여 스크롤 타겟 생성
   el.innerHTML = list.map((c, index) => `
     <div class="comment-item" id="cmt-${index}">
       <div class="cmt-profile">
@@ -130,7 +139,7 @@ function renderComments(list) {
       </div>
     </div>`).join("");
 
-  // [New] URL 해시(예: #cmt-0)가 있다면 해당 위치로 스크롤
+  // URL 해시(예: #cmt-0)가 있다면 해당 위치로 스크롤
   if(window.location.hash) {
       setTimeout(() => {
           const targetId = window.location.hash; // #cmt-0
@@ -139,12 +148,12 @@ function renderComments(list) {
               // 부드럽게 스크롤
               targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
               
-              // (선택사항) 강조 효과 (CSS class 필요 시 추가)
+              // 강조 효과
               targetEl.style.transition = "background 0.5s";
               targetEl.style.backgroundColor = "rgba(37, 99, 235, 0.1)"; // 잠시 파란색 배경
               setTimeout(() => { targetEl.style.backgroundColor = "transparent"; }, 1500);
           }
-      }, 300); // 렌더링 직후 약간의 딜레이
+      }, 300);
   }
 }
 
