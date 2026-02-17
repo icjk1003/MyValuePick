@@ -1,12 +1,16 @@
-/* post.css - 게시글 상세(View) 및 댓글 전용 스타일 */
+/* kr/shared/css/post.css */
 
-/* 1. 게시글 본문 카드 */
+/* =========================================
+   1. 게시글 상세 본문 (Post View)
+   ========================================= */
+
+/* 카드 리셋 (공통 카드 스타일 덮어쓰기) */
 .post-view-card {
     padding: 0 !important;
     overflow: visible !important;
 }
 
-/* 2. 헤더 영역 */
+/* 헤더 영역 */
 .post-view-header {
     padding: 30px 30px 20px;
     background-color: var(--surface);
@@ -19,6 +23,10 @@
     color: var(--primary);
     font-weight: 700;
     margin-bottom: 8px;
+    display: inline-block;
+    background-color: var(--primary-bg);
+    padding: 4px 10px;
+    border-radius: 20px;
 }
 
 .post-title {
@@ -57,7 +65,7 @@
     text-align: right;
 }
 
-/* 3. 본문 영역 */
+/* 본문 영역 */
 .post-view-body {
     padding: 40px 30px 60px;
     min-height: 300px;
@@ -65,10 +73,16 @@
     line-height: 1.8;
     color: var(--text);
     background-color: var(--surface);
-    white-space: pre-line;
+    white-space: pre-wrap; /* 줄바꿈 유지 */
 }
 
-/* 4. 푸터 영역 */
+.post-view-body img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* 푸터 영역 (추천, 작성자 카드 등) */
 .post-view-footer {
     padding: 0 30px 40px;
     background: var(--surface);
@@ -102,7 +116,7 @@
 
 .vote-btn.up:hover {
     border-color: var(--bad);
-    background-color: #fef2f2;
+    background-color: #fef2f2; /* 연한 빨강 */
     color: var(--bad);
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
 }
@@ -203,9 +217,12 @@
     border-color: var(--primary);
 }
 
-/* 5. 댓글 입력 및 컨테이너 */
+/* =========================================
+   2. 댓글 (Comments) & 대댓글 (Replies)
+   ========================================= */
+
 .comment-container {
-    margin-top: 20px;
+    margin-top: 30px;
     padding: 24px 30px;
     background: var(--surface);
     border-radius: 16px;
@@ -223,6 +240,7 @@
     color: var(--primary);
 }
 
+/* 댓글 작성 박스 */
 .comment-write-box {
     background: var(--bg);
     padding: 20px;
@@ -251,6 +269,7 @@
     margin-bottom: 10px;
     font-weight: 700;
     font-size: 14px;
+    color: var(--text);
 }
 
 .d-none {
@@ -274,6 +293,9 @@
     color: var(--text);
     font-size: 14px;
 }
+.comment-textarea:focus {
+    border-color: var(--primary);
+}
 
 .btn-comment-submit {
     width: 90px;
@@ -285,26 +307,36 @@
     border: none;
     cursor: pointer;
 }
+.btn-comment-submit:hover {
+    opacity: 0.9;
+}
 
-/* =========================================
-   6. 댓글 목록 아이템 (JS 동적 생성 요소)
-   ========================================= 
-*/
-
-/* 댓글 아이템 컨테이너 */
-.comment-item {
+/* 댓글 리스트 아이템 (부모) */
+.comment-item, .blog-comment-item {
     display: flex;
     gap: 16px;
     padding: 20px 0;
     border-bottom: 1px solid var(--line);
 }
 
-.comment-item:last-child {
+.comment-item:last-child, .blog-comment-item:last-child {
     border-bottom: none;
 }
 
-/* 프로필 이미지 (원형) */
-.cmt-profile {
+/* 대댓글 리스트 아이템 (자식) - [New] */
+.comment-reply-item {
+    display: flex;
+    gap: 16px;
+    padding: 15px 15px 15px 15px;
+    margin-top: 10px;
+    margin-left: 40px; /* 들여쓰기 */
+    background-color: var(--surface-hover); /* 답글 배경 구분 */
+    border-left: 3px solid var(--line);
+    border-radius: 0 8px 8px 0;
+}
+
+/* 프로필 이미지 */
+.cmt-profile, .guest-profile {
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -323,19 +355,18 @@
     object-fit: cover;
 }
 
-/* 프로필 이미지가 없을 때 플레이스홀더 */
-.cmt-profile-placeholder {
-    font-size: 24px;
-    line-height: 1;
+.cmt-profile-placeholder, .default-avatar {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--muted);
 }
 
-/* 댓글 본문 영역 */
-.cmt-body {
+/* 댓글 내용 영역 */
+.cmt-body, .comment-body {
     flex: 1;
 }
 
-/* 댓글 상단 (정보 + 버튼) */
-.cmt-top {
+.cmt-top, .comment-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -348,20 +379,48 @@
     gap: 8px;
 }
 
-.cmt-nick {
+.cmt-nick, .writer-name {
     font-size: 14px;
     font-weight: 700;
     color: var(--text);
 }
 
-.cmt-date {
+.cmt-date, .meta-date {
     font-size: 12px;
     color: var(--muted);
 }
 
-/* 삭제 버튼 */
-.btn-delete-cmt {
-    font-size: 11px;
+/* 댓글 내용 텍스트 */
+.cmt-content, .comment-body {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+}
+
+/* 댓글 하단 버튼 (답글쓰기, 삭제 등) */
+.cmt-foot, .comment-foot {
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-reply-action {
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+.btn-reply-action:hover {
+    text-decoration: underline;
+    color: var(--primary);
+}
+
+.btn-delete-cmt, .btn-delete-mini {
+    font-size: 12px;
     color: var(--muted);
     cursor: pointer;
     background: none;
@@ -369,49 +428,113 @@
     text-decoration: underline;
     padding: 0;
 }
-
-.btn-delete-cmt:hover {
+.btn-delete-cmt:hover, .btn-delete-mini:hover {
     color: var(--bad);
 }
 
-/* 댓글 추천 버튼 (👍 0) */
-.cmt-vote-btn {
-    border: 1px solid var(--line);
-    background: transparent;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: 0.2s;
-}
-
-.cmt-vote-btn:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface-hover);
-}
-
-/* 댓글 내용 */
-.cmt-content {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--text);
-    white-space: pre-wrap;
-}
-
-.post-top-btns {
-    margin-bottom: 30px; /* 기존: 간격 없음 -> 변경: 30px */
-}
-
-.comment-container {
-    margin-top: 30px;    /* 기존: 20px -> 변경: 30px (더 넓게) */
-    padding: 24px 30px;
+/* 답글 작성 폼 (동적 생성) - [New] */
+.reply-form-wrap {
+    margin-left: 46px; /* 아바타 크기만큼 들여쓰기 */
+    margin-top: 10px;
+    padding: 15px;
     background: var(--surface);
-    border-radius: 16px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease-out;
 }
 
-.board-below-wrap {
-    margin-top: 30px;    /* 기존: 간격 없음 -> 변경: 30px */
+.guest-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: 8px;
 }
+.guest-textarea:focus {
+    border-color: var(--primary);
+}
+
+.btn-cancel {
+    background: none;
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 12px;
+}
+.btn-save-guest {
+    background: var(--primary);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* =========================================
+   3. @멘션 드롭다운 (Mention Dropdown)
+   ========================================= */
+#mentionDropdown {
+    position: absolute;
+    z-index: 9999;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 200px;
+    display: none; /* 기본 숨김 */
+}
+
+.mention-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.1s;
+}
+
+.mention-item:last-child {
+    border-bottom: none;
+}
+
+.mention-item:hover, .mention-item.active {
+    background-color: var(--surface-hover);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.mention-avatar {
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%;
+    background: var(--line);
+    font-size: 10px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: var(--muted);
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 유틸리티 */
+.post-top-btns { margin-bottom: 30px; }
+.board-below-wrap { margin-top: 30px; }
