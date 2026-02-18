@@ -3,15 +3,17 @@
 window.PostManager = window.PostManager || {};
 
 window.PostManager.Board = {
-    // 설정값 (20개씩, 10페이지)
+    // 설정값
     currentPage: 1,
     limit: 20,
     pageCount: 10,
     currentSearchType: "all",
+    searchQuery: "", // [추가] 검색어 상태 관리
 
-    // [초기화] Core에서 호출
+    // [초기화]
     init: function() {
         const params = new URLSearchParams(window.location.search);
+        // URL에 페이지 번호가 있으면 초기값으로 사용
         if (params.get('page')) {
             this.currentPage = parseInt(params.get('page'));
         }
@@ -20,9 +22,9 @@ window.PostManager.Board = {
         this.initBelowSearch();
     },
 
-    // 1. 하단 게시글 목록 로드
+    // 1. 하단 게시글 목록 로드 (검색 필터 적용)
     loadBoardList: function() {
-        // 데이터 가져오기 (MOCK + LocalStorage)
+        // A. 전체 데이터 가져오기
         let allPosts = [];
         if (typeof MOCK_DB !== 'undefined' && MOCK_DB.POSTS) {
             allPosts = [...MOCK_DB.POSTS];
@@ -31,15 +33,49 @@ window.PostManager.Board = {
         const localPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         allPosts = allPosts.concat(localPosts);
 
-        // 최신순 정렬
+        // B. 최신순 정렬
         allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
+        // C. [수정] 검색어 필터링 적용 (화면 이동 없이 내부 필터링)
+        if (this.searchQuery) {
+            const q = this.searchQuery.toLowerCase();
+            allPosts = allPosts.filter(p => {
+                const title = (p.title || "").toLowerCase();
+                const writer = (p.writer || p.nick || "").toLowerCase();
+                
+                if (this.currentSearchType === "all") {
+                    return title.includes(q) || writer.includes(q);
+                } else if (this.currentSearchType === "title") {
+                    return title.includes(q);
+                } else if (this.currentSearchType === "writer") {
+                    return writer.includes(q);
+                }
+                return true;
+            });
+        }
+
+        // D. 페이징 처리
         const totalCount = allPosts.length;
+        const totalPages = Math.ceil(totalCount / this.limit);
+        
+        // 검색 등으로 데이터가 줄었을 때 현재 페이지 보정
+        if (this.currentPage > totalPages && totalPages > 0) {
+            this.currentPage = totalPages;
+        }
+        if (this.currentPage < 1) this.currentPage = 1;
+
         const start = (this.currentPage - 1) * this.limit;
         const pageData = allPosts.slice(start, start + this.limit);
 
         this.renderBelowList(pageData);
         this.renderPager(totalCount);
+    },
+
+    // [신규] 페이지 이동 핸들러 (스크롤 유지의 핵심)
+    goToPage: function(page) {
+        this.currentPage = page;
+        this.loadBoardList(); 
+        // 화면 새로고침(href)이 없으므로 스크롤 위치는 자연스럽게 유지됩니다.
     },
 
     // 2. 리스트 렌더링
@@ -48,18 +84,15 @@ window.PostManager.Board = {
         if (!tbody) return;
 
         if (posts.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px 0;">게시글이 없습니다.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px 0;">검색 결과가 없습니다.</td></tr>`;
             return;
         }
 
-        const currentPostId = window.PostManager.postId; // 현재 보고 있는 글 ID
+        const currentPostId = window.PostManager.postId;
 
         tbody.innerHTML = posts.map(p => {
             const id = p.no || p.id;
-            // 현재 보고 있는 글이면 배경색 강조
             const isCurrent = (id == currentPostId) ? "background-color:var(--surface-hover);" : "";
-            
-            // 댓글 수 표시
             const cmtCnt = p.comments || (p.commentList ? p.commentList.length : 0);
             const cmtHtml = cmtCnt > 0 ? `<span style="color:var(--primary); font-weight:bold; font-size:0.8em;"> [${cmtCnt}]</span>` : "";
 
@@ -93,22 +126,19 @@ window.PostManager.Board = {
         if (endPage > totalPages) endPage = totalPages;
 
         let html = "";
-        const currentId = window.PostManager.postId;
         
-        // 이전 그룹 버튼
+        // [수정] href="..." 대신 onclick="...goToPage()" 사용
         if (startPage > 1) {
-            html += `<a class="pagerBtn" href="post.html?id=${currentId}&page=${startPage - 1}">‹</a>`;
+            html += `<a class="pagerBtn" onclick="window.PostManager.Board.goToPage(${startPage - 1})">‹</a>`;
         }
 
-        // 페이지 번호
         for (let i = startPage; i <= endPage; i++) {
             const active = (i === this.currentPage) ? "active" : "";
-            html += `<a href="post.html?id=${currentId}&page=${i}" class="${active}">${i}</a>`;
+            html += `<a class="${active}" onclick="window.PostManager.Board.goToPage(${i})">${i}</a>`;
         }
 
-        // 다음 그룹 버튼
         if (endPage < totalPages) {
-            html += `<a class="pagerBtn" href="post.html?id=${currentId}&page=${endPage + 1}">›</a>`;
+            html += `<a class="pagerBtn" onclick="window.PostManager.Board.goToPage(${endPage + 1})">›</a>`;
         }
 
         pager.innerHTML = html;
@@ -125,20 +155,20 @@ window.PostManager.Board = {
             { val: "writer", text: "글쓴이" }
         ];
 
-        // Custom Select 연결
         this.setupCustomSelect("boardSearchType", options, this.currentSearchType, (val) => {
             this.currentSearchType = val;
         });
 
-        // 검색 실행 함수
+        // [수정] 검색 실행 함수 (페이지 이동 제거)
         const doSearch = () => {
-            if (input && !input.value.trim()) { 
-                alert("검색어를 입력해주세요."); 
-                return; 
-            }
             const query = input ? input.value.trim() : "";
-            // 검색 시 board.html로 이동
-            location.href = `board.html?q=${encodeURIComponent(query)}&type=${this.currentSearchType}&page=1`;
+            
+            // 상태 업데이트
+            this.searchQuery = query;
+            this.currentPage = 1; // 검색 시 1페이지부터 시작
+            
+            // 리스트 다시 로드 (필터링 적용됨)
+            this.loadBoardList();
         };
 
         if(btn) btn.onclick = doSearch;
@@ -147,7 +177,7 @@ window.PostManager.Board = {
         };
     },
 
-    // [헬퍼] Custom Select 드롭다운 생성
+    // [헬퍼] 커스텀 드롭다운
     setupCustomSelect: function(id, options, initialVal, onChange) {
         const wrapper = document.getElementById(id);
         if (!wrapper) return;
@@ -180,11 +210,9 @@ window.PostManager.Board = {
         wrapper.appendChild(trigger);
         wrapper.appendChild(list);
         
-        // 외부 클릭 시 닫기
         document.addEventListener("click", () => list.style.display = "none");
     },
 
-    // [유틸] 날짜 포맷
     formatDate: function(dateStr) {
         if(!dateStr) return "";
         return dateStr.substring(0, 10).replace(/-/g, '.');
