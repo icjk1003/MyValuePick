@@ -46,7 +46,7 @@ window.PostManager.Comments = {
                     parentId: null,    
                     writer: c.writer,
                     userId: c.userId || null,
-                    password: c.password || "1234", // Mock 데이터 기본 비번
+                    password: c.password || "1234",
                     content: c.content,
                     date: c.date,
                     isMock: true
@@ -84,6 +84,28 @@ window.PostManager.Comments = {
                 listEl.appendChild(this.createCommentElement(reply, true));
             });
         });
+
+        // 렌더링 후 넘치는 텍스트 확인 (더보기 버튼 처리)
+        setTimeout(() => this.checkOverflow(), 0);
+    },
+
+    checkOverflow: function() {
+        const contents = document.querySelectorAll('.cmt-content');
+        contents.forEach(el => {
+            if (el.scrollHeight > el.clientHeight) {
+                const btnId = el.getAttribute('data-btn-id');
+                const btn = document.getElementById(btnId);
+                if (btn) btn.style.display = 'block';
+            }
+        });
+    },
+
+    toggleMore: function(contentId, btn) {
+        const contentEl = document.getElementById(contentId);
+        if (contentEl) {
+            contentEl.classList.remove('line-clamp');
+            btn.style.display = 'none';
+        }
     },
 
     createCommentElement: function(comment, isReply) {
@@ -97,9 +119,15 @@ window.PostManager.Comments = {
             ? `<button class="btn-reply-action" onclick="window.PostManager.Comments.openReplyForm('${comment.id}', '${comment.writer}')">답글쓰기</button>` 
             : '';
         
-        // 삭제 버튼에 ID 전달
         const deleteBtn = `<button class="btn-delete-cmt" onclick="window.PostManager.Comments.checkDeletePermission('${comment.id}')">삭제</button>`;
 
+        // [핵심 수정] 템플릿 리터럴 내부의 공백 제거
+        // 기존:
+        // <div ...>
+        //     ${contentHtml}
+        // </div>
+        //
+        // 수정후: <div ...>${contentHtml}</div> (한 줄로 붙임)
         el.innerHTML = `
             <div class="cmt-profile">
                 <div class="default-avatar">${comment.writer.charAt(0)}</div>
@@ -112,7 +140,14 @@ window.PostManager.Comments = {
                         ${deleteBtn}
                     </div>
                 </div>
-                <div class="cmt-content">${contentHtml}</div>
+                
+                <div id="content-${comment.id}" class="cmt-content line-clamp" data-btn-id="more-btn-${comment.id}">${contentHtml}</div>
+                
+                <button id="more-btn-${comment.id}" class="btn-more" style="display:none;" 
+                    onclick="window.PostManager.Comments.toggleMore('content-${comment.id}', this)">
+                    ...더보기
+                </button>
+
                 <div class="cmt-foot">
                     ${replyBtn}
                 </div>
@@ -162,7 +197,6 @@ window.PostManager.Comments = {
             </div>
         `;
         
-        // 로그인 여부에 따라 답글창의 익명 입력란 노출 제어
         const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
         if (!isLoggedIn) {
             const replyAnonInputs = document.getElementById(`replyAnonInputs-${parentId}`);
@@ -183,18 +217,12 @@ window.PostManager.Comments = {
         
         if (!content) return alert("내용을 입력해주세요.");
         
-        // 답글 저장 시 parentId 기준의 입력란에서 정보를 가져와야 함을 saveCommentData에 알려야 함
-        // 여기서는 간단히 saveCommentData 함수를 수정하여 컨텍스트(답글인지)를 처리하거나,
-        // 아래처럼 답글용 정보를 별도로 추출해서 넘겨줄 수도 있음.
-        // 편의상 saveCommentData를 공용으로 쓰되, 비로그인 시 값을 어디서 가져올지 분기 처리함.
-        
         const success = this.saveCommentData(content, parentId);
         if (success !== false) {
             this.loadComments();
         }
     },
 
-    // [수정] 댓글 데이터 저장 (비밀번호 저장 로직 추가)
     saveCommentData: function(content, parentId) {
         const comments = JSON.parse(localStorage.getItem("comments") || "[]");
         const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
@@ -202,24 +230,21 @@ window.PostManager.Comments = {
         
         let writer = "익명";
         let userId = null;
-        let password = null; // 비밀번호
+        let password = null;
 
         if (isLoggedIn) {
             writer = localStorage.getItem("user_nick") || "회원";
             userId = localStorage.getItem("user_id");
         } else {
-            // 메인 댓글인지 답글인지에 따라 입력 필드 선택
             let nickInput, pwInput;
             
             if (parentId) {
-                // 답글인 경우 해당 폼 내부의 input 찾기
                 const area = document.getElementById(`replyAnonInputs-${parentId}`);
                 if (area) {
                     nickInput = area.querySelector('input[type="text"]');
                     pwInput = area.querySelector('input[type="password"]');
                 }
             } else {
-                // 메인 댓글인 경우
                 nickInput = document.querySelector("#anonInputs input[type='text']");
                 pwInput = document.querySelector("#anonInputs input[type='password']");
             }
@@ -236,7 +261,7 @@ window.PostManager.Comments = {
             }
 
             writer = nickInput.value.trim();
-            password = pwInput.value.trim(); // 비밀번호 저장
+            password = pwInput.value.trim();
         }
 
         const newComment = {
@@ -245,7 +270,7 @@ window.PostManager.Comments = {
             parentId: parentId,
             writer: writer,
             userId: userId,
-            password: password, // 저장
+            password: password,
             content: content,
             date: new Date().toISOString(),
             votes: 0
@@ -256,23 +281,17 @@ window.PostManager.Comments = {
         return true;
     },
 
-    // [신규] 삭제 권한 확인 및 처리
     checkDeletePermission: function(commentId) {
-        // 1. 전체 댓글 목록에서 해당 댓글 찾기 (Mock 포함)
         const postId = window.PostManager.postId;
         const getPostData = window.PostManager.getPostData;
-        
         let targetComment = null;
 
-        // A. LocalStorage 검색
         const localComments = JSON.parse(localStorage.getItem("comments") || "[]");
         targetComment = localComments.find(c => String(c.id) === String(commentId));
 
-        // B. Mock DB 검색 (LocalStorage에 없으면)
         if (!targetComment && typeof getPostData === 'function') {
             const post = getPostData(postId);
             if (post && post.commentList) {
-                // Mock 댓글은 id가 'mock-0' 형태이므로 그대로 비교
                 targetComment = post.commentList.map((c, idx) => ({
                     ...c, id: `mock-${idx}`, isMock: true, password: c.password || "1234"
                 })).find(c => String(c.id) === String(commentId));
@@ -285,27 +304,21 @@ window.PostManager.Comments = {
             return;
         }
 
-        // 2. 권한 체크
         const currentUserId = localStorage.getItem("user_id");
 
         if (targetComment.userId) {
-            // [회원 댓글]
             if (targetComment.userId === currentUserId) {
-                // ID 일치 -> 삭제 확인
                 if (confirm("댓글을 삭제하시겠습니까?")) {
                     this.executeDelete(commentId);
                 }
             } else {
-                // ID 불일치
                 alert("작성자 본인만 삭제할 수 있습니다.");
             }
         } else {
-            // [익명 댓글] -> 비밀번호 확인 모달
             this.showPasswordModal(commentId, targetComment.password);
         }
     },
 
-    // [신규] 익명 댓글 삭제용 비밀번호 모달
     showPasswordModal: function(commentId, correctPassword) {
         const existingModal = document.getElementById("cmtPasswordModal");
         if(existingModal) existingModal.remove();
@@ -343,7 +356,6 @@ window.PostManager.Comments = {
         btnConfirm.onclick = () => {
             const val = input.value;
             if (val === correctPassword) {
-                // 비밀번호 일치 -> 최종 확인
                 modalOverlay.remove();
                 if (confirm("삭제하시겠습니까?")) {
                     this.executeDelete(commentId);
@@ -356,9 +368,7 @@ window.PostManager.Comments = {
         };
     },
 
-    // [신규] 실제 삭제 실행
     executeDelete: function(commentId) {
-        // Mock 데이터 여부 확인
         if (String(commentId).startsWith("mock-")) {
             alert("테스트 데이터(Mock)는 실제로 삭제되지 않습니다.\n(새로고침 시 복구됨)");
             return;
@@ -367,7 +377,6 @@ window.PostManager.Comments = {
         let comments = JSON.parse(localStorage.getItem("comments") || "[]");
         const initialLen = comments.length;
         
-        // 삭제하려는 댓글과 그 자식 댓글(대댓글)까지 모두 삭제
         comments = comments.filter(c => String(c.id) !== String(commentId) && String(c.parentId) !== String(commentId));
         
         if (comments.length !== initialLen) {
