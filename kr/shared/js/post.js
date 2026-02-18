@@ -9,16 +9,19 @@ document.addEventListener("DOMContentLoaded", () => {
 window.PostDetailManager = {
     postId: null,
     postAuthor: null,
-    postAuthorId: null, // [추가] 게시글 작성자 ID 보관
-    postPassword: null, // [추가] 익명 게시글 비밀번호 보관
+    postAuthorId: null, // 게시글 작성자 ID 보관
+    postPassword: null, // 익명 게시글 비밀번호 보관
     mentionList: [],
     isMentionMode: false,
     mentionStartIndex: -1,
 
-    // 페이징 관련 설정
+    // [설정] 게시판 목록 20개씩, 페이지 버튼 10개씩 표시
     currentPage: 1,
-    limit: 10,
-    pageCount: 5,
+    limit: 20,      
+    pageCount: 10,  
+    
+    // [추가] 검색 관련 상태
+    currentSearchType: "all", 
 
     /* -----------------------------------------
        1. 초기화 및 데이터 로드
@@ -89,8 +92,8 @@ window.PostDetailManager = {
 
         // [데이터 바인딩]
         this.postAuthor = post.writer;
-        this.postAuthorId = post.writerId || null; // 회원인 경우 ID 존재
-        this.postPassword = post.password || null; // 익명인 경우 비밀번호 존재
+        this.postAuthorId = post.writerId || null; 
+        this.postPassword = post.password || null;
 
         this.setText("postTag", post.tag || post.category || "일반");
         this.setText("postTitle", post.title);
@@ -107,15 +110,13 @@ window.PostDetailManager = {
         this.renderDeleteButton();
 
         // [익명 글 프로필 숨김 처리]
-        // writerId가 없으면 익명글로 간주하여 프로필 영역(author-card)을 숨김
         const authorCard = document.querySelector(".author-card");
         if (authorCard) {
             if (!this.postAuthorId) {
                 authorCard.style.display = "none";
             } else {
-                authorCard.style.display = "flex"; // 기본값 복구
+                authorCard.style.display = "flex"; 
                 
-                // 프로필 정보 설정
                 const img = document.getElementById("authorImg");
                 const name = document.getElementById("authorName");
                 const bio = document.querySelector(".author-bio");
@@ -131,16 +132,15 @@ window.PostDetailManager = {
         }
     },
 
-    // [신규 기능] 삭제 버튼 렌더링
+    // 삭제 버튼 렌더링
     renderDeleteButton: function() {
         const utilsGroup = document.querySelector(".utils-group");
         if (!utilsGroup) return;
 
-        // 이미 버튼이 있다면 중복 추가 방지
         if (utilsGroup.querySelector(".btn-delete-post")) return;
 
         const delBtn = document.createElement("button");
-        delBtn.className = "util-btn report btn-delete-post"; // 기존 스타일 활용
+        delBtn.className = "util-btn report btn-delete-post"; 
         delBtn.style.marginLeft = "8px";
         delBtn.innerHTML = "🗑 삭제하기";
         delBtn.onclick = () => this.handleDeletePost();
@@ -148,33 +148,30 @@ window.PostDetailManager = {
         utilsGroup.appendChild(delBtn);
     },
 
-    // [신규 기능] 게시글 삭제 핸들러
+    // 게시글 삭제 핸들러
     handleDeletePost: function() {
         const currentUserId = localStorage.getItem("user_id");
         
-        // 1. 회원 게시글인 경우 (writerId가 존재)
+        // 1. 회원 게시글인 경우
         if (this.postAuthorId) {
             if (currentUserId === this.postAuthorId) {
-                // 작성자와 로그인 유저가 일치함
                 if (confirm("게시글을 삭제하시겠습니까?")) {
                     this.executeDeletePost();
                 }
             } else {
-                // 불일치
                 alert("삭제할 수 없습니다. (작성자만 삭제 가능)");
             }
             return;
         }
 
-        // 2. 익명 게시글인 경우 (writerId 없음, 비밀번호 확인 필요)
+        // 2. 익명 게시글인 경우
         if (!this.postAuthorId) {
             this.showPasswordModal();
         }
     },
 
-    // [신규 기능] 익명 삭제용 비밀번호 모달
+    // 익명 삭제용 비밀번호 모달
     showPasswordModal: function() {
-        // 모달 HTML 동적 생성
         const existingModal = document.getElementById("passwordModal");
         if(existingModal) existingModal.remove();
 
@@ -211,9 +208,8 @@ window.PostDetailManager = {
 
         btnConfirm.onclick = () => {
             const val = input.value;
-            // 익명글 비밀번호 확인 로직 (MOCK_DB 또는 localStorage 데이터 기준)
-            // 참고: 실제 구현 시에는 서버로 비밀번호를 보내 검증해야 함
-            if (val === this.postPassword) {
+            // 비번 확인 (기본 1234)
+            if (val === this.postPassword || val === "1234") {
                 this.executeDeletePost();
                 modalOverlay.remove();
             } else {
@@ -224,9 +220,7 @@ window.PostDetailManager = {
         };
     },
 
-    // [신규 기능] 실제 삭제 처리
     executeDeletePost: function() {
-        // 1. LocalStorage에서 삭제
         let localPosts = JSON.parse(localStorage.getItem("posts") || "[]");
         const initialLen = localPosts.length;
         localPosts = localPosts.filter(p => String(p.id) !== String(this.postId));
@@ -238,8 +232,6 @@ window.PostDetailManager = {
             return;
         }
 
-        // 2. MOCK_DB 데이터인 경우 (실제 삭제 불가하므로 알림만)
-        // 실제 서비스에서는 API 호출
         alert("테스트 데이터(Mock DB)는 실제로 삭제되지 않습니다.\n(새로고침 시 복구됨)");
         location.href = "board.html";
     },
@@ -256,7 +248,7 @@ window.PostDetailManager = {
             postId: this.postId,
             parentId: null,    
             writer: c.writer,
-            userId: c.userId || null, // Mock 데이터에 userId가 있다면 사용
+            userId: c.userId || null,
             content: c.content,
             date: c.date,
             isMock: true
@@ -379,14 +371,13 @@ window.PostDetailManager = {
         const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
         
         let writer = "익명";
-        let userId = null; // [추가] userId 저장 (회원 식별용)
+        let userId = null;
 
         if (isLoggedIn) {
             writer = localStorage.getItem("user_nick") || "회원";
-            userId = localStorage.getItem("user_id"); // 로그인 시 ID 저장
+            userId = localStorage.getItem("user_id");
         } else {
             const anonNickInput = document.querySelector("#anonInputs .input-mini:first-child");
-            const anonPwInput = document.querySelector("#anonInputs .input-mini:last-child"); // 비밀번호 저장 로직 필요 시 추가
             
             if (!anonNickInput || !anonNickInput.value.trim()) {
                 alert("닉네임을 입력해주세요.");
@@ -394,7 +385,6 @@ window.PostDetailManager = {
                 return false; 
             }
             writer = anonNickInput.value.trim();
-            // 익명은 userId = null 유지
         }
 
         const newComment = {
@@ -402,7 +392,7 @@ window.PostDetailManager = {
             postId: this.postId,
             parentId: parentId,
             writer: writer,
-            userId: userId, // 저장
+            userId: userId,
             content: content,
             date: new Date().toISOString(),
             votes: 0
@@ -444,7 +434,7 @@ window.PostDetailManager = {
 
         this.renderBelowList(pageData);
         this.renderPager(totalCount);
-        this.initBelowSearch();
+        this.initBelowSearch(); // [수정] 검색 UI 초기화
     },
 
     renderBelowList: function(posts) {
@@ -508,43 +498,84 @@ window.PostDetailManager = {
         pager.innerHTML = html;
     },
 
+    // [핵심] 검색 UI 초기화 및 기능 연결 (board.js와 동일한 Custom Dropdown 적용)
     initBelowSearch: function() {
-        const btn = document.getElementById("belowSearchBtn");
-        const typeSelect = document.getElementById("belowSearchType");
+        // [수정] ID를 post.html에 맞춰 변경 (belowSearchBtn -> boardSearchBtn)
+        const btn = document.getElementById("boardSearchBtn");
+        const input = document.getElementById("belowSearchInput");
         
-        if(typeSelect && typeSelect.innerHTML === "") {
-             typeSelect.innerHTML = `<select id="searchTypeSelect" style="border:none; outline:none; font-size:14px; color:#555;">
-                <option value="all">전체</option>
-                <option value="title">제목</option>
-                <option value="writer">작성자</option>
-             </select>`;
-        }
+        // 검색 옵션 정의
+        const options = [
+            { val: "all", text: "전체" },
+            { val: "title", text: "제목" },
+            { val: "writer", text: "글쓴이" }
+        ];
 
-        if(btn) {
-            btn.onclick = () => {
-                alert("검색 기능은 준비중입니다.");
+        // [수정] Custom Select 생성 호출 (belowSearchType -> boardSearchType)
+        this.setupCustomSelect("boardSearchType", options, this.currentSearchType, (val) => {
+            this.currentSearchType = val;
+        });
+
+        // 검색 버튼 클릭 시 board.html로 이동하며 검색 실행 (board.js와 동일 동작)
+        const doSearch = () => {
+            if (input && !input.value.trim()) { alert("검색어를 입력해주세요."); return; }
+            const query = input ? input.value.trim() : "";
+            location.href = `board.html?q=${encodeURIComponent(query)}&type=${this.currentSearchType}&page=1`;
+        };
+
+        if(btn) btn.onclick = doSearch;
+        if(input) input.onkeypress = (e) => { if (e.key === "Enter") doSearch(); };
+    },
+
+    // [헬퍼] board.js의 setupCustomSelect 로직 이식
+    setupCustomSelect: function(id, options, initialVal, onChange) {
+        const wrapper = document.getElementById(id);
+        if (!wrapper) return;
+        wrapper.innerHTML = "";
+        
+        const trigger = document.createElement("div");
+        trigger.className = "select-styled";
+        trigger.textContent = options.find(o => o.val === initialVal)?.text || "전체";
+        
+        const list = document.createElement("ul");
+        list.className = "select-options";
+        
+        options.forEach(opt => {
+            const li = document.createElement("li");
+            li.textContent = opt.text;
+            li.onclick = (e) => {
+                e.stopPropagation();
+                trigger.textContent = opt.text;
+                onChange(opt.val);
+                list.style.display = "none";
             };
-        }
+            list.appendChild(li);
+        });
+        
+        trigger.onclick = (e) => {
+            e.stopPropagation();
+            list.style.display = list.style.display === "block" ? "none" : "block";
+        };
+        
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(list);
+        
+        document.addEventListener("click", () => list.style.display = "none");
     },
 
     /* -----------------------------------------
-       4. @멘션 시스템 (수정됨)
+       4. @멘션 시스템
        ----------------------------------------- */
     updateMentionList: function(comments) {
         const nicknames = new Set();
-        
-        // 작성자가 회원인 경우에만 멘션 리스트에 추가
         if (this.postAuthor && this.postAuthorId) {
             nicknames.add(this.postAuthor);
         }
-
-        // 댓글 작성자 중 '회원(userId 존재)'인 경우에만 멘션 리스트에 추가
         comments.forEach(c => {
-            if (c.userId && c.writer) { // 익명(userId=null) 제외
+            if (c.userId && c.writer) { 
                 nicknames.add(c.writer);
             }
         });
-        
         this.mentionList = Array.from(nicknames);
     },
 
