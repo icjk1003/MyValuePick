@@ -31,10 +31,10 @@ const MOCK_DB = {
   ]
 };
 
-// [초기화] 데이터 로드 (버전 업그레이드: V3로 변경)
+// [초기화] 데이터 로드 (버전 업그레이드: V4로 변경하여 기존 데이터 덮어쓰기 유도)
 (function initData() {
-  // 👇 여기를 "MOCK_POSTS_V2" -> "MOCK_POSTS_V3" 로 변경!
-  const storedPosts = localStorage.getItem("MOCK_POSTS_V3"); 
+  // 👇 V3 -> V4 로 변경 (필수: 그래야 writerId가 추가된 새 데이터가 생성됨)
+  const storedPosts = localStorage.getItem("MOCK_POSTS_V4"); 
   let loadedData = null;
 
   if (storedPosts) {
@@ -47,7 +47,7 @@ const MOCK_DB = {
 
   if (loadedData && Array.isArray(loadedData) && loadedData.length > 0) {
     MOCK_DB.POSTS = loadedData;
-    console.log("MOCK_DB: 데이터 로드 완료");
+    console.log("MOCK_DB: 데이터 로드 완료 (V4)");
   } else {
     // 데이터가 없으면 새로 생성
     generateAndSavePosts();
@@ -68,7 +68,7 @@ function generateAndSavePosts() {
 
   // 600개 생성
   for (let i = 1; i <= 600; i++) {
-    const isAnon = Math.random() < 0.3;
+    const isAnon = Math.random() < 0.3; // 30% 확률로 익명
     const votes = Math.floor(Math.random() * 300);
     const commentsCount = Math.floor(Math.random() * 30);
     
@@ -80,14 +80,17 @@ function generateAndSavePosts() {
     // 댓글 데이터 생성
     const commentList = Array.from({ length: commentsCount }).map((__, j) => {
       const isBest = Math.random() > 0.9;
+      // 댓글 작성자도 회원/비회원 구분 (3의 배수일 때 익명)
+      const isCmtAnon = j % 3 === 0;
       return {
         id: j,
-        writer: j % 3 === 0 ? "익명" : `유동닉${j}`,
+        writer: isCmtAnon ? "익명" : `유동닉${j}`,
+        userId: isCmtAnon ? null : `user_comment_${j}`, // [추가] 댓글도 ID가 있어야 멘션 등에 뜸
         content: `정말 좋은 글이네요! 주식 정보 감사합니다. ${j+1}번째 댓글입니다.`,
         date: new Date(new Date(dateStr).getTime() + (j * 60000)).toISOString(),
         votes: isBest ? Math.floor(Math.random() * 50) + 10 : Math.floor(Math.random() * 10),
         isBest: isBest,
-        profileImg: j % 3 === 0 ? null : `https://ui-avatars.com/api/?name=User+${j}&background=random&color=fff`
+        profileImg: isCmtAnon ? null : `https://ui-avatars.com/api/?name=User+${j}&background=random&color=fff`
       };
     }).sort((a, b) => b.isBest - a.isBest);
 
@@ -96,9 +99,16 @@ function generateAndSavePosts() {
       id: 10000 + (601 - i),
       tag: tags[i % tags.length], 
       title: titles[i % titles.length] + ` (${601 - i})`, 
+      
+      // [핵심 수정] 회원인 경우 writerId 부여
       writer: isAnon ? "익명" : `StockMaster_${i}`, 
+      writerId: isAnon ? null : `mock_user_${i}`, // 👈 이 부분이 추가되어야 post.js가 회원으로 인식함
+      password: isAnon ? "1234" : null, // 익명인 경우 삭제용 비밀번호 '1234' 부여
+      
       writerImg: isAnon ? null : `https://ui-avatars.com/api/?name=Stock+Master+${i}&background=random&color=fff`,
+      writerBio: isAnon ? null : "MOCK 데이터 생성된 유저입니다.", // 프로필 문구 예시
       isAnonymous: isAnon,
+      
       body: `이 글은 ${10000 + (601 - i)}번 게시글의 본문입니다.\n\n주식 투자는 본인의 선택이며 책임입니다.`, 
       votes: votes,
       views: Math.floor(Math.random() * 5000),
@@ -112,6 +122,8 @@ function generateAndSavePosts() {
   tempPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   MOCK_DB.POSTS = tempPosts;
-  localStorage.setItem("MOCK_POSTS_V3", JSON.stringify(MOCK_DB.POSTS));
-  console.log("MOCK_DB: 데이터 새로 생성 완료 (V3)");
+  
+  // V4로 저장
+  localStorage.setItem("MOCK_POSTS_V4", JSON.stringify(MOCK_DB.POSTS));
+  console.log("MOCK_DB: 데이터 새로 생성 완료 (V4)");
 }

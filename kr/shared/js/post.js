@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
 window.PostDetailManager = {
     postId: null,
     postAuthor: null,
+    postAuthorId: null, // [추가] 게시글 작성자 ID 보관
+    postPassword: null, // [추가] 익명 게시글 비밀번호 보관
     mentionList: [],
     isMentionMode: false,
     mentionStartIndex: -1,
@@ -45,17 +47,16 @@ window.PostDetailManager = {
         this.loadBoardList(); 
         this.bindEvents();
         this.initMentionSystem(); 
-        this.checkLoginStatus(); /* [추가] 로그인 상태에 따른 UI 제어 실행 */
+        this.checkLoginStatus(); 
     },
 
     // 로그인 상태 확인 및 UI 노출 제어
     checkLoginStatus: function() {
-        const isLoggedIn = localStorage.getItem("is_logged_in") === "true"; /* 로그인 상태 확인: 불린 값으로 변환 */
-        const anonInputs = document.getElementById("anonInputs"); /* 익명 입력 영역: 닉네임/비밀번호 */
-        const loginProfile = document.getElementById("loginProfile"); /* 회원 프로필 영역: 로그인 정보 */
+        const isLoggedIn = localStorage.getItem("is_logged_in") === "true"; 
+        const anonInputs = document.getElementById("anonInputs"); 
+        const loginProfile = document.getElementById("loginProfile"); 
 
         if (isLoggedIn) {
-            // [로그인 상태] 익명 입력란을 숨기고 회원 정보를 표시
             if (anonInputs) anonInputs.classList.add("d-none"); 
             if (loginProfile) {
                 loginProfile.classList.remove("d-none");
@@ -63,7 +64,6 @@ window.PostDetailManager = {
                 loginProfile.innerHTML = `작성자: <span class="text-highlight">${userNick}</span>`;
             }
         } else {
-            // [비로그인 상태] 익명 입력란을 표시하고 회원 정보를 숨김
             if (anonInputs) anonInputs.classList.remove("d-none");
             if (loginProfile) loginProfile.classList.add("d-none");
         }
@@ -87,6 +87,11 @@ window.PostDetailManager = {
             return;
         }
 
+        // [데이터 바인딩]
+        this.postAuthor = post.writer;
+        this.postAuthorId = post.writerId || null; // 회원인 경우 ID 존재
+        this.postPassword = post.password || null; // 익명인 경우 비밀번호 존재
+
         this.setText("postTag", post.tag || post.category || "일반");
         this.setText("postTitle", post.title);
         this.setText("postWriter", post.writer || post.nick || "익명");
@@ -98,20 +103,145 @@ window.PostDetailManager = {
         const contentHtml = post.content || post.body || "";
         document.getElementById("postBody").innerHTML = contentHtml.replace(/\n/g, "<br>");
 
-        const img = document.getElementById("authorImg");
-        const name = document.getElementById("authorName");
-        const bio = document.querySelector(".author-bio");
+        // [삭제 버튼 추가]
+        this.renderDeleteButton();
 
-        if(img) img.src = "../shared/images/default_profile.png"; 
-        if(name) name.textContent = post.writer;
-        if(bio) bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
+        // [익명 글 프로필 숨김 처리]
+        // writerId가 없으면 익명글로 간주하여 프로필 영역(author-card)을 숨김
+        const authorCard = document.querySelector(".author-card");
+        if (authorCard) {
+            if (!this.postAuthorId) {
+                authorCard.style.display = "none";
+            } else {
+                authorCard.style.display = "flex"; // 기본값 복구
+                
+                // 프로필 정보 설정
+                const img = document.getElementById("authorImg");
+                const name = document.getElementById("authorName");
+                const bio = document.querySelector(".author-bio");
+                const btnVisit = document.getElementById("btnVisitBlog");
 
-        this.postAuthor = post.writer;
-
-        const btnVisit = document.getElementById("btnVisitBlog");
-        if(btnVisit) {
-            btnVisit.onclick = () => location.href = `blog.html?user=${encodeURIComponent(post.writer)}`;
+                if(img) img.src = "../shared/images/default_profile.png"; 
+                if(name) name.textContent = post.writer;
+                if(bio) bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
+                if(btnVisit) {
+                    btnVisit.onclick = () => location.href = `blog.html?user=${encodeURIComponent(post.writer)}`;
+                }
+            }
         }
+    },
+
+    // [신규 기능] 삭제 버튼 렌더링
+    renderDeleteButton: function() {
+        const utilsGroup = document.querySelector(".utils-group");
+        if (!utilsGroup) return;
+
+        // 이미 버튼이 있다면 중복 추가 방지
+        if (utilsGroup.querySelector(".btn-delete-post")) return;
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "util-btn report btn-delete-post"; // 기존 스타일 활용
+        delBtn.style.marginLeft = "8px";
+        delBtn.innerHTML = "🗑 삭제하기";
+        delBtn.onclick = () => this.handleDeletePost();
+
+        utilsGroup.appendChild(delBtn);
+    },
+
+    // [신규 기능] 게시글 삭제 핸들러
+    handleDeletePost: function() {
+        const currentUserId = localStorage.getItem("user_id");
+        
+        // 1. 회원 게시글인 경우 (writerId가 존재)
+        if (this.postAuthorId) {
+            if (currentUserId === this.postAuthorId) {
+                // 작성자와 로그인 유저가 일치함
+                if (confirm("게시글을 삭제하시겠습니까?")) {
+                    this.executeDeletePost();
+                }
+            } else {
+                // 불일치
+                alert("삭제할 수 없습니다. (작성자만 삭제 가능)");
+            }
+            return;
+        }
+
+        // 2. 익명 게시글인 경우 (writerId 없음, 비밀번호 확인 필요)
+        if (!this.postAuthorId) {
+            this.showPasswordModal();
+        }
+    },
+
+    // [신규 기능] 익명 삭제용 비밀번호 모달
+    showPasswordModal: function() {
+        // 모달 HTML 동적 생성
+        const existingModal = document.getElementById("passwordModal");
+        if(existingModal) existingModal.remove();
+
+        const modalOverlay = document.createElement("div");
+        modalOverlay.id = "passwordModal";
+        modalOverlay.style.cssText = `
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;
+        `;
+
+        modalOverlay.innerHTML = `
+            <div style="background: var(--surface); padding: 20px; border-radius: 12px; width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-align: center;">
+                <h3 style="margin: 0 0 15px; font-size: 16px; color: var(--text);">비밀번호 확인</h3>
+                <input type="password" id="delPasswordInput" placeholder="비밀번호를 입력하세요" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 6px; margin-bottom: 15px; box-sizing: border-box;">
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <button id="btnCancelDel" style="padding: 8px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 6px; cursor: pointer;">취소</button>
+                    <button id="btnConfirmDel" style="padding: 8px 16px; border: none; background: var(--primary); color: white; border-radius: 6px; cursor: pointer;">삭제</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modalOverlay);
+
+        const input = document.getElementById("delPasswordInput");
+        const btnCancel = document.getElementById("btnCancelDel");
+        const btnConfirm = document.getElementById("btnConfirmDel");
+
+        input.focus();
+
+        btnCancel.onclick = () => {
+            modalOverlay.remove();
+        };
+
+        btnConfirm.onclick = () => {
+            const val = input.value;
+            // 익명글 비밀번호 확인 로직 (MOCK_DB 또는 localStorage 데이터 기준)
+            // 참고: 실제 구현 시에는 서버로 비밀번호를 보내 검증해야 함
+            if (val === this.postPassword) {
+                this.executeDeletePost();
+                modalOverlay.remove();
+            } else {
+                alert("비밀번호가 틀립니다.");
+                input.value = "";
+                input.focus();
+            }
+        };
+    },
+
+    // [신규 기능] 실제 삭제 처리
+    executeDeletePost: function() {
+        // 1. LocalStorage에서 삭제
+        let localPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+        const initialLen = localPosts.length;
+        localPosts = localPosts.filter(p => String(p.id) !== String(this.postId));
+        
+        if (localPosts.length !== initialLen) {
+            localStorage.setItem("posts", JSON.stringify(localPosts));
+            alert("삭제되었습니다.");
+            location.href = "board.html";
+            return;
+        }
+
+        // 2. MOCK_DB 데이터인 경우 (실제 삭제 불가하므로 알림만)
+        // 실제 서비스에서는 API 호출
+        alert("테스트 데이터(Mock DB)는 실제로 삭제되지 않습니다.\n(새로고침 시 복구됨)");
+        location.href = "board.html";
     },
 
     /* -----------------------------------------
@@ -126,6 +256,7 @@ window.PostDetailManager = {
             postId: this.postId,
             parentId: null,    
             writer: c.writer,
+            userId: c.userId || null, // Mock 데이터에 userId가 있다면 사용
             content: c.content,
             date: c.date,
             isMock: true
@@ -200,7 +331,7 @@ window.PostDetailManager = {
         const content = input.value.trim();
         if (!content) return alert("내용을 입력해주세요.");
 
-        const success = this.saveCommentData(content, null); /* 저장 시도 */
+        const success = this.saveCommentData(content, null); 
         if (success !== false) {
             input.value = "";
             this.loadComments();
@@ -248,17 +379,22 @@ window.PostDetailManager = {
         const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
         
         let writer = "익명";
+        let userId = null; // [추가] userId 저장 (회원 식별용)
+
         if (isLoggedIn) {
             writer = localStorage.getItem("user_nick") || "회원";
+            userId = localStorage.getItem("user_id"); // 로그인 시 ID 저장
         } else {
-            // [수정] 비로그인 시 닉네임 입력란 값 확인
             const anonNickInput = document.querySelector("#anonInputs .input-mini:first-child");
+            const anonPwInput = document.querySelector("#anonInputs .input-mini:last-child"); // 비밀번호 저장 로직 필요 시 추가
+            
             if (!anonNickInput || !anonNickInput.value.trim()) {
                 alert("닉네임을 입력해주세요.");
                 if(anonNickInput) anonNickInput.focus();
-                return false; /* 등록 중단 */
+                return false; 
             }
             writer = anonNickInput.value.trim();
+            // 익명은 userId = null 유지
         }
 
         const newComment = {
@@ -266,6 +402,7 @@ window.PostDetailManager = {
             postId: this.postId,
             parentId: parentId,
             writer: writer,
+            userId: userId, // 저장
             content: content,
             date: new Date().toISOString(),
             votes: 0
@@ -391,12 +528,23 @@ window.PostDetailManager = {
     },
 
     /* -----------------------------------------
-       4. @멘션 시스템
+       4. @멘션 시스템 (수정됨)
        ----------------------------------------- */
     updateMentionList: function(comments) {
         const nicknames = new Set();
-        if (this.postAuthor) nicknames.add(this.postAuthor);
-        comments.forEach(c => nicknames.add(c.writer));
+        
+        // 작성자가 회원인 경우에만 멘션 리스트에 추가
+        if (this.postAuthor && this.postAuthorId) {
+            nicknames.add(this.postAuthor);
+        }
+
+        // 댓글 작성자 중 '회원(userId 존재)'인 경우에만 멘션 리스트에 추가
+        comments.forEach(c => {
+            if (c.userId && c.writer) { // 익명(userId=null) 제외
+                nicknames.add(c.writer);
+            }
+        });
+        
         this.mentionList = Array.from(nicknames);
     },
 
