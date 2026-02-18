@@ -1,4 +1,6 @@
-/* kr/shared/js/post.js */
+/* =========================================
+   [JS] 게시글 상세 및 댓글 관리 (PostDetailManager)
+   ========================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
     window.PostDetailManager.init();
@@ -11,11 +13,14 @@ window.PostDetailManager = {
     isMentionMode: false,
     mentionStartIndex: -1,
 
-    // 페이징 관련
+    // 페이징 관련 설정
     currentPage: 1,
     limit: 10,
     pageCount: 5,
 
+    /* -----------------------------------------
+       1. 초기화 및 데이터 로드
+       ----------------------------------------- */
     init: function() {
         const params = new URLSearchParams(window.location.search);
         this.postId = parseInt(params.get('id') || params.get('no'));
@@ -40,9 +45,30 @@ window.PostDetailManager = {
         this.loadBoardList(); 
         this.bindEvents();
         this.initMentionSystem(); 
+        this.checkLoginStatus(); /* [추가] 로그인 상태에 따른 UI 제어 실행 */
     },
 
-    // 1. 게시글 상세 정보 로드
+    // 로그인 상태 확인 및 UI 노출 제어
+    checkLoginStatus: function() {
+        const isLoggedIn = localStorage.getItem("is_logged_in") === "true"; /* 로그인 상태 확인: 불린 값으로 변환 */
+        const anonInputs = document.getElementById("anonInputs"); /* 익명 입력 영역: 닉네임/비밀번호 */
+        const loginProfile = document.getElementById("loginProfile"); /* 회원 프로필 영역: 로그인 정보 */
+
+        if (isLoggedIn) {
+            // [로그인 상태] 익명 입력란을 숨기고 회원 정보를 표시
+            if (anonInputs) anonInputs.classList.add("d-none"); 
+            if (loginProfile) {
+                loginProfile.classList.remove("d-none");
+                const userNick = localStorage.getItem("user_nick") || "회원";
+                loginProfile.innerHTML = `작성자: <span class="text-highlight">${userNick}</span>`;
+            }
+        } else {
+            // [비로그인 상태] 익명 입력란을 표시하고 회원 정보를 숨김
+            if (anonInputs) anonInputs.classList.remove("d-none");
+            if (loginProfile) loginProfile.classList.add("d-none");
+        }
+    },
+
     getPostData: function(id) {
         let post = MOCK_DB.POSTS.find(p => p.no === id || p.id === id);
         if (!post) {
@@ -88,7 +114,9 @@ window.PostDetailManager = {
         }
     },
 
-    // 2. 댓글 로드
+    /* -----------------------------------------
+       2. 댓글 관련 로직
+       ----------------------------------------- */
     loadComments: function() {
         const post = this.getPostData(this.postId);
         if(!post) return;
@@ -132,31 +160,19 @@ window.PostDetailManager = {
         });
     },
 
-    // [핵심 수정] 댓글 HTML 구조 변경 (좌측:프로필 / 우측:내용)
     createCommentElement: function(comment, isReply) {
         const el = document.createElement("div");
-        // CSS에서 .comment-item, .comment-reply-item 은 display: flex가 적용되어 있습니다.
         el.className = isReply ? "comment-reply-item" : "comment-item"; 
         el.id = `comment-${comment.id}`;
 
-        // 멘션 하이라이팅
         let contentHtml = comment.content.replace(/@([가-힣a-zA-Z0-9_]+)/g, '<span style="color:var(--primary); font-weight:700;">@$1</span>');
 
-        // 답글 버튼
         const replyBtn = !isReply 
             ? `<button class="btn-reply-action" onclick="window.PostDetailManager.openReplyForm('${comment.id}', '${comment.writer}')">답글쓰기</button>` 
             : '';
 
-        // 삭제 버튼
         const deleteBtn = `<button class="btn-delete-cmt" onclick="window.PostDetailManager.deleteComment('${comment.id}')">삭제</button>`;
 
-        // [구조 변경] 
-        // 1. .cmt-profile (좌측)
-        // 2. .cmt-body (우측 - 전체 공간 차지)
-        //    ㄴ .cmt-top (닉네임, 날짜, 삭제버튼)
-        //    ㄴ .cmt-content (내용)
-        //    ㄴ .cmt-foot (답글 버튼)
-        //    ㄴ 답글 폼 영역
         el.innerHTML = `
             <div class="cmt-profile">
                 <div class="default-avatar" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#eee; color:#888;">${comment.writer.charAt(0)}</div>
@@ -179,15 +195,16 @@ window.PostDetailManager = {
         return el;
     },
 
-    // 3. 댓글 작성 및 삭제
     addComment: function() {
         const input = document.querySelector(".comment-textarea");
         const content = input.value.trim();
         if (!content) return alert("내용을 입력해주세요.");
 
-        this.saveCommentData(content, null);
-        input.value = "";
-        this.loadComments();
+        const success = this.saveCommentData(content, null); /* 저장 시도 */
+        if (success !== false) {
+            input.value = "";
+            this.loadComments();
+        }
     },
 
     openReplyForm: function(parentId, parentWriter) {
@@ -220,20 +237,28 @@ window.PostDetailManager = {
         const content = input.value.trim();
         if (!content) return alert("내용을 입력해주세요.");
         
-        this.saveCommentData(content, parentId);
-        this.loadComments();
+        const success = this.saveCommentData(content, parentId);
+        if (success !== false) {
+            this.loadComments();
+        }
     },
 
     saveCommentData: function(content, parentId) {
         const comments = JSON.parse(localStorage.getItem("comments") || "[]");
-        const isLoggedIn = localStorage.getItem("is_logged_in");
+        const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
         
         let writer = "익명";
         if (isLoggedIn) {
-            writer = localStorage.getItem("user_nick");
+            writer = localStorage.getItem("user_nick") || "회원";
         } else {
-            const anonNick = document.querySelector(".anon-input-group input")?.value;
-            if(anonNick) writer = anonNick;
+            // [수정] 비로그인 시 닉네임 입력란 값 확인
+            const anonNickInput = document.querySelector("#anonInputs .input-mini:first-child");
+            if (!anonNickInput || !anonNickInput.value.trim()) {
+                alert("닉네임을 입력해주세요.");
+                if(anonNickInput) anonNickInput.focus();
+                return false; /* 등록 중단 */
+            }
+            writer = anonNickInput.value.trim();
         }
 
         const newComment = {
@@ -248,6 +273,7 @@ window.PostDetailManager = {
 
         comments.push(newComment);
         localStorage.setItem("comments", JSON.stringify(comments));
+        return true;
     },
 
     deleteComment: function(id) {
@@ -265,8 +291,9 @@ window.PostDetailManager = {
         this.loadComments();
     },
 
-
-    // 4. 하단 게시글 목록
+    /* -----------------------------------------
+       3. 하단 게시판 목록 및 유틸
+       ----------------------------------------- */
     loadBoardList: function() {
         let allPosts = [...MOCK_DB.POSTS];
         const localPosts = JSON.parse(localStorage.getItem("posts") || "[]");
@@ -346,8 +373,8 @@ window.PostDetailManager = {
 
     initBelowSearch: function() {
         const btn = document.getElementById("belowSearchBtn");
-        
         const typeSelect = document.getElementById("belowSearchType");
+        
         if(typeSelect && typeSelect.innerHTML === "") {
              typeSelect.innerHTML = `<select id="searchTypeSelect" style="border:none; outline:none; font-size:14px; color:#555;">
                 <option value="all">전체</option>
@@ -363,7 +390,9 @@ window.PostDetailManager = {
         }
     },
 
-    // 5. @멘션 시스템
+    /* -----------------------------------------
+       4. @멘션 시스템
+       ----------------------------------------- */
     updateMentionList: function(comments) {
         const nicknames = new Set();
         if (this.postAuthor) nicknames.add(this.postAuthor);
@@ -496,6 +525,9 @@ window.PostDetailManager = {
         return coordinates;
     },
 
+    /* -----------------------------------------
+       5. 공통 이벤트 및 헬퍼
+       ----------------------------------------- */
     bindEvents: function() {
         const btn = document.querySelector(".btn-comment-submit");
         if(btn) btn.onclick = () => this.addComment();
