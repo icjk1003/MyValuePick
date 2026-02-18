@@ -1,0 +1,38 @@
+/* kr/shared/css/post-core.css */
+
+/* =========================================
+   [Core] 게시글 페이지 기본 레이아웃
+   ========================================= */
+
+/* 메인 컨테이너 */
+.post-container {
+    max-width: 900px; /* 게시글 읽기에 적당한 너비 */
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* 상단 네비게이션 버튼 (목록으로) */
+.post-top-btns {
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.btn-back:hover {
+    color: var(--primary);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .post-container {
+        padding: 20px 16px;
+    }
+}

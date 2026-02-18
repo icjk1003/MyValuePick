@@ -1,0 +1,83 @@
+/* kr/shared/css/post-mention.css */
+
+/* =========================================
+   [Mention] 멘션 시스템 스타일
+   ========================================= */
+
+/* 1. 멘션 드롭다운 컨테이너 */
+#mentionDropdown {
+    position: absolute;
+    z-index: 9999;
+    background-color: var(--surface); /* 배경색 명시 (투명 방지) */
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 200px;
+    display: none; /* 기본 숨김 */
+}
+
+/* 2. 스크롤바 커스텀 (다크모드 대응) */
+#mentionDropdown::-webkit-scrollbar {
+    width: 6px;
+}
+#mentionDropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+#mentionDropdown::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+}
+/* 다크모드 스크롤바 */
+html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
+    background-color: #475569;
+}
+
+/* 3. 드롭다운 아이템 */
+.mention-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    background-color: var(--surface);
+    transition: background-color 0.1s;
+}
+
+.mention-item:last-child {
+    border-bottom: none;
+}
+
+.mention-item:hover, .mention-item.active {
+    background-color: var(--surface-hover);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* 4. 아이템 내 아바타 */
+.mention-avatar {
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%;
+    background: var(--line);
+    font-size: 10px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+/* 5. 입력창 내 삽입되는 멘션 태그 스타일 */
+/* (참고: post-comments.css에도 있을 수 있지만, 여기가 원천입니다) */
+.mention-tag {
+    color: var(--primary);
+    font-weight: 700;
+    display: inline-block;
+    vertical-align: baseline;
+    margin-right: 2px;
+}

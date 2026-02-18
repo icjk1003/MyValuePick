@@ -1,0 +1,238 @@
+/* kr/shared/css/post-board.css */
+
+/* =========================================
+   [Board] 하단 게시글 목록 및 검색 스타일
+   ========================================= */
+
+.board-below-wrap {
+    margin-top: 60px; /* 본문/댓글과의 간격 */
+}
+
+/* 1. 테이블 스타일 (board.css 스타일 이식) */
+.boardTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border-top: 1px solid var(--text); /* 상단 굵은 선 */
+}
+
+.boardTable th,
+.boardTable td {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+.boardTable th {
+    background: var(--surface-hover);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 12px;
+}
+
+/* 컬럼 너비 */
+.colNo { width: 60px; }
+.colTag { width: 80px; }
+.colWriter { width: 120px; color: var(--muted); }
+.colVotes { width: 60px; }
+.colViews { width: 70px; }
+.colTime { width: 100px; }
+
+/* 제목 셀 (왼쪽 정렬) */
+.boardTable td:nth-child(3) {
+    text-align: left;
+    padding-left: 15px;
+}
+
+.boardTable a {
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+    width: 100%;
+}
+.boardTable a:hover {
+    text-decoration: underline;
+}
+
+.boardTable tbody tr:hover {
+    background-color: var(--surface-hover);
+}
+
+/* 2. 페이지네이션 */
+.pagerWrap {
+    padding: 30px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.pager {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+}
+
+.pager a {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.pager a:hover {
+    background-color: var(--surface-hover);
+    color: var(--text);
+}
+
+.pager a.active {
+    background: var(--primary);
+    color: white;
+}
+
+.pagerBtn {
+    font-size: 16px; /* 화살표 크기 */
+}
+
+/* 3. 하단 검색창 (Custom Dropdown 포함) */
+.boardSearchBelow {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 60px;
+    margin-top: 0;
+}
+
+.boardSearchBar {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 0 12px;
+    width: 100%;
+    max-width: 420px;
+    height: 44px;
+    position: relative;
+}
+
+.boardSearchBar input {
+    border: none;
+    background: transparent;
+    padding: 0 12px;
+    height: 100%;
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    outline: none;
+    color: var(--text);
+}
+
+.boardSearchBtn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+}
+
+.searchDivider {
+    width: 1px;
+    height: 16px;
+    background: var(--line);
+    margin: 0;
+    flex-shrink: 0;
+}
+
+/* 커스텀 셀렉트 (검색 타입) */
+.custom-select {
+    position: relative;
+    height: 100%;
+    width: 100px;
+    margin-left: -12px;
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.select-styled {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 12px;
+    padding-right: 15px;
+    color: var(--text);
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.select-styled::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-20%);
+    border: 4.5px solid transparent;
+    border-top-color: var(--muted);
+}
+
+.select-options {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    z-index: 100;
+    padding: 4px 0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin: 0;
+}
+
+.select-options li {
+    padding: 10px 0;
+    cursor: pointer;
+    list-style: none;
+    text-align: center;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 13px;
+}
+.select-options li:hover {
+    background-color: var(--surface-hover);
+    color: var(--primary);
+}
+
+/* 태그 디자인 (Chip) */
+.chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background-color: var(--surface-hover);
+    font-size: 11px;
+    color: var(--muted);
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+    .colNo, .colViews, .colVotes { display: none; }
+    .colTime { width: 70px; font-size: 11px; text-align: right; }
+    .pagerWrap { padding: 20px 0; }
+}

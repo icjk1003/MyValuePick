@@ -1,0 +1,280 @@
+/* kr/shared/css/post-comments.css */
+
+/* =========================================
+   [Comments] 댓글 및 답글 스타일
+   ========================================= */
+
+.comment-container {
+    margin-top: 30px;
+    padding: 24px 30px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px solid var(--line);
+}
+
+.comment-header {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+.text-highlight {
+    color: var(--primary);
+}
+
+/* --- 댓글 작성 박스 --- */
+.comment-write-box {
+    background: var(--bg);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border: 1px solid var(--line);
+}
+
+.anon-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.input-mini {
+    width: 140px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    outline: none;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.login-user-info {
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.d-none {
+    display: none;
+}
+
+.write-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* [New] ContentEditable 입력창 */
+.comment-input-div {
+    flex: 1;
+    min-height: 80px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.comment-input-div:focus {
+    border-color: var(--primary);
+}
+
+/* Placeholder (빈 값일 때) */
+.comment-input-div:empty:before {
+    content: attr(placeholder);
+    color: var(--muted);
+    display: block;
+}
+
+/* 입력창 내부 멘션 태그 (파란색) */
+.comment-input-div .mention-tag {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.btn-comment-submit {
+    width: 90px;
+    height: auto;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+.btn-comment-submit:hover {
+    opacity: 0.9;
+}
+
+/* --- 댓글 리스트 아이템 --- */
+.comment-item {
+    display: flex;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+/* 대댓글 아이템 */
+.comment-reply-item {
+    display: flex;
+    gap: 16px;
+    padding: 15px;
+    margin-top: 10px;
+    margin-left: 40px; /* 들여쓰기 */
+    background-color: var(--surface-hover);
+    border-left: 3px solid var(--line);
+    border-radius: 0 8px 8px 0;
+}
+
+/* 프로필 이미지 */
+.cmt-profile {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--surface-hover);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.default-avatar {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--muted);
+}
+
+.cmt-profile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 댓글 내용 */
+.cmt-body {
+    flex: 1;
+    min-width: 0; /* flex overflow 방지 */
+}
+
+.cmt-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.cmt-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cmt-nick {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.cmt-date {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.cmt-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.cmt-foot {
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-reply-action, .btn-delete-cmt {
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-reply-action:hover {
+    text-decoration: underline;
+    color: var(--primary);
+}
+
+.btn-delete-cmt:hover {
+    text-decoration: underline;
+    color: var(--bad);
+}
+
+/* --- 답글 작성 폼 (동적 생성) --- */
+.reply-form-wrap {
+    margin-left: 46px;
+    margin-top: 10px;
+    padding: 15px;
+    background: var(--surface);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* 답글창은 textarea 유지 (필요시 div로 변경 가능) */
+.guest-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    background: var(--bg);
+    color: var(--text);
+    margin-bottom: 8px;
+}
+.guest-textarea:focus {
+    border-color: var(--primary);
+}
+
+.btn-cancel {
+    background: none;
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 12px;
+}
+
+.btn-save-guest {
+    background: var(--primary);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

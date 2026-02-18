@@ -1,0 +1,27 @@
+<div class="comment-container">
+    
+    <div class="comment-header">
+        댓글 <span id="commentCountHeader" class="text-highlight">0</span>
+    </div>
+
+    <div class="comment-write-box">
+        
+        <div id="loginProfile" class="login-user-info d-none">
+            작성자: <span class="text-highlight" id="currentUserNick"></span>
+        </div>
+
+        <div id="anonInputs" class="anon-input-group">
+            <input type="text" class="input-mini" placeholder="닉네임" maxlength="10">
+            <input type="password" class="input-mini" placeholder="비밀번호" maxlength="10">
+        </div>
+
+        <div class="write-row">
+            <div id="mainCommentInput" class="comment-input-div" contenteditable="true" placeholder="댓글을 입력하세요 (@로 멘션 가능)"></div>
+            <button class="btn-comment-submit">등록</button>
+        </div>
+    </div>
+
+    <div id="commentList" class="comment-list">
+        </div>
+
+</div>

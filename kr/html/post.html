@@ -1,184 +1,154 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>게시글 읽기</title>
-  
-  <link rel="stylesheet" href="../shared/css/common.css">
-  <link rel="stylesheet" href="../shared/css/board.css">
-  <link rel="stylesheet" href="../shared/css/post.css">
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "DiscussionForumPosting",
-    "headline": "게시글 제목 로딩중...", 
-    "author": {
-      "@type": "Person",
-      "name": "작성자"
-    }
-  }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세 - MyValuePick</title>
+    
+    <link rel="stylesheet" href="../shared/css/common.css">
+    
+    <link rel="stylesheet" href="../shared/css/post-core.css">
+    <link rel="stylesheet" href="../shared/css/post-view.css">
+    <link rel="stylesheet" href="../shared/css/post-comments.css">
+    <link rel="stylesheet" href="../shared/css/post-mention.css">
+    <link rel="stylesheet" href="../shared/css/post-board.css">
 </head>
 <body>
 
-  <div id="global-header"></div>
+    <div id="global-header"></div>
 
-  <main class="container boardWide">
-    <div class="boardLayoutCenter">
-      
-      <aside class="adTall">
-        <div class="ad-placeholder ad-skyscraper">
-          <span class="ad-label">AD</span>
-          <div class="ad-text-placeholder">300 x 600</div>
-        </div>
-      </aside>
-
-      <section class="boardCardWrap">
+    <main class="container post-container">
         
         <div class="post-top-btns">
-          <a href="board.html" class="btn">≡ 목록으로</a>
+            <a href="board.html" class="btn-back">← 목록으로</a>
         </div>
 
-        <article class="card post-view-card">
-          
-          <header class="post-view-header">
-            <div id="postTag" class="post-tag">태그</div>
-            <h1 id="postTitle" class="post-title">제목 로딩중...</h1>
-            
-            <div class="post-meta-row">
-              <div class="meta-left">
-                <span id="postWriter" class="writer-name">작성자</span> 
-                <span class="meta-divider">|</span> 
-                <span id="postDate">날짜</span>
-              </div>
-              <div class="meta-right">
-                조회 <b id="postViews">0</b> <span class="meta-divider">|</span> 
-                추천 <b id="postVotes">0</b> <span class="meta-divider">|</span> 
-                댓글 <b id="postCommentCount">0</b>
-              </div>
-            </div>
-          </header>
-
-          <div class="post-view-body" id="postBody">
-            내용 로딩중...
-          </div>
-
-          <footer class="post-view-footer">
-            <div class="vote-group">
-              <button class="vote-btn up" id="btnVoteUp">
-                <span id="voteUpCount">0</span>
-              </button>
-              <button class="vote-btn down" id="btnVoteDown">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path>
-                </svg>
-              </button>
-            </div>
-
-            <div class="utils-group">
-              <button class="util-btn" onclick="sharePost()">🔗 공유하기</button>
-              <button class="util-btn report" onclick="reportPost()">🚨 신고하기</button>
-            </div>
-
-            <div class="author-card">
-              <div class="author-info">
-                <img src="" id="authorImg" class="author-img" alt="프로필">
-                <div class="author-detail">
-                  <span class="author-nick" id="authorName">닉네임</span>
-                  <span class="author-bio">주식과 경제를 분석하는 개인 투자자입니다.</span>
+        <div id="postViewArea">
+            <div class="post-view-card">
+                
+                <div class="post-view-header">
+                    <span id="postTag" class="post-tag">Tag</span>
+                    <h1 id="postTitle" class="post-title">Loading...</h1>
+                    
+                    <div class="post-meta-row">
+                        <div class="meta-left">
+                            <span id="postWriter" class="writer-name">Writer</span>
+                            <span class="meta-divider">|</span>
+                            <span id="postDate" class="meta-date">Date</span>
+                        </div>
+                        <div class="meta-right">
+                            <span>조회 <span id="postViews">0</span></span>
+                            <span class="meta-divider">|</span>
+                            <span>추천 <span id="postVotes">0</span></span>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div style="display:flex; gap:8px; align-items:center;">
-                  <button id="btnVisitBlog" style="padding: 6px 12px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='var(--surface)'">
-                    🏠 블로그
-                  </button>
-                  <button class="btn-subscribe" onclick="this.classList.toggle('active');">+ 구독하기</button>
-              </div>
-            </div>
-          </footer>
-        </article>
-
-        <div class="comment-container">
-          <div class="comment-header">
-            댓글 <span id="commentCountHeader" class="text-highlight">0</span>개
-          </div>
-          
-          <div class="comment-write-box">
-            <div class="anon-input-group" id="anonInputs">
-              <input type="text" class="input-mini" placeholder="닉네임">
-              <input type="password" class="input-mini" placeholder="비밀번호">
-            </div>
             
-            <div id="loginProfile" class="login-user-info d-none">
-              내 프로필: <span class="text-highlight">로그인유저</span>
-            </div>
+                <div id="postBody" class="post-view-body"></div>
             
-            <div class="write-row">
-              <div class="comment-input-div" contenteditable="true" placeholder="댓글을 입력하세요 (@로 멘션 가능)"></div>
-              <button class="btn-comment-submit">등록</button>
-            </div>
-          </div>
-          
-          <div id="commentList"></div>
-        </div>
-
-        <div class="board-below-wrap">
-          <div class="card">
-            <div class="hd"><h3 class="h3">게시판 글 목록</h3></div>
-            <table class="boardTable">
-              <thead>
-                <tr>
-                  <th class="colNo">번호</th>
-                  <th class="colTag">탭</th>
-                  <th>제목</th>
-                  <th class="colWriter">글쓴이</th>
-                  <th class="colVotes">추천</th>
-                  <th class="colViews mobile-hide">조회</th>
-                  <th class="colTime mobile-hide">날짜</th>
-                </tr>
-              </thead>
-              <tbody id="boardBelowRows"></tbody>
-            </table>
-
-            <div class="pagerWrap">
-                <div id="belowPager" class="pager"></div>
-            </div>
-
-            <div class="boardSearchBelow">
-                <div class="boardSearchBar">
-                    <div id="boardSearchType" class="custom-select"></div>
-                    <div class="searchDivider"></div>
-                    <input id="belowSearchInput" placeholder="검색어를 입력하세요" autocomplete="off" />
-                    <button class="boardSearchBtn" id="boardSearchBtn" type="button">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/>
-                            <path d="M16.5 16.5 21 21"/>
-                        </svg>
-                    </button>
-
+                <div class="post-view-footer">
+                    
+                    <div class="vote-group">
+                        <button class="vote-btn up">
+                            👍 <span id="voteUpCount">0</span>
+                        </button>
+                        <button class="vote-btn down">
+                            👎
+                        </button>
+                    </div>
+            
+                    <div class="utils-group">
+                        <button id="btnShare" class="util-btn share">🔗 공유하기</button>
+                        <button id="btnReport" class="util-btn report">🚨 신고하기</button>
+                        </div>
+            
+                    <div class="author-card">
+                        <div class="author-info">
+                            <img id="authorImg" src="../shared/images/default_profile.png" alt="프로필" class="author-img">
+                            <div class="author-detail">
+                                <span id="authorName" class="author-nick">닉네임</span>
+                                <span class="author-bio">자기소개가 없습니다.</span>
+                            </div>
+                        </div>
+                        <div class="author-actions">
+                            <button id="btnVisitBlog" class="btn-visit">🏠 블로그</button>
+                            <button id="btnSubscribe" class="btn-subscribe">+ 구독하기</button>
+                        </div>
+                    </div>
+            
                 </div>
             </div>
-
-          </div>
         </div>
 
-      </section>
-
-      <aside class="adTall">
-        <div class="ad-placeholder ad-skyscraper">
-          <span class="ad-label">AD</span>
-          <div class="ad-text-placeholder">300 x 600</div>
+        <div id="postCommentsArea">
+            <div class="comment-container">
+                <div class="comment-header">
+                    댓글 <span id="commentCountHeader" class="text-highlight">0</span>
+                </div>
+                <div class="comment-write-box">
+                    <div id="loginProfile" class="login-user-info d-none">
+                        작성자: <span class="text-highlight" id="currentUserNick"></span>
+                    </div>
+                    <div id="anonInputs" class="anon-input-group">
+                        <input type="text" class="input-mini" placeholder="닉네임" maxlength="10">
+                        <input type="password" class="input-mini" placeholder="비밀번호" maxlength="10">
+                    </div>
+                    <div class="write-row">
+                        <div id="mainCommentInput" class="comment-input-div" contenteditable="true" placeholder="댓글을 입력하세요 (@로 멘션 가능)"></div>
+                        <button class="btn-comment-submit">등록</button>
+                    </div>
+                </div>
+                <div id="commentList" class="comment-list"></div>
+            </div>
         </div>
-      </aside>
-    </div>
-  </main>
 
-  <div id="global-footer"></div>
+        <div id="postBoardArea">
+            <div class="board-below-wrap">
+                <table class="boardTable">
+                    <thead>
+                        <tr>
+                            <th class="colNo">번호</th>
+                            <th class="colTag">태그</th>
+                            <th class="postTitle">제목</th>
+                            <th class="colWriter">글쓴이</th>
+                            <th class="colVotes">추천</th>
+                            <th class="colViews mobile-hide">조회</th>
+                            <th class="colTime mobile-hide">날짜</th>
+                        </tr>
+                    </thead>
+                    <tbody id="boardBelowRows"></tbody>
+                </table>
+                <div class="pagerWrap">
+                    <div id="belowPager" class="pager"></div>
+                </div>
+                <div class="boardSearchBelow">
+                    <div class="boardSearchBar">
+                        <div id="boardSearchType" class="custom-select"></div>
+                        <div class="searchDivider"></div>
+                        <input id="belowSearchInput" type="text" placeholder="게시글 검색" autocomplete="off">
+                        <button id="boardSearchBtn" class="boardSearchBtn" type="button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <script src="../shared/js/data.js"></script>
-  <script src="../shared/js/common.js"></script>
-  <script src="../shared/js/post.js"></script>
+    </main>
+
+    <div id="global-footer"></div>
+
+    <script src="../shared/js/data.js"></script>
+    <script src="../shared/js/common.js"></script>
+
+    <script src="../shared/js/post-mention.js"></script>
+    <script src="../shared/js/post-comments.js"></script>
+    <script src="../shared/js/post-view.js"></script>
+    <script src="../shared/js/post-board.js"></script>
+    <script src="../shared/js/post-core.js"></script>
+
 </body>
 </html>
