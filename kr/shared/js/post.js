@@ -20,7 +20,7 @@ window.PostDetailManager = {
     limit: 20,      
     pageCount: 10,  
     
-    // [추가] 검색 관련 상태
+    // 검색 관련 상태
     currentSearchType: "all", 
 
     /* -----------------------------------------
@@ -237,7 +237,7 @@ window.PostDetailManager = {
     },
 
     /* -----------------------------------------
-       2. 댓글 관련 로직
+       2. 댓글 관련 로직 (수정됨)
        ----------------------------------------- */
     loadComments: function() {
         const post = this.getPostData(this.postId);
@@ -318,14 +318,17 @@ window.PostDetailManager = {
         return el;
     },
 
+    // [수정] 댓글 등록: contenteditable div에서 텍스트 추출
     addComment: function() {
-        const input = document.querySelector(".comment-textarea");
-        const content = input.value.trim();
+        const inputDiv = document.querySelector(".comment-input-div");
+        if (!inputDiv) return;
+
+        const content = inputDiv.innerText.trim();
         if (!content) return alert("내용을 입력해주세요.");
 
         const success = this.saveCommentData(content, null); 
         if (success !== false) {
-            input.value = "";
+            inputDiv.innerHTML = ""; // 초기화
             this.loadComments();
         }
     },
@@ -351,7 +354,8 @@ window.PostDetailManager = {
         `;
         
         const replyInput = document.getElementById(`replyInput-${parentId}`);
-        this.attachMentionEvents(replyInput);
+        // 답글창은 textarea 유지 (필요시 div로 변경 가능)
+        this.attachMentionEvents(replyInput); 
         replyInput.focus();
     },
 
@@ -434,7 +438,7 @@ window.PostDetailManager = {
 
         this.renderBelowList(pageData);
         this.renderPager(totalCount);
-        this.initBelowSearch(); // [수정] 검색 UI 초기화
+        this.initBelowSearch(); 
     },
 
     renderBelowList: function(posts) {
@@ -498,25 +502,21 @@ window.PostDetailManager = {
         pager.innerHTML = html;
     },
 
-    // [핵심] 검색 UI 초기화 및 기능 연결 (board.js와 동일한 Custom Dropdown 적용)
+    // 검색 UI 초기화 (Custom Dropdown)
     initBelowSearch: function() {
-        // [수정] ID를 post.html에 맞춰 변경 (belowSearchBtn -> boardSearchBtn)
         const btn = document.getElementById("boardSearchBtn");
         const input = document.getElementById("belowSearchInput");
         
-        // 검색 옵션 정의
         const options = [
             { val: "all", text: "전체" },
             { val: "title", text: "제목" },
             { val: "writer", text: "글쓴이" }
         ];
 
-        // [수정] Custom Select 생성 호출 (belowSearchType -> boardSearchType)
         this.setupCustomSelect("boardSearchType", options, this.currentSearchType, (val) => {
             this.currentSearchType = val;
         });
 
-        // 검색 버튼 클릭 시 board.html로 이동하며 검색 실행 (board.js와 동일 동작)
         const doSearch = () => {
             if (input && !input.value.trim()) { alert("검색어를 입력해주세요."); return; }
             const query = input ? input.value.trim() : "";
@@ -527,7 +527,6 @@ window.PostDetailManager = {
         if(input) input.onkeypress = (e) => { if (e.key === "Enter") doSearch(); };
     },
 
-    // [헬퍼] board.js의 setupCustomSelect 로직 이식
     setupCustomSelect: function(id, options, initialVal, onChange) {
         const wrapper = document.getElementById(id);
         if (!wrapper) return;
@@ -564,7 +563,7 @@ window.PostDetailManager = {
     },
 
     /* -----------------------------------------
-       4. @멘션 시스템
+       4. @멘션 시스템 (ContentEditable 적용 완료)
        ----------------------------------------- */
     updateMentionList: function(comments) {
         const nicknames = new Set();
@@ -588,28 +587,49 @@ window.PostDetailManager = {
     },
 
     attachMentionEvents: function(inputEl) {
+        // div contenteditable은 keyup/keydown 사용
         inputEl.addEventListener("keyup", (e) => this.handleMentionKeyup(e, inputEl));
         inputEl.addEventListener("keydown", (e) => this.handleMentionKeydown(e, inputEl));
     },
 
+    // [수정] 키 입력 감지 로직 (Selection API 사용)
     handleMentionKeyup: function(e, input) {
         if (["ArrowUp", "ArrowDown", "Enter", "Escape"].includes(e.key)) return;
-        const cursor = input.selectionStart;
-        const text = input.value;
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const node = selection.anchorNode;
+
+        // 텍스트 노드인 경우에만 처리
+        if (node.nodeType !== Node.TEXT_NODE) return;
+
+        const text = node.textContent;
+        const cursor = selection.anchorOffset;
+        
         const leftText = text.substring(0, cursor);
         const lastAt = leftText.lastIndexOf("@");
-        
+
         if (lastAt === -1) { this.closeMentionDropdown(); return; }
-        if (lastAt > 0 && text[lastAt - 1] !== ' ' && text[lastAt - 1] !== '\n') { this.closeMentionDropdown(); return; }
+        
+        // @ 앞에 공백이나 줄바꿈이 있어야 함
+        if (lastAt > 0 && text[lastAt - 1] !== ' ' && text[lastAt - 1] !== '\u00A0' && text[lastAt - 1] !== '\n') {
+            this.closeMentionDropdown();
+            return;
+        }
 
         const query = leftText.substring(lastAt + 1);
         if (query.includes(' ')) { this.closeMentionDropdown(); return; }
 
         this.isMentionMode = true;
-        this.mentionStartIndex = lastAt;
+        this.mentionStartIndex = lastAt; 
         
         const matches = this.mentionList.filter(nick => nick.toLowerCase().includes(query.toLowerCase()));
-        this.showMentionDropdown(matches, input, lastAt);
+        
+        // 드롭다운 위치 계산 (Range 활용)
+        const rect = range.getBoundingClientRect();
+        this.showMentionDropdown(matches, rect);
     },
 
     handleMentionKeydown: function(e, input) {
@@ -646,7 +666,8 @@ window.PostDetailManager = {
         }
     },
 
-    showMentionDropdown: function(list, input, atIndex) {
+    // [수정] 드롭다운 표시 (화면 좌표 기준)
+    showMentionDropdown: function(list, rect) {
         const dropdown = document.getElementById("mentionDropdown");
         if (list.length === 0) { dropdown.style.display = "none"; return; }
 
@@ -655,27 +676,62 @@ window.PostDetailManager = {
             const div = document.createElement("div");
             div.className = "mention-item" + (idx === 0 ? " active" : "");
             div.innerHTML = `<span class="mention-avatar">${nick.charAt(0)}</span> ${nick}`;
-            div.onclick = () => this.insertMention(nick, input);
+            div.onclick = (e) => {
+                e.preventDefault(); 
+                this.insertMention(nick);
+            };
             dropdown.appendChild(div);
         });
 
-        const coords = this.getCaretCoordinates(input, atIndex);
-        const rect = input.getBoundingClientRect();
-        dropdown.style.top = (rect.top + window.scrollY + coords.top + 25) + "px";
-        dropdown.style.left = (rect.left + window.scrollX + coords.left) + "px";
+        dropdown.style.top = (rect.bottom + window.scrollY + 5) + "px";
+        dropdown.style.left = (rect.left + window.scrollX) + "px";
         dropdown.style.display = "block";
     },
 
-    insertMention: function(nick, input) {
-        const text = input.value;
-        const before = text.substring(0, this.mentionStartIndex);
-        const after = text.substring(input.selectionStart);
-        const newText = before + "@" + nick + " " + after;
-        input.value = newText;
-        input.focus();
-        const newCursorPos = this.mentionStartIndex + 1 + nick.length + 1;
-        input.setSelectionRange(newCursorPos, newCursorPos);
+    // [핵심] 멘션 삽입 (파란색 태그 생성)
+    insertMention: function(nick) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const node = selection.anchorNode;
+        const text = node.textContent;
+        
+        const cursor = selection.anchorOffset;
+        const start = text.lastIndexOf("@", cursor - 1);
+        
+        if (start !== -1) {
+            // 1. 기존 텍스트(@query) 삭제
+            const deleteRange = document.createRange();
+            deleteRange.setStart(node, start);
+            deleteRange.setEnd(node, cursor);
+            deleteRange.deleteContents();
+
+            // 2. 파란색 멘션 태그 생성
+            const span = document.createElement("span");
+            span.className = "mention-tag";
+            span.contentEditable = "false"; // 지울 때 한 번에 지워짐
+            span.innerText = "@" + nick;
+            
+            // 3. 멘션 뒤 공백
+            const space = document.createTextNode("\u00A0"); 
+
+            // 4. 삽입
+            deleteRange.insertNode(space);
+            deleteRange.insertNode(span);
+
+            // 5. 커서 이동
+            const newRange = document.createRange();
+            newRange.setStartAfter(space);
+            newRange.setEndAfter(space);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+        }
+
         this.closeMentionDropdown();
+        
+        const inputDiv = document.querySelector(".comment-input-div");
+        if(inputDiv) inputDiv.focus();
     },
 
     closeMentionDropdown: function() {
@@ -684,33 +740,15 @@ window.PostDetailManager = {
         this.isMentionMode = false;
     },
 
-    getCaretCoordinates: function(element, position) {
-        const div = document.createElement('div');
-        document.body.appendChild(div);
-        const style = div.style;
-        const computed = window.getComputedStyle(element);
-        style.whiteSpace = 'pre-wrap';
-        style.wordWrap = 'break-word';
-        style.position = 'absolute';
-        style.visibility = 'hidden';
-        const properties = ['direction', 'boxSizing', 'width', 'height', 'overflowX', 'overflowY', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'fontStyle', 'fontVariant', 'fontWeight', 'fontStretch', 'fontSize', 'lineHeight', 'fontFamily', 'textAlign', 'textTransform', 'textIndent', 'textDecoration', 'letterSpacing', 'wordSpacing'];
-        properties.forEach(prop => style[prop] = computed[prop]);
-        div.textContent = element.value.substring(0, position);
-        const span = document.createElement('span');
-        span.textContent = element.value.substring(position) || '.';
-        div.appendChild(span);
-        const coordinates = { top: span.offsetTop + parseInt(computed['borderTopWidth']), left: span.offsetLeft + parseInt(computed['borderLeftWidth']) };
-        document.body.removeChild(div);
-        return coordinates;
-    },
-
     /* -----------------------------------------
        5. 공통 이벤트 및 헬퍼
        ----------------------------------------- */
     bindEvents: function() {
         const btn = document.querySelector(".btn-comment-submit");
         if(btn) btn.onclick = () => this.addComment();
-        const mainInput = document.querySelector(".comment-textarea");
+        
+        // [수정] .comment-input-div에 이벤트 연결
+        const mainInput = document.querySelector(".comment-input-div");
         if(mainInput) this.attachMentionEvents(mainInput);
 
         document.addEventListener("click", (e) => {

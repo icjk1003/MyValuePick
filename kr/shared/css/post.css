@@ -281,7 +281,40 @@
     gap: 12px;
 }
 
-.comment-textarea {
+/* [New] ContentEditable 입력창 스타일 */
+.comment-input-div {
+    flex: 1;
+    min-height: 80px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    overflow-y: auto;
+    white-space: pre-wrap; /* 줄바꿈 허용 */
+}
+
+.comment-input-div:focus {
+    border-color: var(--primary);
+}
+
+/* placeholder 구현 */
+.comment-input-div:empty:before {
+    content: attr(placeholder);
+    color: var(--muted);
+    display: block;
+}
+
+/* 태그된 닉네임 파란색 표시 */
+.comment-input-div .mention-tag {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* (구형 textarea 스타일 - 하위 호환 및 답글용) */
+.comment-textarea, .guest-textarea {
     flex: 1;
     min-height: 80px;
     padding: 12px;
@@ -293,7 +326,7 @@
     color: var(--text);
     font-size: 14px;
 }
-.comment-textarea:focus {
+.comment-textarea:focus, .guest-textarea:focus {
     border-color: var(--primary);
 }
 
@@ -323,7 +356,7 @@
     border-bottom: none;
 }
 
-/* 대댓글 리스트 아이템 (자식) - [New] */
+/* 대댓글 리스트 아이템 (자식) */
 .comment-reply-item {
     display: flex;
     gap: 16px;
@@ -432,7 +465,7 @@
     color: var(--bad);
 }
 
-/* 답글 작성 폼 (동적 생성) - [New] */
+/* 답글 작성 폼 (동적 생성) */
 .reply-form-wrap {
     margin-left: 46px; /* 아바타 크기만큼 들여쓰기 */
     margin-top: 10px;
@@ -443,6 +476,7 @@
     animation: fadeIn 0.3s ease-out;
 }
 
+/* 답글창 전용 스타일 (textarea) */
 .guest-textarea {
     width: 100%;
     padding: 10px;
@@ -454,9 +488,6 @@
     background: var(--bg);
     color: var(--text);
     margin-bottom: 8px;
-}
-.guest-textarea:focus {
-    border-color: var(--primary);
 }
 
 .btn-cancel {
@@ -482,17 +513,36 @@
 /* =========================================
    3. @멘션 드롭다운 (Mention Dropdown)
    ========================================= */
+/* [수정] 드롭다운 스타일 (배경 불투명 및 스크롤바 개선) */
 #mentionDropdown {
     position: absolute;
     z-index: 9999;
-    background: var(--surface);
+    background-color: var(--surface); /* 배경색 명시 */
     border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     max-height: 200px;
     overflow-y: auto;
     width: 200px;
     display: none; /* 기본 숨김 */
+}
+
+/* 다크모드 대응 스크롤바 디자인 */
+#mentionDropdown::-webkit-scrollbar {
+    width: 8px;
+}
+#mentionDropdown::-webkit-scrollbar-track {
+    background: transparent;
+}
+#mentionDropdown::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* 연한 회색 */
+    border-radius: 4px;
+    border: 2px solid var(--surface); /* 여백 효과 */
+}
+
+/* 다크모드일 때 스크롤바 색상 변경 (html[data-theme="dark"] 가정) */
+html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
+    background-color: #475569;
 }
 
 .mention-item {
@@ -505,6 +555,7 @@
     gap: 10px;
     border-bottom: 1px solid var(--line);
     transition: background 0.1s;
+    background-color: var(--surface);
 }
 
 .mention-item:last-child {
@@ -540,7 +591,7 @@
 .board-below-wrap { margin-top: 30px; }
 
 /* =========================================
-   [추가] 4. 검색창 및 필터 (Search Bar) - From Board
+   4. 검색창 및 필터 (Search Bar) - From Board
    ========================================= */
 .boardSearchBelow {
     display: flex;
