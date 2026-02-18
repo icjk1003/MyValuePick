@@ -3,18 +3,17 @@
 window.PostManager = window.PostManager || {};
 
 window.PostManager.Mention = {
-    mentionList: [],        // 멘션 가능한 닉네임 목록
-    isMentionMode: false,   // 현재 멘션 모드인지 여부
-    mentionStartIndex: -1,  // '@'가 시작된 위치 인덱스
-    
-    // [초기화] 드롭다운 DOM 생성
+    mentionList: [],
+    isMentionMode: false,
+    mentionStartIndex: -1,
+    currentInput: null, 
+
     init: function() {
         if (!document.getElementById("mentionDropdown")) {
             const dd = document.createElement("div");
             dd.id = "mentionDropdown";
             document.body.appendChild(dd);
             
-            // 드롭다운 외부 클릭 시 닫기
             document.addEventListener("click", (e) => {
                 if (!e.target.closest("#mentionDropdown")) {
                     this.closeDropdown();
@@ -23,37 +22,35 @@ window.PostManager.Mention = {
         }
     },
 
-    // 1. 이벤트 연결 (입력창 엘리먼트에 keyup, keydown 부착)
     attachEvents: function(inputEl) {
         if (!inputEl) return;
-        this.init(); // 안전장치: 드롭다운 없으면 생성
+        this.init();
 
-        inputEl.addEventListener("keyup", (e) => this.handleKeyup(e));
+        inputEl.addEventListener("keyup", (e) => this.handleKeyup(e, inputEl));
         inputEl.addEventListener("keydown", (e) => this.handleKeydown(e));
+        inputEl.addEventListener("click", () => this.checkCursorPosition(inputEl));
     },
 
-    // 2. 멘션 리스트 업데이트 (댓글 데이터 기반)
     updateList: function(comments) {
         const nicknames = new Set();
-        
-        // 게시글 작성자 (회원인 경우)
         if (window.PostManager.View && window.PostManager.View.postAuthorId) {
              const authorName = document.getElementById("postWriter")?.textContent;
              if (authorName) nicknames.add(authorName);
         }
-
-        // 댓글 작성자들 (회원인 경우)
         comments.forEach(c => {
-            if (c.userId && c.writer) { 
-                nicknames.add(c.writer);
-            }
+            if (c.userId && c.writer) nicknames.add(c.writer);
         });
-        
         this.mentionList = Array.from(nicknames);
     },
 
-    // 3. 키 입력 감지 (@ 입력 확인)
-    handleKeyup: function(e) {
+    checkCursorPosition: function(inputEl) {
+        const selection = window.getSelection();
+        if (!selection.rangeCount || !this.isMentionMode) return;
+    },
+
+    handleKeyup: function(e, inputEl) {
+        this.currentInput = inputEl;
+
         if (["ArrowUp", "ArrowDown", "Enter", "Escape"].includes(e.key)) return;
 
         const selection = window.getSelection();
@@ -62,24 +59,32 @@ window.PostManager.Mention = {
         const range = selection.getRangeAt(0);
         const node = selection.anchorNode;
 
-        // 텍스트 노드가 아니면 무시 (이미지나 태그 선택 등)
-        if (node.nodeType !== Node.TEXT_NODE) return;
+        // 텍스트가 없거나 노드가 사라진 경우 처리
+        if (!node || (node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '')) {
+             // 필요 시 추가 로직
+        }
+        
+        if (inputEl.textContent === "") {
+            this.closeDropdown();
+            return;
+        }
+
+        if (node.nodeType !== Node.TEXT_NODE) {
+            this.closeDropdown();
+            return;
+        }
 
         const text = node.textContent;
         const cursor = selection.anchorOffset;
         
-        // 커서 앞쪽 텍스트 분석
         const leftText = text.substring(0, cursor);
         const lastAt = leftText.lastIndexOf("@");
         
-        // @가 없으면 종료
         if (lastAt === -1) { 
             this.closeDropdown(); 
             return; 
         }
 
-        // @ 앞이 공백이나 줄바꿈이어야 함 (문장 중간의 이메일 등 방지)
-        // 단, 문장 시작(index 0)이면 허용
         if (lastAt > 0) {
             const charBefore = text[lastAt - 1];
             if (charBefore !== ' ' && charBefore !== '\u00A0' && charBefore !== '\n') {
@@ -89,23 +94,18 @@ window.PostManager.Mention = {
         }
 
         const query = leftText.substring(lastAt + 1);
-        
-        // 공백이 포함되면 멘션 모드 해제 (단, 닉네임에 공백 허용 정책이면 로직 수정 필요)
         if (query.includes(' ')) { 
             this.closeDropdown(); 
             return; 
         }
 
-        // 매칭되는 닉네임 필터링
         const matches = this.mentionList.filter(nick => 
             nick.toLowerCase().includes(query.toLowerCase())
         );
 
         if (matches.length > 0) {
             this.isMentionMode = true;
-            this.mentionStartIndex = lastAt; // 해당 노드 내에서의 인덱스
-            
-            // 드롭다운 위치 계산 (Range API 활용)
+            this.mentionStartIndex = lastAt;
             const rect = range.getBoundingClientRect();
             this.showDropdown(matches, rect);
         } else {
@@ -113,7 +113,6 @@ window.PostManager.Mention = {
         }
     },
 
-    // 4. 키보드 네비게이션 (화살표, 엔터)
     handleKeydown: function(e) {
         if (!this.isMentionMode) return;
         
@@ -128,18 +127,18 @@ window.PostManager.Mention = {
 
         if (e.key === "ArrowDown") {
             e.preventDefault();
-            const next = (activeIndex + 1) % items.length;
+            const next = Math.min(activeIndex + 1, items.length - 1);
             this.updateActiveItem(items, next);
         } else if (e.key === "ArrowUp") {
             e.preventDefault();
-            const prev = (activeIndex - 1 + items.length) % items.length;
+            const prev = Math.max(activeIndex - 1, 0); 
             this.updateActiveItem(items, prev);
         } else if (e.key === "Enter") {
-            e.preventDefault(); // 줄바꿈 방지
+            e.preventDefault();
             if (activeIndex > -1) {
-                items[activeIndex].click();
+                items[activeIndex].click(); // click 이벤트 트리거
             } else if (items.length > 0) {
-                items[0].click(); // 선택 안 했으면 첫 번째 자동 선택
+                items[0].click();
             }
         } else if (e.key === "Escape") {
             e.preventDefault();
@@ -155,38 +154,39 @@ window.PostManager.Mention = {
         }
     },
 
-    // 5. 드롭다운 표시
     showDropdown: function(list, rect) {
         const dropdown = document.getElementById("mentionDropdown");
         dropdown.innerHTML = "";
+        dropdown.scrollTop = 0;
 
         list.forEach((nick, idx) => {
             const div = document.createElement("div");
             div.className = "mention-item" + (idx === 0 ? " active" : "");
+            div.innerHTML = `<span class="mention-avatar">${nick.charAt(0)}</span> ${nick}`;
             
-            // 아바타 + 닉네임
-            div.innerHTML = `
-                <span class="mention-avatar">${nick.charAt(0)}</span>
-                <span class="mention-nick">${nick}</span>
-            `;
-            
-            // 클릭 시 멘션 삽입 (mousedown으로 하면 포커스 잃을 수 있어 click 사용하되 preventDefault 주의)
-            div.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            // [수정 1] click 대신 mousedown 사용 (포커스 유지)
+            // mousedown은 blur보다 먼저 발생하므로 입력창 포커스가 유지됨
+            div.addEventListener("mousedown", (e) => {
+                e.preventDefault(); // 기본 동작 방지 (포커스 이동 막기)
                 this.insertMention(nick);
-            };
+            });
+            
+            // 키보드 엔터 지원을 위해 click도 유지하되 로직 중복 방지
+            div.addEventListener("click", (e) => {
+               // mousedown에서 처리 안 된 경우(키보드 등) 대비
+               // 이미 mousedown으로 처리됐으면 닫혀있으므로 문제없음
+               if(this.isMentionMode) this.insertMention(nick);
+            });
+
             dropdown.appendChild(div);
         });
 
-        // 위치 보정 (커서 바로 아래)
-        // scrollY를 더해줘야 전체 문서 기준 위치가 잡힘
         dropdown.style.top = (rect.bottom + window.scrollY + 5) + "px";
         dropdown.style.left = (rect.left + window.scrollX) + "px";
         dropdown.style.display = "block";
     },
 
-    // 6. 멘션 삽입 (파란색 태그 생성)
+    // [수정 2] 멘션 삽입 후 커서 처리 개선 (한글 깨짐 방지)
     insertMention: function(nick) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -196,44 +196,44 @@ window.PostManager.Mention = {
         const text = node.textContent;
         const cursor = selection.anchorOffset;
 
-        // 현재 커서 기준 뒤쪽에서 @ 찾기
-        // (handleKeyup에서 저장한 mentionStartIndex가 있지만, 안전을 위해 다시 탐색)
         const start = text.lastIndexOf("@", cursor - 1);
 
         if (start !== -1) {
-            // A. 기존 텍스트(@입력값) 삭제
+            // 1. 기존 텍스트(@쿼리) 삭제
             const deleteRange = document.createRange();
             deleteRange.setStart(node, start);
             deleteRange.setEnd(node, cursor);
             deleteRange.deleteContents();
 
-            // B. 멘션 태그 생성
-            // contenteditable="false"로 설정하여 백스페이스 시 한 번에 지워지게 함
+            // 2. 멘션 태그 생성
             const span = document.createElement("span");
             span.className = "mention-tag";
             span.contentEditable = "false"; 
             span.innerText = "@" + nick;
 
-            // C. 태그 뒤에 공백 추가 (이어쓰기 편하도록)
-            const space = document.createTextNode("\u00A0"); 
+            // 3. 태그 뒤 공백 생성
+            const space = document.createTextNode("\u00A0"); // nbsp
 
-            // D. 삽입
+            // 4. 삽입 (태그 + 공백)
             deleteRange.insertNode(space);
             deleteRange.insertNode(span);
 
-            // E. 커서를 공백 뒤로 이동
+            // 5. 커서를 공백 노드의 '끝'으로 이동
+            // 이렇게 해야 다음 입력이 공백 뒤의 새로운 텍스트로 인식됨
             const newRange = document.createRange();
-            newRange.setStartAfter(space);
-            newRange.setEndAfter(space);
+            newRange.setStart(space, 1); // 공백 텍스트노드의 1번째 위치 (글자 뒤)
+            newRange.setEnd(space, 1);
+            newRange.collapse(true);
+            
             selection.removeAllRanges();
             selection.addRange(newRange);
         }
 
         this.closeDropdown();
         
-        // 입력창에 포커스 유지 (혹시 잃었을 경우 대비)
-        const inputDiv = document.querySelector(".comment-input-div");
-        if(inputDiv) inputDiv.focus();
+        if (this.currentInput) {
+            this.currentInput.focus();
+        }
     },
 
     closeDropdown: function() {

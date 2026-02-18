@@ -17,133 +17,147 @@
 
     <div id="global-header"></div>
 
-    <main class="container post-container">
-        
-        <div class="post-top-btns">
-            <a href="board.html" class="btn-back">← 목록으로</a>
-        </div>
-
-        <div id="postViewArea">
-            <div class="post-view-card">
-                
-                <div class="post-view-header">
-                    <span id="postTag" class="post-tag">Tag</span>
-                    <h1 id="postTitle" class="post-title">Loading...</h1>
-                    
-                    <div class="post-meta-row">
-                        <div class="meta-left">
-                            <span id="postWriter" class="writer-name">Writer</span>
-                            <span class="meta-divider">|</span>
-                            <span id="postDate" class="meta-date">Date</span>
-                        </div>
-                        <div class="meta-right">
-                            <span>조회 <span id="postViews">0</span></span>
-                            <span class="meta-divider">|</span>
-                            <span>추천 <span id="postVotes">0</span></span>
-                        </div>
-                    </div>
+    <main class="container post-container boardWide">
+        <div class="boardLayoutCenter">
+            
+            <aside class="adTall">
+                <div class="ad-placeholder ad-skyscraper">
+                    <span class="ad-label">AD</span>
+                    <div class="ad-text-placeholder">300 x 600</div>
                 </div>
-            
-                <div id="postBody" class="post-view-body"></div>
-            
-                <div class="post-view-footer">
-                    
-                    <div class="vote-group">
-                        <button class="vote-btn up">
-                            👍 <span id="voteUpCount">0</span>
-                        </button>
-                        <button class="vote-btn down">
-                            👎
-                        </button>
-                    </div>
-            
-                    <div class="utils-group">
-                        <button id="btnShare" class="util-btn share">🔗 공유하기</button>
-                        <button id="btnReport" class="util-btn report">🚨 신고하기</button>
-                        </div>
-            
-                    <div class="author-card">
-                        <div class="author-info">
-                            <img id="authorImg" src="../shared/images/default_profile.png" alt="프로필" class="author-img">
-                            <div class="author-detail">
-                                <span id="authorName" class="author-nick">닉네임</span>
-                                <span class="author-bio">자기소개가 없습니다.</span>
+            </aside>
+
+            <section class="boardCardWrap">
+                
+                <div class="post-top-btns">
+                    <a href="board.html" class="btn-back">← 목록으로</a>
+                </div>
+
+                <div id="postViewArea">
+                    <div class="post-view-card">
+                        <div class="post-view-header">
+                            <span id="postTag" class="post-tag">Tag</span>
+                            <h1 id="postTitle" class="post-title">Loading...</h1>
+                            <div class="post-meta-row">
+                                <div class="meta-left">
+                                    <span id="postWriter" class="writer-name">Writer</span>
+                                    <span class="meta-divider">|</span>
+                                    <span id="postDate" class="meta-date">Date</span>
+                                </div>
+                                <div class="meta-right">
+                                    <span>조회 <span id="postViews">0</span></span>
+                                    <span class="meta-divider">|</span>
+                                    <span>추천 <span id="postVotes">0</span></span>
+                                </div>
                             </div>
                         </div>
-                        <div class="author-actions">
-                            <button id="btnVisitBlog" class="btn-visit">🏠 블로그</button>
-                            <button id="btnSubscribe" class="btn-subscribe">+ 구독하기</button>
+                        <div id="postBody" class="post-view-body"></div>
+                        <div class="post-view-footer">
+                            <div class="vote-group">
+                                <button class="vote-btn up">👍 <span id="voteUpCount">0</span></button>
+                                <button class="vote-btn down">👎</button>
+                            </div>
+                            <div class="utils-group">
+                                <button id="btnShare" class="util-btn share">🔗 공유하기</button>
+                                <button id="btnReport" class="util-btn report">🚨 신고하기</button>
+                            </div>
+                            <div class="author-card">
+                                <div class="author-info">
+                                    <img id="authorImg" src="../shared/images/default_profile.png" alt="프로필" class="author-img">
+                                    <div class="author-detail">
+                                        <span id="authorName" class="author-nick">닉네임</span>
+                                        <span class="author-bio">자기소개가 없습니다.</span>
+                                    </div>
+                                </div>
+                                <div class="author-actions">
+                                    <button id="btnVisitBlog" class="btn-visit">🏠 블로그</button>
+                                    <button id="btnSubscribe" class="btn-subscribe">+ 구독하기</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-            
                 </div>
-            </div>
-        </div>
 
-        <div id="postCommentsArea">
-            <div class="comment-container">
-                <div class="comment-header">
-                    댓글 <span id="commentCountHeader" class="text-highlight">0</span>
+                <div id="postCommentsArea">
+                    <div class="comment-container">
+                        <div class="comment-header">
+                            댓글 <span id="commentCountHeader" class="text-highlight">0</span>
+                        </div>
+                        <div class="comment-write-box">
+                            <div id="loginProfile" class="login-user-info d-none">
+                                작성자: <span class="text-highlight" id="currentUserNick"></span>
+                            </div>
+                            <div id="anonInputs" class="anon-input-group">
+                                <input type="text" class="input-mini" placeholder="닉네임" maxlength="10">
+                                <input type="password" class="input-mini" placeholder="비밀번호" maxlength="10">
+                            </div>
+                            <div class="write-row">
+                                <div id="mainCommentInput" class="comment-input-div" contenteditable="true" placeholder="댓글을 입력하세요 (@로 멘션 가능)"></div>
+                                <button class="btn-comment-submit">등록</button>
+                            </div>
+                        </div>
+                        <div id="commentList" class="comment-list"></div>
+                    </div>
                 </div>
-                <div class="comment-write-box">
-                    <div id="loginProfile" class="login-user-info d-none">
-                        작성자: <span class="text-highlight" id="currentUserNick"></span>
-                    </div>
-                    <div id="anonInputs" class="anon-input-group">
-                        <input type="text" class="input-mini" placeholder="닉네임" maxlength="10">
-                        <input type="password" class="input-mini" placeholder="비밀번호" maxlength="10">
-                    </div>
-                    <div class="write-row">
-                        <div id="mainCommentInput" class="comment-input-div" contenteditable="true" placeholder="댓글을 입력하세요 (@로 멘션 가능)"></div>
-                        <button class="btn-comment-submit">등록</button>
-                    </div>
-                </div>
-                <div id="commentList" class="comment-list"></div>
-            </div>
-        </div>
 
-        <div id="postBoardArea">
-            <div class="board-below-wrap">
-                <table class="boardTable">
-                    <thead>
-                        <tr>
-                            <th class="colNo">번호</th>
-                            <th class="colTag">태그</th>
-                            <th class="postTitle">제목</th>
-                            <th class="colWriter">글쓴이</th>
-                            <th class="colVotes">추천</th>
-                            <th class="colViews mobile-hide">조회</th>
-                            <th class="colTime mobile-hide">날짜</th>
-                        </tr>
-                    </thead>
-                    <tbody id="boardBelowRows"></tbody>
-                </table>
-                <div class="pagerWrap">
-                    <div id="belowPager" class="pager"></div>
-                </div>
-                <div class="boardSearchBelow">
-                    <div class="boardSearchBar">
-                        <div id="boardSearchType" class="custom-select"></div>
-                        <div class="searchDivider"></div>
-                        <input id="belowSearchInput" type="text" placeholder="게시글 검색" autocomplete="off">
-                        <button id="boardSearchBtn" class="boardSearchBtn" type="button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </button>
+                <div id="postBoardArea">
+                    <div class="board-below-wrap">
+                        <div class="card" style="padding: 0; overflow: hidden;">
+                            <div class="hd" style="padding: 15px 20px; background: var(--surface);">
+                                <h3 class="h3">게시판 글 목록</h3>
+                            </div>
+                            <table class="boardTable" style="border-top: none;">
+                                <thead>
+                                    <tr>
+                                        <th class="colNo">번호</th>
+                                        <th class="colTag">태그</th>
+                                        <th class="postTitle">제목</th>
+                                        <th class="colWriter">글쓴이</th>
+                                        <th class="colVotes">추천</th>
+                                        <th class="colViews mobile-hide">조회</th>
+                                        <th class="colTime mobile-hide">날짜</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="boardBelowRows"></tbody>
+                            </table>
+                            
+                            <div class="pagerWrap">
+                                <div id="belowPager" class="pager"></div>
+                            </div>
+
+                            <div class="boardSearchBelow">
+                                <div class="boardSearchBar">
+                                    <div id="boardSearchType" class="custom-select"></div>
+                                    <div class="searchDivider"></div>
+                                    <input id="belowSearchInput" type="text" placeholder="게시글 검색" autocomplete="off">
+                                    <button id="boardSearchBtn" class="boardSearchBtn" type="button">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
+            </section>
+
+            <aside class="adTall">
+                <div class="ad-placeholder ad-skyscraper">
+                    <span class="ad-label">AD</span>
+                    <div class="ad-text-placeholder">300 x 600</div>
+                </div>
+            </aside>
+
+        </div>
     </main>
 
     <div id="global-footer"></div>
 
     <script src="../shared/js/data.js"></script>
     <script src="../shared/js/common.js"></script>
-
     <script src="../shared/js/post-mention.js"></script>
     <script src="../shared/js/post-comments.js"></script>
     <script src="../shared/js/post-view.js"></script>

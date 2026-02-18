@@ -1,17 +1,91 @@
 /* kr/shared/css/post-core.css */
 
 /* =========================================
-   [Core] 게시글 페이지 기본 레이아웃
+   [Core] 게시글 페이지 기본 레이아웃 (반응형 수정됨)
    ========================================= */
 
 /* 메인 컨테이너 */
 .post-container {
-    max-width: 900px; /* 게시글 읽기에 적당한 너비 */
+    width: 100%; 
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 40px 16px;
 }
 
-/* 상단 네비게이션 버튼 (목록으로) */
+/* [수정] 3단 레이아웃 (광고 - 본문 - 광고) */
+.boardLayoutCenter {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    
+    /* [핵심 1] 최대 너비 확장 
+       본문(900) + 광고(300*2) + 간격(40) + 여백 고려 
+       기존 1400px -> 1600px로 늘려 본문이 찌그러지지 않게 함 */
+    max-width: 1600px; 
+    margin: 0 auto;
+}
+
+/* 광고 영역 (사이드) */
+.adTall {
+    width: 300px;
+    flex-shrink: 0; 
+    position: sticky;
+    top: 80px; 
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 광고 플레이스홀더 스타일 */
+.ad-placeholder {
+    background-color: var(--surface-hover);
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    color: var(--muted);
+}
+
+.ad-skyscraper {
+    width: 100%;
+    height: 600px; 
+}
+
+.ad-label {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.1);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.ad-text-placeholder {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--muted);
+    opacity: 0.5;
+}
+
+/* [수정] 중앙 컨텐츠 영역 (게시글+댓글+목록) */
+.boardCardWrap {
+    /* [핵심 2] flex-shrink: 0 추가 -> 공간이 좁아져도 본문이 찌그러지지 않고 버팀 */
+    flex: 0 0 900px; /* 기본 900px 고정 점유 */
+    max-width: 900px; 
+    width: 100%; /* 모바일에서 줄어들 수 있도록 */
+    min-width: 0; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* 상단 네비게이션 버튼 */
 .post-top-btns {
     margin-bottom: 20px;
 }
@@ -30,8 +104,23 @@
     color: var(--primary);
 }
 
-/* 모바일 대응 */
-@media (max-width: 768px) {
+/* [핵심 3] 반응형 Breakpoint 조정 
+   본문(900) + 광고(600) + 여백 = 약 1540px
+   따라서 1560px 밑으로 내려가면 '본문을 줄이는 게 아니라' 광고를 먼저 숨김 */
+@media (max-width: 1560px) {
+    .adTall {
+        display: none; /* 공간 부족 시 광고 숨김 */
+    }
+    .boardLayoutCenter {
+        max-width: 900px; /* 광고 사라지면 본문 너비에 맞춤 */
+    }
+}
+
+/* 모바일 대응 (본문이 900px보다 작아질 때) */
+@media (max-width: 940px) {
+    .boardCardWrap {
+        flex: 1; /* 고정 해제하고 유동적으로 줄어듦 */
+    }
     .post-container {
         padding: 20px 16px;
     }

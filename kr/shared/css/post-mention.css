@@ -1,24 +1,27 @@
 /* kr/shared/css/post-mention.css */
 
-/* =========================================
-   [Mention] 멘션 시스템 스타일
-   ========================================= */
-
-/* 1. 멘션 드롭다운 컨테이너 */
+/* [수정 3] 배경색 불투명 처리 */
 #mentionDropdown {
     position: absolute;
     z-index: 9999;
-    background-color: var(--surface); /* 배경색 명시 (투명 방지) */
+    background-color: #ffffff; /* 라이트 모드: 흰색 */
     border: 1px solid var(--line);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     max-height: 200px;
     overflow-y: auto;
     width: 200px;
-    display: none; /* 기본 숨김 */
+    display: none; 
+    overscroll-behavior: contain;
 }
 
-/* 2. 스크롤바 커스텀 (다크모드 대응) */
+html[data-theme="dark"] #mentionDropdown {
+    background-color: #1e293b; /* 다크 모드: 짙은 남색 (불투명) */
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* 스크롤바 */
 #mentionDropdown::-webkit-scrollbar {
     width: 6px;
 }
@@ -29,12 +32,11 @@
     background-color: #cbd5e1;
     border-radius: 3px;
 }
-/* 다크모드 스크롤바 */
 html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
     background-color: #475569;
 }
 
-/* 3. 드롭다운 아이템 */
+/* 아이템 */
 .mention-item {
     padding: 10px 12px;
     cursor: pointer;
@@ -44,7 +46,7 @@ html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
     align-items: center;
     gap: 10px;
     border-bottom: 1px solid var(--line);
-    background-color: var(--surface);
+    background-color: transparent; /* 부모 배경 따름 */
     transition: background-color 0.1s;
 }
 
@@ -58,7 +60,6 @@ html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
     font-weight: 600;
 }
 
-/* 4. 아이템 내 아바타 */
 .mention-avatar {
     width: 24px; 
     height: 24px;
@@ -72,8 +73,6 @@ html[data-theme="dark"] #mentionDropdown::-webkit-scrollbar-thumb {
     font-weight: 700;
 }
 
-/* 5. 입력창 내 삽입되는 멘션 태그 스타일 */
-/* (참고: post-comments.css에도 있을 수 있지만, 여기가 원천입니다) */
 .mention-tag {
     color: var(--primary);
     font-weight: 700;
