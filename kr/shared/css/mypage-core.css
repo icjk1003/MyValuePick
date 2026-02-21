@@ -53,7 +53,12 @@
 }
 
 .file-input-hidden { display: none; }
-.hidden { display: none !important; }
+
+/* 공통 요소 숨김 처리 (!important 제거 및 우선순위 강화) */
+html body .hidden,
+html body [hidden] {
+    display: none; /* 요소 숨김: html과 body를 명시하여 다른 디스플레이 속성보다 우선 적용되도록 설계 */
+}
 
 /* --- 3. Sidebar (사이드바) --- */
 .mypage-sidebar {

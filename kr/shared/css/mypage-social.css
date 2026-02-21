@@ -156,5 +156,3 @@ html[data-theme="dark"] .slider {
 html[data-theme="dark"] input:checked + .slider {
     background-color: var(--primary, #007bff);
 }
-
-.hidden { display: none !important; }
