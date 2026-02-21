@@ -1,56 +1,54 @@
 /* kr/shared/js/login.js */
 
+/**
+ * [Expert Web Developer & Architect Guidelines] 적용
+ * 분석 결과: 디버깅용 Step 로그 및 중복된 이벤트 리스너 제거 필요.
+ * 조치 사항: 1. Form Submit 기반의 통합 이벤트 모델 적용 / 2. 불필요한 콘솔 출력 삭제 / 3. 에러 핸들링 최적화.
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 폼 제출 방지 및 이벤트 바인딩
-    const loginBtn = document.getElementById("btnLogin") || document.querySelector(".btn-login");
-    const emailInput = document.getElementById("loginId"); 
-    const passwordInput = document.getElementById("loginPw");
+    // 폼 요소를 찾아 한 번에 이벤트를 바인딩합니다. (버튼 클릭 + 엔터키 동시 대응)
+    const loginForm = document.querySelector(".login-form");
 
-    if (loginBtn) {
-        loginBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            handleLogin();
-        });
-    }
-
-    // 비밀번호 입력창에서 엔터 키 입력 시 로그인 시도
-    if (passwordInput) {
-        passwordInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                handleLogin();
-            }
+    if (loginForm) {
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault(); // 기본 제출 동작(새로고침) 방지
+            await handleLogin();
         });
     }
 });
 
-// [핵심] 비동기 API(DB_API)를 통한 로그인 검증
+/**
+ * [Core Logic] 로그인 처리 함수
+ */
 async function handleLogin() {
+    // 1. DOM 요소 참조
     const emailInput = document.getElementById("loginId");
     const passwordInput = document.getElementById("loginPw");
 
-    const email = emailInput ? emailInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value.trim() : "";
+    if (!emailInput || !passwordInput) return;
 
-    // 1. 유효성 검사 (프론트엔드 단)
-    if (!email) {
-        alert("이메일을 입력해주세요.");
-        if (emailInput) emailInput.focus();
-        return;
-    }
+    // 2. 입력 데이터 추출 및 정제
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
 
-    if (!password) {
-        alert("비밀번호를 입력해주세요.");
-        if (passwordInput) passwordInput.focus();
+    // 3. 유효성 검사
+    if (!email || !password) {
+        alert("이메일과 비밀번호를 입력해주세요.");
+        if (!email) emailInput.focus();
+        else passwordInput.focus();
         return;
     }
 
     try {
-        // 2. 서버(DB_API)에 로그인 요청
-        // 일치하는 회원이 없으면 catch 블록으로 에러가 넘어갑니다.
-        const user = await DB_API.login(email, password);
-        
-        // 3. 로그인 성공 시 클라이언트 세션(localStorage)에 정보 저장
+        // 4. 비동기 인증 요청 (data.js의 DB_API 호출)
+        if (!window.DB_API) {
+            throw new Error("시스템 엔진이 로드되지 않았습니다. 관리자에게 문의하세요.");
+        }
+
+        const user = await window.DB_API.login(email, password);
+
+        // 5. 로그인 성공: 브라우저 세션(localStorage) 저장
         localStorage.setItem("is_logged_in", "true");
         localStorage.setItem("user_id", user.id);
         localStorage.setItem("user_nick", user.nickname);
@@ -60,23 +58,20 @@ async function handleLogin() {
             localStorage.setItem("user_profile_img", user.profileImg);
         }
 
-        alert(`환영합니다, ${user.nickname}님!`);
-        
-        // 4. 로그인 완료 후 페이지 이동 처리
-        // 이전 페이지가 저장되어 있다면 그곳으로, 없다면 메인 홈으로 이동
+        // 6. 페이지 이동
+        // 로그인 후 리다이렉트할 페이지가 지정되어 있다면 그곳으로, 없으면 홈으로 이동
         const redirectUrl = sessionStorage.getItem("redirect_after_login") || "/kr/html/home.html";
-        sessionStorage.removeItem("redirect_after_login"); // 사용 후 제거
+        sessionStorage.removeItem("redirect_after_login");
+        
         window.location.href = redirectUrl;
 
     } catch (error) {
-        // 5. 로그인 실패 처리 (비밀번호 틀림, 존재하지 않는 이메일 등)
-        console.error("로그인 실패:", error);
-        alert(error.message || "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+        // 7. 로그인 실패 처리
+        console.error("Login Error:", error.message);
+        alert(error.message);
         
-        // 보안 및 편의성을 위해 비밀번호 입력창만 비우고 포커스
-        if (passwordInput) {
-            passwordInput.value = "";
-            passwordInput.focus();
-        }
+        // 편의를 위해 비밀번호 창 초기화 및 포커스
+        passwordInput.value = "";
+        passwordInput.focus();
     }
 }
