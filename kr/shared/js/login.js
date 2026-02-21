@@ -3,8 +3,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     // 폼 제출 방지 및 이벤트 바인딩
     const loginBtn = document.getElementById("btnLogin") || document.querySelector(".btn-login");
-    const emailInput = document.getElementById("emailInput");
-    const passwordInput = document.getElementById("passwordInput");
+    const emailInput = document.getElementById("loginId"); 
+    const passwordInput = document.getElementById("loginPw");
 
     if (loginBtn) {
         loginBtn.addEventListener("click", (e) => {
@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // [핵심] 비동기 API(DB_API)를 통한 로그인 검증
 async function handleLogin() {
-    const emailInput = document.getElementById("emailInput");
-    const passwordInput = document.getElementById("passwordInput");
+    const emailInput = document.getElementById("loginId");
+    const passwordInput = document.getElementById("loginPw");
 
     const email = emailInput ? emailInput.value.trim() : "";
     const password = passwordInput ? passwordInput.value.trim() : "";
