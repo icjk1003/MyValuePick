@@ -1,0 +1,158 @@
+/* =========================================
+   1. [공통 UI] 버튼 컴포넌트 (Buttons)
+   ========================================= */
+
+/* 기본 버튼 스타일 */
+.btn {
+    display: inline-flex; /* 텍스트와 아이콘의 수평 정렬을 위한 플렉스박스 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    gap: 8px; /* 내부 요소 간 간격 설정 */
+    padding: 8px 14px; /* 내부 여백 설정 (상하, 좌우) */
+    border-radius: var(--radius-sm); /* 작은 둥근 모서리 적용 */
+    border: 1px solid var(--line); /* 기본 얇은 테두리 설정 */
+    background: var(--surface); /* 카드 표면색과 동일한 배경 적용 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+    font-size: 14px; /* 본문 폰트 크기 설정 */
+    font-weight: 500; /* 약간 굵은 중간 글씨체 */
+    cursor: pointer; /* 마우스 오버 시 클릭 가능한 포인터 커서 표시 */
+    transition: 0.2s; /* 호버 및 포커스 상태 변경 시 부드러운 전환 효과 */
+}
+
+/* 버튼 호버 상태 */
+.btn:hover {
+    background: var(--surface-hover); /* 마우스 호버 시 옅은 회색 배경으로 피드백 제공 */
+}
+
+/* 주요 액션(Primary) 버튼 */
+.btn.primary {
+    background: var(--primary); /* 브랜드 메인 색상 배경 적용 */
+    border-color: var(--primary); /* 테두리도 메인 색상으로 일치 */
+    color: #fff; /* 가독성을 위한 흰색 텍스트 강제 적용 */
+}
+
+/* 소형(Small) 버튼 */
+.btn.small {
+    padding: 6px 10px; /* 내부 여백 축소 */
+    font-size: 12px; /* 폰트 크기 축소 */
+    border-radius: 10px; /* 모서리 둥글기 비율 축소 */
+}
+
+/* =========================================
+   2. [공통 UI] 카드 컴포넌트 (Cards)
+   ========================================= */
+
+/* 카드 기본 컨테이너 */
+.card {
+    background: var(--surface); /* 카드 내부 표면 배경색 */
+    border: 1px solid var(--line); /* 구분감을 위한 테두리 선 설정 */
+    border-radius: var(--radius-md); /* 중간 크기의 둥근 모서리 적용 */
+    box-shadow: var(--shadow); /* 깊이감을 나타내는 은은한 그림자 효과 */
+    overflow: hidden; /* 내부 요소가 모서리의 둥글기를 벗어나지 못하도록 마스킹 */
+    margin-bottom: 16px; /* 카드 간 세로 간격(여백) 확보 */
+}
+
+/* 카드 헤더(Top) 영역 */
+.card .hd {
+    padding: 14px 16px; /* 헤더 내부 상하, 좌우 여백 */
+    border-bottom: 1px solid var(--line); /* 본문(바디) 영역과의 경계선 */
+    display: flex; /* 자식 요소 가로 배치를 위한 플렉스 적용 */
+    justify-content: space-between; /* 양 끝 정렬 (제목은 좌측, 버튼은 우측) */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+/* 카드 본문(Body) 영역 */
+.card .bd {
+    padding: 16px; /* 본문 콘텐츠를 감싸는 넉넉한 내부 여백 */
+}
+
+/* =========================================
+   3. [공통 UI] 폼 & 입력 컨트롤 (Forms & Inputs)
+   ========================================= */
+
+/* 둥근 형태의 폼 컨테이너 공통 (알약형 및 인풋 래퍼) */
+.pill,
+.input {
+    background: var(--surface); /* 입력 필드 배경색 설정 */
+    border: 1px solid var(--line); /* 테두리 설정 */
+    border-radius: 999px; /* 완전한 반원 형태의 알약 모양 모서리 (Pill 기본형) */
+    padding: 6px 12px; /* 내부 텍스트와 테두리 사이의 여백 */
+    display: flex; /* 아이콘과 입력 필드의 수평 정렬용 */
+    align-items: center; /* 수직 중앙 정렬 */
+    gap: 8px; /* 아이콘 등 내부 요소 간 간격 */
+}
+
+/* 일반 텍스트 입력 컨테이너 (알약형 스타일 오버라이딩) */
+.input {
+    border-radius: 12px; /* 일반적인 인풋 스타일의 둥근 모서리로 변경 */
+    width: 100%; /* 부모 너비에 맞게 꽉 채움 */
+}
+
+/* 검색창 및 일반 인풋의 실제 텍스트 입력 필드 */
+.input input,
+.searchBox input {
+    border: 0; /* 브라우저 기본 테두리 제거 (부모 래퍼 테두리를 활용) */
+    outline: 0; /* 브라우저 기본 포커스 아웃라인 제거 */
+    background: transparent; /* 배경을 투명하게 하여 부모 래퍼 색상을 보여줌 */
+    color: var(--text); /* 입력 텍스트 색상 적용 */
+    width: 100%; /* 입력 영역을 부모 컨테이너 너비만큼 확장 */
+    font-size: 13px; /* 가독성을 위한 폰트 크기 설정 */
+    font-weight: 700; /* 입력 내용을 강조하기 위한 굵은 글씨체 */
+}
+
+/* 드롭다운(Select) 폼 공통 스타일 */
+.pill select,
+.calSelect {
+    border: 1px solid var(--line); /* 기본 테두리 설정 */
+    border-radius: 8px; /* 사각형 형태의 둥근 모서리 설정 */
+    background-color: var(--surface); /* 드롭다운 배경색 적용 */
+    color: var(--text); /* 선택된 텍스트 색상 적용 */
+    font-size: 13px; /* 폰트 크기 설정 */
+    font-weight: 700; /* 굵은 글씨체 설정 */
+    cursor: pointer; /* 클릭 가능한 요소임을 나타내는 커서 변경 */
+    appearance: none; /* 브라우저 기본 셀렉트 박스 디자인 제거 (초기화) */
+    -webkit-appearance: none; /* 사파리 등 WebKit 브라우저용 추가 초기화 */
+    padding: 4px 28px 4px 10px; /* 커스텀 화살표가 들어갈 우측 여백(28px) 확보 */
+    min-width: 82px; /* 너무 좁아지지 않도록 최소 너비 보장 */
+    outline: 0; /* 포커스 아웃라인 제거 */
+}
+
+/* 드롭다운(Select) 커스텀 화살표 아이콘 적용 */
+.pill select,
+.calSelect {
+    /* SVG 화살표 아이콘을 Data URI 형식으로 변환하여 배경으로 삽입 (회색 계열) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; /* 배경 이미지(화살표)가 반복되지 않도록 설정 */
+    background-position: right 8px center; /* 우측 끝에서 8px 띄우고 수직 중앙에 배치 */
+}
+
+/* 다크 모드에서의 드롭다운 및 화살표 색상 반전 처리 */
+:root[data-theme="dark"] .pill select,
+:root[data-theme="dark"] .calSelect {
+    background-color: rgba(255, 255, 255, 0.05); /* 다크 모드용 반투명 밝은 배경 적용 */
+    /* 다크 모드 가독성을 위해 밝은 색상(#94a3b8)의 SVG 화살표로 교체 삽입 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* 달력 컨트롤 전용 아이콘 버튼 예외 처리 */
+.calCtrl .iconBtn {
+    color: #475569; /* 아이콘 색상을 보조 텍스트 색상으로 강제 지정 */
+    background: var(--surface); /* 배경색 지정 */
+    border: 1px solid var(--line); /* 테두리 지정 */
+}
+
+/* =========================================
+   4. [공통 UI] 칩(Chip) 및 상태 태그 (Chips)
+   ========================================= */
+
+/* 칩(Tag) 컴포넌트 기본 스타일 */
+.chip {
+    display: inline-flex; /* 콘텐츠 길이에 맞춰 크기가 조절되는 인라인 플렉스 */
+    align-items: center; /* 텍스트 수직 중앙 정렬 */
+    padding: 4px 10px; /* 작고 콤팩트한 내부 여백 설정 */
+    border-radius: 999px; /* 완전한 둥근 알약 모서리 적용 */
+    font-size: 12px; /* 보조 정보 표시를 위한 작은 폰트 크기 */
+    border: 1px solid var(--line); /* 얇은 테두리로 영역 구분 */
+    background: var(--surface); /* 기본 카드 표면색 배경 적용 */
+    color: var(--muted); /* 눈에 덜 띄는 보조 텍스트 색상 적용 */
+}

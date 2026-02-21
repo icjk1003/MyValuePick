@@ -1,4 +1,4 @@
-/* shared/js/find_account.js */
+/* shared/js/find-account.js */
 
 document.addEventListener("DOMContentLoaded", () => {
     initTabs();

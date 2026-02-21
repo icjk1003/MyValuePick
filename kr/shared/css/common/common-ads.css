@@ -1,0 +1,122 @@
+/* =========================================
+   1. [광고] 광고 래퍼 및 플레이스홀더 (Ad Wrappers & Placeholder)
+   ========================================= */
+
+/* 전역 광고 컨테이너 (정렬 및 여백용) */
+.ad-container {
+    display: flex; /* 내부 광고를 중앙 정렬하기 위한 플렉스박스 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-bottom: 24px; /* 다음 콘텐츠와의 세로 간격 확보 */
+    width: 100%; /* 부모 요소의 전체 너비 사용 */
+}
+
+/* 광고가 아직 로드되지 않았거나 없을 때 보여줄 대체(Placeholder) 박스 */
+.ad-placeholder {
+    background-color: var(--surface-hover); /* 회색 계열의 빈 공간 배경색 적용 */
+    border: 1px dashed var(--line); /* 점선 테두리로 임시 공간임을 표시 */
+    border-radius: 12px; /* 둥근 모서리 적용 */
+    display: flex; /* 내부 텍스트와 라벨 중앙 정렬용 플렉스 */
+    flex-direction: column; /* 텍스트를 위아래로 배치 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    position: relative; /* 우측 상단 'AD' 라벨의 절대 위치 기준점 */
+    overflow: hidden; /* 내부 요소가 모서리를 벗어나지 않도록 마스킹 */
+    color: var(--muted); /* 눈에 덜 띄는 보조 텍스트 색상 적용 */
+    transition: 0.2s; /* 호버 시 테두리 및 배경색 변경을 위한 부드러운 전환 */
+}
+
+/* 다크 모드용 광고 플레이스홀더 테마 오버라이딩 */
+:root[data-theme="dark"] .ad-placeholder {
+    background-color: #1e293b; /* 다크 모드용 짙은 남색 배경 */
+    /* 사선 패턴의 그라데이션을 적용하여 빈 공간임을 시각적으로 강조 */
+    background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 20px);
+    border-color: #334155; /* 다크 모드용 점선 테두리 색상 */
+    color: #94a3b8; /* 다크 모드용 보조 텍스트 색상 */
+}
+
+/* 광고 플레이스홀더 마우스 호버 효과 (선택사항) */
+.ad-placeholder:hover {
+    border-color: var(--primary); /* 호버 시 테두리를 브랜드 메인 컬러로 변경 */
+    background-color: var(--bg); /* 호버 시 배경색을 약간 밝게 전환 */
+}
+
+/* 우측 상단 'AD' 텍스트 라벨 */
+.ad-label {
+    position: absolute; /* 플레이스홀더 우측 상단에 고정 */
+    top: 8px; /* 상단에서 8px 띄움 */
+    right: 8px; /* 우측에서 8px 띄움 */
+    left: auto; /* 좌측 정렬 해제 */
+    background: rgba(0, 0, 0, 0.1); /* 배경과 구분되는 반투명 검은색 뱃지 배경 */
+    color: var(--muted); /* 보조 텍스트 색상 적용 */
+    font-size: 10px; /* 아주 작은 라벨 폰트 크기 */
+    font-weight: 700; /* 라벨 가독성을 위한 굵은 글씨체 */
+    padding: 2px 6px; /* 라벨 내부 여백 */
+    border-radius: 4px; /* 라벨 모서리 둥글게 처리 */
+    text-transform: uppercase; /* 소문자로 입력되어도 항상 대문자로 표시 (예: ad -> AD) */
+}
+
+/* 다크 모드용 'AD' 라벨 테마 오버라이딩 */
+:root[data-theme="dark"] .ad-label {
+    background: #334155; /* 다크 모드용 어두운 회색 뱃지 배경 */
+    color: #94a3b8; /* 다크 모드용 밝은 텍스트 색상 */
+}
+
+/* =========================================
+   2. [광고] 표준 규격별 광고 컨테이너 사이즈 (Ad Sizes)
+   ========================================= */
+
+/* 리더보드 (PC 상/하단 가로형 배너, 보통 728x90) */
+.ad-leaderboard {
+    width: 100%; /* 너비를 꽉 채워 반응형 지원 */
+    height: 100px; /* 데스크탑 기준 기본 높이 확보 */
+    min-height: 90px; /* 높이가 줄어들더라도 최소 배너 사이즈인 90px 보장 */
+    display: flex; /* 정렬을 위한 플렉스박스 */
+    flex-direction: column; /* 세로 정렬 설정 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+/* 모바일 화면(768px 이하)에서의 리더보드 예외 처리 */
+@media (max-width: 768px) {
+    .ad-leaderboard {
+        min-height: 100px; /* 모바일(보통 320x50 또는 320x100)용 높이 확보하여 Layout Shift 방지 */
+    }
+}
+
+/* 직사각형 (우측 사이드바 및 본문 삽입형 배너, 보통 300x250) */
+.ad-rectangle {
+    width: 100%; /* 부모 너비에 맞춤 */
+    height: 250px; /* 직사각형 배너 표준 높이인 250px 고정 확보 */
+    display: flex; /* 정렬을 위한 플렉스박스 */
+    flex-direction: column; /* 세로 정렬 설정 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+/* 스카이스크래퍼 (좌/우측 길쭉한 세로형 배너, 보통 160x600 또는 300x600) */
+.ad-skyscraper {
+    width: 100%; /* 부모 영역 너비에 맞춤 */
+    height: 100%; /* 유동적인 세로 길이 확보 */
+    min-height: 600px; /* 세로형 배너 최소 높이인 600px 확보 */
+}
+
+/* =========================================
+   3. [광고] 내부 텍스트 스타일 (Ad Texts)
+   ========================================= */
+
+/* 플레이스홀더 중앙 큰 안내 텍스트 (예: Advertisement) */
+.ad-text-placeholder {
+    font-size: 18px; /* 강조를 위한 큰 폰트 크기 */
+    font-weight: 700; /* 굵은 글씨체 */
+    color: var(--muted); /* 보조 색상으로 시선 분산 방지 */
+    opacity: 0.5; /* 반투명하게 처리하여 디자인에 녹아들도록 설정 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+}
+
+/* 플레이스홀더 중앙 작은 부가 설명 텍스트 */
+.ad-text-desc {
+    font-size: 12px; /* 작은 폰트 크기 설정 */
+    margin-top: 4px; /* 위쪽 메인 텍스트와의 간격 확보 */
+    opacity: 0.7; /* 반투명 처리 */
+}

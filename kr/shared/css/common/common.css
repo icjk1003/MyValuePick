@@ -1,0 +1,11 @@
+/* =========================================
+   MyValuePick Global Styles - Index
+   경로: kr/shared/css/common.css
+   ========================================= */
+
+@import url('./common-base.css');
+@import url('./common-layout.css');
+@import url('./common-ui.css');
+@import url('./common-noti.css');
+@import url('./common-modal.css');
+@import url('./common-ads.css');

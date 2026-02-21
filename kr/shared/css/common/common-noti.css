@@ -1,0 +1,282 @@
+/* =========================================
+   1. [알림/검색] 실시간 인기 글 리스트 (Search Rankings)
+   ========================================= */
+
+/* 검색/인기글 리스트 아이템 컨테이너 */
+.searchItem {
+    display: flex; /* 순위와 콘텐츠 가로 배치 */
+    align-items: center; /* 수직 중앙 정렬 */
+    padding: 12px 0; /* 상하 여백 설정 */
+    border-bottom: 1px solid var(--line); /* 아이템 간 구분선 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+    transition: background-color 0.2s; /* 호버 시 배경색 부드러운 전환 */
+}
+
+/* 마지막 검색 리스트 아이템 예외 처리 */
+.searchItem:last-child {
+    border-bottom: none; /* 마지막 항목의 하단 선 제거 */
+}
+
+/* 검색 리스트 아이템 호버 효과 */
+.searchItem:hover {
+    background-color: var(--surface-hover); /* 마우스 호버 시 옅은 배경 적용 */
+    border-radius: 8px; /* 호버 영역 모서리 둥글게 처리 */
+    padding-left: 8px; /* 호버 영역 확장을 위한 좌측 패딩 추가 */
+    padding-right: 8px; /* 호버 영역 확장을 위한 우측 패딩 추가 */
+    margin: 0 -8px; /* 패딩 추가로 인한 레이아웃 틀어짐 방지용 음수 마진 */
+}
+
+/* 인기글 순위 숫자 영역 */
+.rank-num {
+    width: 24px; /* 순위 숫자 영역 고정 너비 */
+    text-align: center; /* 숫자 가운데 정렬 */
+    font-size: 16px; /* 순위 강조를 위한 폰트 크기 */
+    margin-right: 12px; /* 콘텐츠와의 간격 확보 */
+    flex-shrink: 0; /* 플렉스 컨테이너 내 크기 축소 방지 */
+    font-variant-numeric: tabular-nums; /* 숫자 너비를 일정하게 맞춰 정렬 유지 */
+}
+
+/* 인기글 텍스트 콘텐츠 영역 */
+.rank-content {
+    flex: 1; /* 남은 영역을 모두 차지하도록 확장 */
+    overflow: hidden; /* 영역을 벗어나는 텍스트 숨김 */
+    display: flex; /* 제목과 메타정보 세로 배치용 플렉스 */
+    flex-direction: column; /* 세로 방향으로 요소 정렬 */
+    gap: 2px; /* 제목과 메타정보 사이 간격 */
+}
+
+/* 인기글 제목 텍스트 */
+.rank-title {
+    font-size: 14px; /* 본문과 동일한 폰트 크기 */
+    font-weight: 600; /* 약간 굵은 폰트로 가독성 확보 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+}
+
+/* 인기글 메타 정보 (작성일, 조회수 등) */
+.rank-meta {
+    font-size: 11px; /* 부가 정보용 작은 폰트 크기 */
+    color: var(--muted); /* 눈에 덜 띄는 보조 텍스트 색상 적용 */
+    display: flex; /* 메타 정보 내 요소들 가로 배치 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+/* 인기글 우측 아이콘 (상승/하락 화살표 등) */
+.rank-icon {
+    width: 24px; /* 우측 아이콘 영역 고정 너비 */
+    display: flex; /* 아이콘 배치를 위한 플렉스 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: flex-end; /* 우측 끝으로 밀착 정렬 */
+    opacity: 0.7; /* 시각적 피로도를 줄이기 위한 반투명 처리 */
+}
+
+/* =========================================
+   2. [알림/검색] 알림 센터 버튼 및 뱃지 (Notification Trigger)
+   ========================================= */
+
+/* 알림 버튼 래퍼 컨테이너 */
+.noti-btn-wrap {
+    position: relative; /* 자식 요소(뱃지, 드롭다운)의 절대 위치 기준점 */
+    display: flex; /* 아이콘 수직 수평 중앙 정렬용 플렉스 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: center; /* 수평 중앙 정렬 */
+    width: 36px; /* 클릭 영역 고정 너비 */
+    height: 36px; /* 클릭 영역 고정 높이 */
+    cursor: pointer; /* 클릭 가능한 요소임을 나타내는 커서 설정 */
+    border-radius: 50%; /* 완전한 원형 모양 적용 */
+    margin-right: 12px; /* 우측 로그인 버튼과의 간격 확보 */
+    transition: all 0.2s ease-in-out; /* 상태 변화 시 부드러운 애니메이션 적용 */
+}
+
+/* 알림 버튼 호버 및 활성화 상태 효과 */
+.noti-btn-wrap:hover,
+.noti-btn-wrap.active {
+    background-color: var(--surface-hover); /* 호버 시 원형 배경색 채움 */
+    transform: translateY(-1px); /* 살짝 위로 떠오르는 입체 효과 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* 하단에 은은한 그림자 추가 */
+}
+
+/* 알림 버튼 호버 시 내부 아이콘 색상 변경 */
+.noti-btn-wrap:hover .noti-icon {
+    color: var(--primary); /* 호버 시 아이콘을 브랜드 컬러로 강조 */
+    filter: drop-shadow(0 0 2px var(--primary)); /* 아이콘 주변부 형광 발광 효과 */
+}
+
+/* 알림 종 아이콘 설정 */
+.noti-icon {
+    width: 20px; /* 아이콘 너비 설정 */
+    height: 20px; /* 아이콘 높이 설정 */
+    color: var(--muted); /* 기본 상태의 보조 텍스트 색상 */
+    transition: color 0.2s; /* 색상 변경 시 부드러운 전환 */
+}
+
+/* 읽지 않은 알림을 표시하는 빨간 뱃지 */
+.noti-badge {
+    position: absolute; /* 버튼 래퍼를 기준으로 절대 위치 설정 */
+    top: 6px; /* 상단에서 6px 아래로 배치 */
+    right: 6px; /* 우측에서 6px 좌측으로 배치 */
+    width: 8px; /* 뱃지 너비 크기 */
+    height: 8px; /* 뱃지 높이 크기 */
+    background-color: var(--bad); /* 눈에 띄는 붉은색(경고/나쁨) 적용 */
+    border-radius: 50%; /* 완전한 원형태 설정 */
+    border: 1px solid var(--header-bg); /* 아이콘과 겹칠 때 구분을 위한 헤더 배경색 테두리 */
+}
+
+/* =========================================
+   3. [알림/검색] 알림 드롭다운 창 (Notification Dropdown)
+   ========================================= */
+
+/* 알림 리스트 드롭다운 컨테이너 */
+.noti-dropdown {
+    position: absolute; /* 알림 버튼 기준 절대 위치 설정 */
+    top: 50px; /* 버튼 아래로 50px 간격 띄움 */
+    right: -130px; /* 중앙 정렬을 위해 우측으로 이동 오프셋 적용 */
+    width: 320px; /* 드롭다운 창의 고정 너비 설정 */
+    background-color: #ffffff; /* 컨텐츠 가독성을 위한 불투명 흰색 배경 */
+    border: 1px solid var(--line); /* 외곽 테두리 선 적용 */
+    border-radius: var(--radius-md); /* 중간 크기의 모서리 둥글기 적용 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 입체감을 주기 위한 부드러운 그림자 */
+    z-index: 10005; /* 다른 헤더 요소들보다 위에 표시되도록 높은 z-index */
+    display: none; /* 평상시에는 화면에서 숨김 처리 */
+    flex-direction: column; /* 헤더와 리스트를 세로로 배치 */
+    overflow: hidden; /* 둥근 모서리 밖으로 컨텐츠가 삐져나가지 않도록 잘라냄 */
+}
+
+/* 다크 모드용 알림 드롭다운 예외 처리 */
+:root[data-theme="dark"] .noti-dropdown {
+    background-color: #1e293b; /* 다크 모드 짙은 배경색 적용 */
+    border-color: #334155; /* 다크 모드 테두리 색상 적용 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* 다크 모드용 강한 그림자 적용 */
+}
+
+/* 알림 드롭다운 활성화 상태 */
+.noti-dropdown.show {
+    display: flex; /* 활성화 시 숨김 해제 후 세로 정렬 구조 유지 */
+    animation: fadeIn 0.2s ease-out; /* 나타날 때 부드러운 페이드인 애니메이션 적용 */
+}
+
+/* 알림 드롭다운 상단 타이틀 영역 */
+.noti-header {
+    padding: 12px 16px; /* 내부 여백 (상하 12px, 좌우 16px) */
+    border-bottom: 1px solid var(--line); /* 리스트 영역과의 구분선 */
+    display: flex; /* 타이틀과 모두읽음 버튼 가로 배치 */
+    justify-content: space-between; /* 양 끝 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    background-color: inherit; /* 부모(드롭다운)의 배경색 상속 */
+}
+
+/* 알림 드롭다운 타이틀 텍스트 */
+.noti-title {
+    font-size: 14px; /* 폰트 크기 설정 */
+    font-weight: 700; /* 강조를 위한 굵은 폰트 웨이트 */
+}
+
+/* 알림 '모두 읽음' 텍스트 버튼 */
+.noti-read-all {
+    font-size: 11px; /* 작은 텍스트 버튼 사이즈 적용 */
+    color: var(--primary); /* 클릭 유도를 위해 브랜드 컬러 적용 */
+    cursor: pointer; /* 마우스 오버 시 포인터 커서 적용 */
+    background: none; /* 브라우저 기본 버튼 배경색 제거 */
+    border: none; /* 브라우저 기본 테두리 제거 */
+    padding: 0; /* 브라우저 기본 내부 여백 제거 */
+}
+
+/* =========================================
+   4. [알림/검색] 알림 리스트 스크롤 및 아이템 (List & Items)
+   ========================================= */
+
+/* 알림 목록이 출력되는 스크롤 영역 */
+.noti-list {
+    max-height: 320px; /* 컨테이너 최대 높이 지정 (초과 시 스크롤) */
+    overflow-y: auto; /* 내용 초과 시 세로 스크롤바 자동 생성 */
+    overscroll-behavior: contain; /* 알림창 스크롤 시 부모(body) 스크롤 동작 방지 */
+    scrollbar-width: thin; /* 파이어폭스용 얇은 스크롤바 설정 */
+    scrollbar-color: #ccc transparent; /* 파이어폭스용 스크롤바 및 트랙 색상 지정 */
+}
+
+/* 다크 모드 스크롤바 색상 예외 처리 */
+:root[data-theme="dark"] .noti-list {
+    scrollbar-color: #555 transparent; /* 다크 모드 파이어폭스용 스크롤바 색상 지정 */
+}
+
+/* WebKit(크롬/사파리) 기반 브라우저 스크롤바 너비 커스텀 */
+.noti-list::-webkit-scrollbar {
+    width: 6px; /* 얇고 깔끔한 스크롤바 두께 지정 */
+}
+
+/* WebKit 스크롤바 트랙(바탕) 투명화 처리 */
+.noti-list::-webkit-scrollbar-track {
+    background: transparent; /* 스크롤바 바탕을 투명하게 하여 UI 조화 유지 */
+}
+
+/* WebKit 스크롤바 손잡이(Thumb) 디자인 */
+.noti-list::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* 기본 회색 손잡이 색상 */
+    border-radius: 3px; /* 손잡이 모서리를 둥글게 처리 */
+}
+
+/* 다크 모드 WebKit 스크롤바 손잡이 색상 처리 */
+:root[data-theme="dark"] .noti-list::-webkit-scrollbar-thumb {
+    background-color: #555; /* 다크 모드용 어두운 회색 손잡이 적용 */
+}
+
+/* WebKit 스크롤바 손잡이 마우스 호버 효과 */
+.noti-list::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb; /* 마우스 오버 시 손잡이 색상을 진하게 변경 */
+}
+:root[data-theme="dark"] .noti-list::-webkit-scrollbar-thumb:hover {
+    background-color: #777; /* 다크 모드 손잡이 호버 색상 처리 */
+}
+
+/* 개별 알림 컨텐츠 아이템 컨테이너 */
+.noti-item {
+    padding: 12px 16px; /* 아이템별 넉넉한 클릭/터치 영역 확보 */
+    border-bottom: 1px solid var(--line); /* 항목 간 구분선 */
+    cursor: pointer; /* 클릭 가능한 항목임을 명시 */
+    transition: 0.2s; /* 호버 시 부드러운 상태 변화 애니메이션 */
+    display: flex; /* 아이콘과 내용을 정렬하기 위한 플렉스 */
+    align-items: flex-start; /* 텍스트 내용이 길어져도 상단 기준으로 맞춤 */
+}
+
+/* 마지막 알림 항목 구분선 제거 예외 처리 */
+.noti-item:last-child {
+    border-bottom: none; /* 마지막 항목의 하단 선 제거하여 깔끔하게 마감 */
+}
+
+/* 알림 항목 호버 효과 */
+.noti-item:hover {
+    background-color: var(--surface-hover); /* 마우스 오버 시 배경색으로 피드백 제공 */
+}
+
+/* 읽지 않은 알림 항목 강조 표시 */
+.noti-item.unread {
+    background-color: var(--primary-bg); /* 읽지 않음을 나타내는 연한 브랜드 배경색 채움 */
+}
+
+/* 알림 내용 텍스트 래퍼 */
+.noti-content {
+    display: flex; /* 내용과 시간을 세로 정렬하기 위한 플렉스 */
+    flex-direction: column; /* 방향을 세로로 지정 */
+    gap: 4px; /* 알림 내용과 시간 사이의 간격 */
+}
+
+/* 메인 알림 메시지 텍스트 */
+.noti-msg {
+    font-size: 13px; /* 가독성을 위한 폰트 크기 설정 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+    line-height: 1.4; /* 내용이 길어져 두 줄이 될 경우를 대비한 줄간격 설정 */
+}
+
+/* 알림 발생 시간 정보 텍스트 */
+.noti-time {
+    font-size: 11px; /* 부가 정보용 작은 폰트 적용 */
+    color: var(--muted); /* 보조 색상을 적용하여 덜 강조되도록 처리 */
+}
+
+/* 알림이 없을 경우 나타나는 빈 상태 화면 */
+.noti-empty {
+    padding: 40px 0; /* 중앙 정렬을 위한 넉넉한 상하 여백 */
+    text-align: center; /* 안내 문구를 정중앙에 배치 */
+    font-size: 13px; /* 기본 폰트 크기 설정 */
+    color: var(--muted); /* 보조 색상을 적용하여 빈 상태임을 조화롭게 표시 */
+}

@@ -1,0 +1,199 @@
+/* =========================================
+   1. [레이아웃] 헤더 및 네비게이션 (Header & Navigation)
+   ========================================= */
+
+/* 상단 글로벌 네비게이션 바 (GNB) */
+.topbar {
+    position: sticky; /* 스크롤 시 상단 고정 */
+    top: 0; /* 최상단에 위치 */
+    z-index: 9999; /* 다른 요소들보다 항상 위에 표시 */
+    background: rgba(255, 255, 255, 0.85); /* 반투명 흰색 배경 */
+    backdrop-filter: blur(12px); /* 배경 흐림 효과로 유리 질감 표현 */
+    border-bottom: 1px solid var(--line); /* 하단 경계선 */
+}
+
+/* 다크 모드 글로벌 네비게이션 바 */
+:root[data-theme="dark"] .topbar {
+    background: rgba(11, 18, 32, 0.85); /* 다크 모드용 반투명 남색 배경 */
+}
+
+/* 상단바 내부 컨테이너 */
+.topbar .inner {
+    max-width: 1400px; /* 최대 너비 제한 (와이드 모니터 대응) */
+    margin: 0 auto; /* 중앙 정렬 */
+    padding: 10px 16px; /* 상하 10px, 좌우 16px 여백 */
+    display: flex; /* 가로 배치를 위한 플렉스박스 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: space-between; /* 양끝 배치 */
+    gap: 20px; /* 내부 요소 간격 */
+}
+
+/* 브랜드 로고 영역 */
+.brand {
+    display: flex; /* 로고와 텍스트 가로 배치 */
+    align-items: center; /* 수직 중앙 정렬 */
+    flex-direction: row; /* 가로 방향 설정 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    gap: 8px; /* 로고 아이콘과 텍스트 사이 간격 */
+}
+
+/* 브랜드 로고 뱃지 (아이콘) */
+.brand-badge {
+    width: 32px; /* 너비 고정 */
+    height: 32px; /* 높이 고정 */
+    border-radius: 8px; /* 둥근 모서리 */
+    background: linear-gradient(135deg, var(--primary), #60A5FA); /* 브랜드 컬러 그라데이션 */
+    color: white; /* 텍스트(로고 글자) 색상 */
+    display: grid; /* 중앙 정렬을 위한 그리드 */
+    place-items: center; /* 수평/수직 중앙 완벽 정렬 */
+    font-weight: 900; /* 가장 굵은 폰트 웨이트 */
+}
+
+/* 범용 아이콘 사이즈 */
+.icon {
+    width: 20px; /* 너비 고정 */
+    height: 20px; /* 높이 고정 */
+    color: var(--muted); /* 보조 텍스트 색상 적용 */
+    flex-shrink: 0; /* 플렉스 컨테이너 안에서 크기 축소 방지 */
+}
+
+/* =========================================
+   2. [레이아웃] 헤더 기능 요소 (Search & Header Buttons)
+   ========================================= */
+
+/* 헤더 검색창 컨테이너 */
+.topbar .inner #headerSearchBox {
+    transition: all 0.2s ease-in-out; /* 부드러운 상태 전환 애니메이션 */
+}
+
+/* 헤더 검색창 호버 효과 */
+.topbar .inner #headerSearchBox:hover {
+    border-color: var(--primary); /* 호버 시 테두리 브랜드 컬러로 변경 */
+    box-shadow: 0 4px 12px var(--primary-bg); /* 호버 시 은은한 발광 그림자 */
+}
+
+/* 헤더 검색창 포커스 효과 */
+.topbar .inner #headerSearchBox:focus-within {
+    border-color: var(--primary); /* 내부 인풋 포커스 시 테두리 강조 */
+    box-shadow: 0 0 0 2px var(--primary-bg); /* 접근성을 위한 포커스 링 */
+}
+
+/* 헤더 다크모드 토글 버튼 */
+.topbar .inner #themeBtn {
+    transition: all 0.2s ease-in-out; /* 부드러운 상태 전환 */
+}
+
+/* 헤더 다크모드 토글 버튼 호버 효과 */
+.topbar .inner #themeBtn:hover {
+    transform: translateY(-1px); /* 살짝 위로 떠오르는 효과 */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* 해/달 아이콘 형광 발광 효과 */
+    filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); /* 주변부 빛 번짐 효과 */
+}
+
+/* 헤더 로그인 / 닉네임 버튼 */
+.topbar .inner #btnLogin {
+    display: inline-block; /* Transform 적용을 위해 블록 속성 부여 */
+    transition: all 0.2s ease-in-out; /* 부드러운 상태 전환 */
+}
+
+/* 헤더 로그인 버튼 호버 효과 */
+.topbar .inner #btnLogin:hover {
+    color: var(--primary); /* 호버 시 브랜드 컬러로 변경 */
+    text-shadow: 0 0 8px var(--primary-bg); /* 글자 주변 발광 효과 */
+    transform: translateY(-1px); /* 살짝 위로 떠오르는 효과 */
+}
+
+/* 헤더 관리자 모드 버튼 */
+.topbar .inner #btnAdminMode {
+    transition: all 0.2s ease-in-out; /* 부드러운 상태 전환 */
+}
+
+/* 헤더 관리자 모드 버튼 호버 효과 */
+.topbar .inner #btnAdminMode:hover {
+    background-color: #000; /* 호버 시 검은색 배경으로 강조 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* 호버 시 강한 그림자 */
+    transform: translateY(calc(-50% - 1px)); /* 수직 중앙 정렬을 유지하며 위로 1px 이동 */
+}
+
+/* 검색 제안(자동완성) 드롭다운 레이아웃 */
+.search-suggestions {
+    position: absolute; /* 검색창 하단에 절대 위치 */
+    top: calc(100% + 6px); /* 검색창 높이 + 6px 간격 */
+    left: 0; /* 좌측 정렬 */
+    width: 100%; /* 검색창 너비와 동일하게 맞춤 */
+    max-height: 320px; /* 최대 높이 제한 */
+    overflow-y: auto; /* 내용이 넘칠 경우 세로 스크롤 생성 */
+    background-color: var(--surface); /* 표면 배경색 */
+    border: 1px solid var(--line); /* 테두리 경계선 */
+    border-radius: 14px; /* 둥근 모서리 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* 드롭다운 입체감을 위한 강한 그림자 */
+    display: none; /* 기본 상태는 숨김 */
+    margin-top: 0; /* 상단 여백 제거 */
+    overscroll-behavior: contain; /* 드롭다운 스크롤 시 바디 스크롤 방지 */
+    z-index: 10002; /* 상단바(9999)보다 높게 설정하여 덮임 방지 */
+}
+
+/* 다크 모드 검색 제안 드롭다운 */
+html[data-theme="dark"] .search-suggestions {
+    background-color: #1e293b; /* 다크 모드 짙은 배경색 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* 다크 모드용 어두운 그림자 */
+}
+
+/* 검색 제안 드롭다운 활성화 상태 */
+.search-suggestions.active {
+    display: block; /* 활성화 시 화면에 표시 */
+}
+
+/* 개별 검색 제안 아이템 */
+.suggestion-item {
+    padding: 12px 16px; /* 넉넉한 클릭 영역 확보 */
+    border-bottom: 1px solid var(--line); /* 아이템 간 구분선 */
+    cursor: pointer; /* 클릭 가능한 요소임을 표시 */
+    display: flex; /* 종목명과 티커 가로 배치 */
+    justify-content: space-between; /* 양끝으로 밀어서 배치 */
+}
+
+/* 검색 제안 아이템 호버 효과 */
+.suggestion-item:hover {
+    background: var(--surface-hover); /* 호버 시 배경색 변경으로 피드백 제공 */
+}
+
+/* =========================================
+   3. [레이아웃] 푸터 및 스켈레톤 (Footer & Layout Shift)
+   ========================================= */
+
+/* 전역 푸터 레이아웃 */
+.footer {
+    margin-top: 40px; /* 본문 컨텐츠와의 간격 */
+    padding: 40px 0; /* 상하 넉넉한 패딩 */
+    border-top: 1px solid var(--line); /* 상단 구분선 */
+    background: var(--surface); /* 푸터 배경색 */
+    color: var(--muted); /* 저채도 텍스트 색상 */
+    font-size: 13px; /* 작은 폰트 사이즈 적용 */
+}
+
+/* Layout Shift(화면 덜컹거림) 방지 - 헤더 영역 */
+#global-header,
+#header-placeholder {
+    min-height: 60px; /* 자바스크립트 렌더링 전 헤더 높이 확보 */
+    display: block; /* 블록 요소로 공간 차지 */
+}
+
+/* Layout Shift 방지 - 푸터 영역 */
+#global-footer,
+#footer-placeholder {
+    min-height: 100px; /* 자바스크립트 렌더링 전 푸터 높이 확보 */
+    display: block; /* 블록 요소로 공간 차지 */
+}
+
+/* =========================================
+   4. [레이아웃] 반응형 유틸리티 (Responsive Utility)
+   ========================================= */
+
+/* 모바일 화면 (768px 이하) 대응 */
+@media (max-width: 768px) {
+    /* 모바일에서 불필요한 요소 숨김 처리 */
+    .mobile-hide {
+        display: none; /* 공간을 차지하지 않고 완전 숨김 */
+    }
+}

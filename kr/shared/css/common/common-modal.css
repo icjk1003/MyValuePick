@@ -1,0 +1,192 @@
+/* =========================================
+   1. [모달/오버레이] 유저 닉네임 드롭다운 (User Dropdown)
+   ========================================= */
+
+/* 유저 닉네임 클릭 시 나타나는 드롭다운 컨테이너 */
+.user-dropdown {
+    position: absolute; /* 클릭한 닉네임 기준으로 절대 위치 설정 */
+    background-color: #ffffff; /* 가독성을 위한 불투명 흰색 배경 */
+    border: 1px solid var(--line); /* 외곽 테두리 선 적용 */
+    border-radius: 12px; /* 부드러운 둥근 모서리 적용 */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); /* 입체감을 주는 그림자 효과 */
+    width: 180px; /* 드롭다운 메뉴 고정 너비 */
+    z-index: 10010; /* 헤더(9999) 및 알림(10005)보다 높게 설정하여 최상단 노출 */
+    display: none; /* 평상시에는 숨김 처리 */
+    flex-direction: column; /* 내부 아이템들을 세로로 배치 */
+    overflow: hidden; /* 둥근 모서리를 벗어나는 자식 요소 마스킹 */
+}
+
+/* 다크 모드용 유저 드롭다운 예외 처리 */
+html[data-theme="dark"] .user-dropdown {
+    background-color: #1e293b; /* 다크모드용 불투명 남색 배경 */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); /* 다크 모드용 강한 그림자 */
+}
+
+/* 유저 드롭다운 활성화 상태 */
+.user-dropdown.show {
+    display: flex; /* 숨김 해제 및 세로 정렬 유지 */
+    animation: fadeIn 0.2s ease-out; /* 서서히 나타나는 부드러운 애니메이션 */
+}
+
+/* 유저 드롭다운 상단 닉네임 표시 헤더 */
+.user-dropdown-header {
+    padding: 12px 16px; /* 넉넉한 상하좌우 여백 */
+    border-bottom: 1px solid var(--line); /* 하단 메뉴들과의 구분선 */
+    font-size: 14px; /* 본문 폰트 크기 */
+    font-weight: 700; /* 강조를 위한 굵은 글씨체 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+    background-color: var(--surface-hover); /* 헤더 영역 구분을 위한 옅은 배경색 */
+}
+
+/* 유저 드롭다운 개별 메뉴 아이템 */
+.user-dropdown-item {
+    padding: 10px 16px; /* 클릭하기 편한 넉넉한 내부 여백 */
+    font-size: 13px; /* 메뉴 텍스트 크기 설정 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+    text-decoration: none; /* 링크 밑줄 제거 */
+    cursor: pointer; /* 클릭 가능한 요소임을 표시 */
+    display: flex; /* 텍스트와 우측 정보/아이콘 가로 배치 */
+    align-items: center; /* 수직 중앙 정렬 */
+    justify-content: space-between; /* 양 끝단 정렬 */
+    transition: background-color 0.2s; /* 호버 시 배경색 부드러운 전환 효과 */
+    background: none; /* 버튼일 경우를 대비한 기본 배경 제거 */
+    border: none; /* 버튼일 경우를 대비한 기본 테두리 제거 */
+    text-align: left; /* 버튼일 경우를 대비한 텍스트 좌측 정렬 */
+    width: 100%; /* 부모 너비에 꽉 차게 확장 */
+}
+
+/* 유저 드롭다운 아이템 호버 효과 */
+.user-dropdown-item:hover {
+    background-color: var(--surface-hover); /* 마우스 호버 시 옅은 배경색으로 피드백 제공 */
+    color: var(--primary); /* 호버 시 텍스트 및 아이콘을 브랜드 컬러로 강조 */
+}
+
+/* 유저 드롭다운 내 게시글/댓글 개수 강조 텍스트 */
+.user-dropdown-item .count {
+    font-weight: 700; /* 개수 정보 굵게 강조 */
+    color: var(--primary); /* 개수 정보를 브랜드 컬러로 강조 */
+}
+
+/* =========================================
+   2. [모달/오버레이] 쪽지 보내기 모달 (Message Modal)
+   ========================================= */
+
+/* 모달 등장 시 화면 전체를 덮는 어두운 배경 (오버레이) */
+.message-modal-overlay {
+    position: fixed; /* 화면 전체를 덮기 위한 고정 위치 */
+    top: 0; /* 화면 최상단 밀착 */
+    left: 0; /* 화면 최좌측 밀착 */
+    width: 100%; /* 화면 전체 너비 */
+    height: 100%; /* 화면 전체 높이 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은색 오버레이 처리 */
+    z-index: 10020; /* 유저 드롭다운(10010)보다 높게 설정하여 최상위 노출 */
+    display: none; /* 평상시 숨김 */
+    justify-content: center; /* 모달창 수평 중앙 정렬 */
+    align-items: center; /* 모달창 수직 중앙 정렬 */
+    backdrop-filter: blur(2px); /* 오버레이 뒷배경 흐림(블러) 효과 적용 */
+}
+
+/* 모달 오버레이 활성화 상태 */
+.message-modal-overlay.show {
+    display: flex; /* 숨김 해제 및 중앙 정렬 유지 */
+    animation: fadeIn 0.2s ease-out; /* 부드러운 페이드인 애니메이션 */
+}
+
+/* 실제 쪽지 보내기 모달 콘텐츠 컨테이너 */
+.message-modal {
+    background-color: #ffffff; /* 라이트모드용 불투명 흰색 배경 */
+    width: 90%; /* 모바일 환경을 고려한 너비 (화면의 90%) */
+    max-width: 400px; /* PC 환경을 고려한 최대 너비 제한 */
+    border-radius: 16px; /* 둥근 모서리 적용 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* 팝업 입체감을 위한 강한 그림자 */
+    overflow: hidden; /* 모서리 둥글기를 벗어나는 자식 요소 잘라냄 */
+}
+
+/* 다크 모드용 모달 컨테이너 예외 처리 */
+html[data-theme="dark"] .message-modal {
+    background-color: #1e293b; /* 다크모드용 불투명 남색 배경 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* 다크 모드용 짙은 그림자 */
+}
+
+/* 모달 상단 헤더 (제목 및 닫기 버튼 영역) */
+.message-modal-header {
+    padding: 16px 20px; /* 넉넉한 내부 여백 */
+    border-bottom: 1px solid var(--line); /* 본문 영역과의 구분선 */
+    display: flex; /* 제목과 버튼 가로 배치 */
+    justify-content: space-between; /* 양 끝 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+/* 모달 상단 타이틀 텍스트 */
+.message-modal-title {
+    font-size: 16px; /* 제목 폰트 크기 설정 */
+    font-weight: 700; /* 강조를 위한 굵은 글씨체 */
+    margin: 0; /* 기본 여백 제거 */
+}
+
+/* 모달 닫기(X) 아이콘 버튼 */
+.btn-close-modal {
+    background: none; /* 기본 버튼 배경 제거 */
+    border: none; /* 기본 테두리 제거 */
+    font-size: 20px; /* 클릭하기 쉬운 큰 X 아이콘 폰트 크기 */
+    color: var(--muted); /* 보조 텍스트 색상 적용 */
+    cursor: pointer; /* 포인터 커서로 클릭 가능 표시 */
+    padding: 0; /* 내부 여백 제거 */
+    line-height: 1; /* 높이를 폰트 크기와 동일하게 맞춤 */
+}
+
+/* 모달 닫기 버튼 호버 효과 */
+.btn-close-modal:hover {
+    color: var(--bad); /* 호버 시 경고/위험 색상(빨간색)으로 변경하여 닫기 의미 강조 */
+}
+
+/* 모달 본문 (받는 사람 정보 및 입력창 영역) */
+.message-modal-body {
+    padding: 20px; /* 본문 내부 넉넉한 상하좌우 여백 */
+}
+
+/* 받는 사람 정보 표시 텍스트 */
+.msg-target-info {
+    font-size: 14px; /* 본문 폰트 크기 적용 */
+    margin-bottom: 12px; /* 하단 텍스트 영역과의 간격 확보 */
+    color: var(--text); /* 기본 텍스트 색상 적용 */
+}
+
+/* 받는 사람 닉네임 강조 텍스트 */
+.msg-target-info strong {
+    color: var(--primary); /* 수신자 닉네임을 브랜드 컬러로 강조 */
+}
+
+/* 쪽지 내용 입력 텍스트 영역 (Textarea) */
+.message-textarea {
+    width: 100%; /* 부모 컨테이너에 맞춰 꽉 채움 */
+    height: 120px; /* 초기 높이 설정 */
+    padding: 12px; /* 입력 텍스트와 테두리 사이의 여백 */
+    border: 1px solid var(--line); /* 기본 테두리 적용 */
+    border-radius: 8px; /* 입력창 모서리 둥글게 처리 */
+    background-color: var(--bg); /* 본문과 구분되는 약간 짙은(또는 다른) 배경색 적용 */
+    color: var(--text); /* 입력 텍스트 색상 적용 */
+    resize: none; /* 사용자가 임의로 크기 조절하지 못하도록 방지 */
+    font-family: inherit; /* 기본 지정 폰트(Pretendard) 상속 */
+    font-size: 13px; /* 입력 글꼴 크기 설정 */
+    box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+    transition: 0.2s; /* 포커스 상태 변경 시 부드러운 애니메이션 */
+}
+
+/* 쪽지 내용 입력창 포커스 상태 */
+.message-textarea:focus {
+    outline: none; /* 브라우저 기본 아웃라인 제거 */
+    border-color: var(--primary); /* 포커스 시 테두리를 브랜드 컬러로 변경 */
+    background-color: var(--surface); /* 포커스 시 입력창 배경을 표면색(보통 흰색)으로 변경하여 활성화 느낌 부여 */
+    box-shadow: 0 0 0 2px var(--primary-bg); /* 접근성을 위한 포커스 발광 그림자 링 추가 */
+}
+
+/* 모달 하단 푸터 (취소/전송 버튼 영역) */
+.message-modal-footer {
+    padding: 16px 20px; /* 내부 여백 설정 */
+    border-top: 1px solid var(--line); /* 본문과의 구분선 설정 */
+    display: flex; /* 버튼 가로 배치를 위한 플렉스 */
+    justify-content: flex-end; /* 우측 정렬 */
+    gap: 8px; /* 버튼 간의 간격(8px) 설정 */
+    background-color: var(--surface-hover); /* 푸터 영역 구분을 위한 옅은 배경색 적용 */
+}
