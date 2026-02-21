@@ -335,7 +335,14 @@
     color: var(--text);
 }
 
-/* --- [Common] 취소/저장 버튼 및 유틸 --- */
+.btn-area {
+    display: flex;
+    justify-content: flex-end; /* 우측 정렬 */
+    align-items: center;
+    gap: 10px; /* 버튼 사이 간격을 16px로 띄움 */
+    margin-top: 24px;
+}
+
 .btn-cancel {
     padding: 12px 24px;
     background: var(--surface, #fff);
