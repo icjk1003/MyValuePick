@@ -62,27 +62,43 @@ function setupCustomSelect(id, options, initialVal, onChange) {
   document.addEventListener("click", () => list.style.display = "none");
 }
 
-function loadBoardData() {
+// [핵심 변경] 비동기 데이터 로딩 적용 (DB_API 연동)
+async function loadBoardData() {
   const urlParams = new URLSearchParams(location.search);
   const query = urlParams.get("q");
   
-  // [수정] 원본 데이터를 복사 후 날짜 최신순으로 정렬
-  let targetData = (typeof MOCK_DB !== 'undefined' && MOCK_DB.POSTS) ? [...MOCK_DB.POSTS] : [];
-  targetData.sort((a, b) => new Date(b.date) - new Date(a.date));
+  try {
+    // 1. 실제 DB API(Mock API)를 통해 데이터 가져오기
+    let posts = await DB_API.getPosts();
+    let targetData = [...posts];
 
-  if (query) {
-    const inputEl = document.getElementById("boardSearchInput");
-    if(inputEl) inputEl.value = query;
-    targetData = targetData.filter(p => {
-      const title = p.title || ""; const writer = p.writer || "";
-      if (currentSearchType === "title") return title.includes(query);
-      if (currentSearchType === "writer") return writer.includes(query);
-      return title.includes(query) || writer.includes(query);
-    });
+    // 2. 날짜 최신순으로 정렬
+    targetData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 3. 검색어 필터링 적용
+    if (query) {
+      const inputEl = document.getElementById("boardSearchInput");
+      if(inputEl) inputEl.value = query;
+      targetData = targetData.filter(p => {
+        const title = p.title || ""; const writer = p.writer || "";
+        if (currentSearchType === "title") return title.includes(query);
+        if (currentSearchType === "writer") return writer.includes(query);
+        return title.includes(query) || writer.includes(query);
+      });
+    }
+    
+    // 4. 화면 렌더링
+    renderList(targetData);
+    renderPager(targetData.length);
+    
+  } catch (error) {
+    // API 에러 발생 시 처리
+    console.error("게시판 데이터를 불러오는 중 오류 발생:", error);
+    const tbody = document.getElementById("boardRows");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:60px 0;color:var(--bad);">게시글을 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.</td></tr>`;
+    }
   }
-  
-  renderList(targetData);
-  renderPager(targetData.length);
 }
 
 function renderList(posts) {

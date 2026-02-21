@@ -2,12 +2,12 @@
 
 /**
  * [Blog Core Module]
- * 블로그의 라우팅, 공통 레이아웃 데이터(프로필) 로드 담당
+ * 블로그의 라우팅, 공통 레이아웃 데이터(프로필) 로드 및 권한 제어 담당 (비동기 DB 연동 완료)
  */
 
-document.addEventListener("DOMContentLoaded", () => {
-    // 1. 블로그 주인/방문자 정보 로드
-    initBlogProfile();
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. 블로그 주인/방문자 정보 비동기 로드
+    await initBlogProfile();
 
     // 2. 초기 섹션 로드 (URL 파라미터 기반)
     const urlParams = new URLSearchParams(window.location.search);
@@ -32,7 +32,8 @@ const pageCache = {};
  */
 window.loadBlogSection = async function(sectionName, pushState = true) {
     const mainView = document.getElementById("blog-main-view");
-    
+    if (!mainView) return;
+
     // 1. 네비게이션 활성화 처리
     document.querySelectorAll('.blog-nav .nav-item').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`nav-${sectionName}`);
@@ -47,11 +48,13 @@ window.loadBlogSection = async function(sectionName, pushState = true) {
 
     // 3. 컨텐츠 로드 (캐시 확인 -> fetch)
     try {
+        // 로딩 상태 표시 (인라인 스타일 대신 클래스 활용)
+        mainView.innerHTML = `<div class="loading-msg">화면을 불러오는 중입니다...</div>`;
+
         let htmlContent = pageCache[sectionName];
 
         if (!htmlContent) {
             // 캐시에 없으면 파일 요청
-            // 주의: 로컬 파일 시스템(file://)에서는 CORS 에러 발생 가능. (Live Server 사용 권장)
             const response = await fetch(`/kr/html/blog/blog-${sectionName}.html`);
             
             if (!response.ok) {
@@ -110,42 +113,89 @@ function initModuleScript(sectionName) {
 }
 
 /**
- * 사이드바 프로필 데이터 로드
+ * [변경] 사이드바 프로필 데이터 비동기 로드 및 권한 제어
  */
-function initBlogProfile() {
-    // [TODO] 실제로는 URL의 사용자 ID 등을 통해 서버에서 블로그 주인 정보를 가져와야 함
-    // 여기서는 로컬 스토리지(본인) 정보를 사용하는 예시
-    
-    const isLogged = localStorage.getItem("is_logged_in");
-    const myNick = localStorage.getItem("user_nick") || "Guest";
-    const myImg = localStorage.getItem("user_img");
+async function initBlogProfile() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetNickname = urlParams.get('user'); // URL 파라미터 (방문한 블로그의 주인)
+    const loggedInUserId = localStorage.getItem("user_id");
+    const loggedInUserNick = localStorage.getItem("user_nick");
 
-    // 사이드바 요소 바인딩
-    const nickEl = document.getElementById("blogNick");
-    const bioEl = document.getElementById("blogBio");
-    const imgEl = document.getElementById("blogProfileImg");
-    const statPost = document.getElementById("statPost");
-    
-    // 더미 데이터 세팅
-    if (nickEl) nickEl.textContent = myNick;
-    if (bioEl) bioEl.textContent = "주식과 경제를 공부하며 기록하는 공간입니다."; // 더미 소개글
-    if (imgEl) imgEl.src = myImg || "https://via.placeholder.com/150?text=User";
-    if (statPost) statPost.textContent = "124"; // 더미 포스트 수
+    let blogOwner = null;
+    let isOwner = false;
 
-    // 본인 블로그 여부 확인 (간단 예시)
-    // 실제로는 서버에서 isOwner 플래그를 받아 처리
-    const isOwner = isLogged; // 지금은 로그인했으면 주인으로 간주 (테스트용)
+    try {
+        // [1] 블로그 주인 데이터 판별
+        if (!targetNickname || targetNickname === loggedInUserNick) {
+            // 내 블로그인 경우
+            isOwner = true;
+            if (loggedInUserId) {
+                blogOwner = await DB_API.getUserProfile(loggedInUserId);
+            }
+        } else {
+            // 타인의 블로그인 경우
+            isOwner = false;
+            
+            // 실제 환경에서는 DB_API.getUserProfileByNickname(targetNickname) 형태의 API를 호출
+            // Mock 환경에서는 네트워크 딜레이 시뮬레이션 후 MOCK_DB에서 검색
+            await new Promise(res => setTimeout(res, 150));
+            if (typeof MOCK_DB !== 'undefined' && MOCK_DB.USERS) {
+                blogOwner = MOCK_DB.USERS.find(u => u.nickname === targetNickname);
+            }
+            
+            // MOCK_DB에 유저 정보가 없으면 더미 객체 생성 (테스트 환경 대응)
+            if (!blogOwner) {
+                blogOwner = {
+                    nickname: targetNickname,
+                    bio: "주식과 경제를 공부하며 기록하는 공간입니다.",
+                    profileImg: null
+                };
+            }
+        }
 
-    if (isOwner) {
-        // 주인장용 버튼 표시
-        document.getElementById("ownerActions").classList.remove("hidden");
-        document.getElementById("visitorActions").classList.add("hidden");
+        if (!blogOwner) {
+            alert("존재하지 않거나 삭제된 블로그입니다.");
+            location.href = "/kr/html/home.html";
+            return;
+        }
+
+        // [2] 사이드바 요소 바인딩
+        const nickEl = document.getElementById("blogNick");
+        const bioEl = document.getElementById("blogBio");
+        const imgEl = document.getElementById("blogProfileImg");
+        const statPost = document.getElementById("statPost");
         
-        // 주인장용 메뉴 표시 (글쓰기 등)
-        document.querySelectorAll(".owner-only").forEach(el => el.classList.remove("hidden"));
-    } else {
-        // 방문자용
-        document.getElementById("ownerActions").classList.add("hidden");
-        document.getElementById("visitorActions").classList.remove("hidden");
+        if (nickEl) nickEl.textContent = blogOwner.nickname;
+        if (bioEl) bioEl.textContent = blogOwner.bio || "주식과 경제를 공부하며 기록하는 공간입니다.";
+        if (imgEl) imgEl.src = blogOwner.profileImg || "https://via.placeholder.com/150?text=User";
+
+        // [3] 작성된 전체 포스트 수 집계 (Mock 환경 대응)
+        if (statPost) {
+            if (typeof MOCK_DB !== 'undefined' && MOCK_DB.POSTS) {
+                const postCount = MOCK_DB.POSTS.filter(p => p.writer === blogOwner.nickname).length;
+                statPost.textContent = postCount.toLocaleString();
+            } else {
+                statPost.textContent = "0";
+            }
+        }
+
+        // [4] 권한(본인 여부)에 따른 UI 제어 (클래스 기반 토글)
+        const ownerActions = document.getElementById("ownerActions");
+        const visitorActions = document.getElementById("visitorActions");
+        const ownerOnlyItems = document.querySelectorAll(".owner-only");
+
+        if (isOwner) {
+            if (ownerActions) ownerActions.classList.remove("hidden");
+            if (visitorActions) visitorActions.classList.add("hidden");
+            ownerOnlyItems.forEach(el => el.classList.remove("hidden"));
+        } else {
+            if (ownerActions) ownerActions.classList.add("hidden");
+            if (visitorActions) visitorActions.classList.remove("hidden");
+            ownerOnlyItems.forEach(el => el.classList.add("hidden"));
+        }
+
+    } catch (error) {
+        console.error("블로그 프로필 로딩 실패:", error);
+        alert("블로그 정보를 불러오지 못했습니다.");
     }
 }

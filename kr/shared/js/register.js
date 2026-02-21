@@ -1,184 +1,98 @@
-/* shared/js/register.js */
+/* kr/shared/js/register.js */
 
 document.addEventListener("DOMContentLoaded", () => {
-    initIdField();
-    initNicknameCheck();
-    initPasswordCheck();
-    initSubmit();
+    // 폼 제출 방지 및 이벤트 바인딩
+    const registerBtn = document.getElementById("btnRegister") || document.querySelector(".btn-register");
+
+    if (registerBtn) {
+        registerBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            handleRegister();
+        });
+    }
 });
 
-// =========================================
-// [기능 1] 아이디(이메일) 실시간 검사 & UX
-// =========================================
-function initIdField() {
-    const idInput = document.getElementById("regId");
-    const msgBox = document.getElementById("idCheckMsg"); // 추가된 메시지 박스
-    if (!idInput || !msgBox) return;
+// [핵심] 비동기 API(DB_API)를 통한 회원가입 처리
+async function handleRegister() {
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordConfirmInput = document.getElementById("passwordConfirmInput");
+    const nicknameInput = document.getElementById("nicknameInput");
+    const termsCheckbox = document.getElementById("termsAgree");
 
-    // 포커스 UX
-    idInput.addEventListener("focus", () => {
-        idInput.placeholder = "이메일 (예: user@email.com)";
-    });
+    const email = emailInput ? emailInput.value.trim() : "";
+    const password = passwordInput ? passwordInput.value.trim() : "";
+    const passwordConfirm = passwordConfirmInput ? passwordConfirmInput.value.trim() : "";
+    const nickname = nicknameInput ? nicknameInput.value.trim() : "";
 
-    idInput.addEventListener("blur", () => {
-        if (idInput.value === "") {
-            idInput.placeholder = "아이디";
-            msgBox.textContent = "";
-            msgBox.className = "msg-mini";
-        }
-    });
-
-    // 실시간 유효성 검사
-    idInput.addEventListener("input", () => {
-        const val = idInput.value.trim();
-        if (val === "") {
-            msgBox.textContent = "";
-            msgBox.className = "msg-mini";
-            return;
-        }
-
-        if (!validateEmail(val)) {
-            msgBox.textContent = "올바른 이메일 형식이 아닙니다.";
-            msgBox.className = "msg-mini error";
-        } else {
-            msgBox.textContent = "사용 가능한 이메일입니다.";
-            msgBox.className = "msg-mini success";
-        }
-    });
-}
-
-// =========================================
-// [기능 2] 닉네임 실시간 검사
-// =========================================
-function initNicknameCheck() {
-    const input = document.getElementById("regNick");
-    const msgBox = document.getElementById("nickCheckMsg");
-    if (!input || !msgBox) return;
-
-    const runCheck = () => {
-        const val = input.value.trim();
-        if (val === "") {
-            msgBox.textContent = "";
-            msgBox.className = "msg-mini";
-            return;
-        }
-        if (val.length < 2 || val.length > 10) {
-            msgBox.textContent = "닉네임은 2~10자여야 합니다.";
-            msgBox.className = "msg-mini error";
-            return;
-        }
-        if (checkNicknameDuplicate(val)) {
-            msgBox.textContent = "이미 사용 중인 닉네임입니다.";
-            msgBox.className = "msg-mini error";
-        } else {
-            msgBox.textContent = "사용 가능한 닉네임입니다.";
-            msgBox.className = "msg-mini success";
-        }
-    };
-    input.addEventListener("input", runCheck);
-}
-
-// =========================================
-// [기능 3] 비밀번호 실시간 검사 (통합 관리)
-// =========================================
-function initPasswordCheck() {
-    const pwInput = document.getElementById("regPw");
-    const pwCheckInput = document.getElementById("regPwCheck");
+    // 1. 프론트엔드 유효성 검사 (Validation)
+    if (!email) {
+        alert("이메일을 입력해주세요.");
+        if (emailInput) emailInput.focus();
+        return;
+    }
     
-    // 비밀번호 필드 메시지 (길이 체크용)
-    const pwMsg = document.getElementById("pwCheckMsg"); 
-    // 비밀번호 확인 필드 메시지 (일치 여부용)
-    const pwConfirmMsg = document.getElementById("pwCheckMsgConfirm");
+    // 이메일 형식 정규식 검사
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert("유효한 이메일 주소를 입력해주세요.");
+        if (emailInput) emailInput.focus();
+        return;
+    }
 
-    if (!pwInput || !pwCheckInput) return;
+    if (!password) {
+        alert("비밀번호를 입력해주세요.");
+        if (passwordInput) passwordInput.focus();
+        return;
+    }
 
-    // 1. 비밀번호 길이 체크
-    pwInput.addEventListener("input", () => {
-        const val = pwInput.value;
-        if (val === "") {
-            if(pwMsg) pwMsg.textContent = "";
-            return;
-        }
-        if (val.length < 4) {
-            if(pwMsg) { pwMsg.textContent = "4자 이상 입력해주세요."; pwMsg.className = "msg-mini error"; }
-        } else {
-            if(pwMsg) { pwMsg.textContent = "사용 가능한 비밀번호입니다."; pwMsg.className = "msg-mini success"; }
-        }
-        // 비밀번호가 바뀌면 확인창도 다시 체크
-        checkMatch();
-    });
+    if (password.length < 4) {
+        alert("비밀번호는 최소 4자 이상이어야 합니다.");
+        if (passwordInput) passwordInput.focus();
+        return;
+    }
 
-    // 2. 비밀번호 일치 체크
-    pwCheckInput.addEventListener("input", checkMatch);
+    if (password !== passwordConfirm) {
+        alert("비밀번호가 일치하지 않습니다.");
+        if (passwordConfirmInput) passwordConfirmInput.focus();
+        return;
+    }
 
-    function checkMatch() {
-        const pw = pwInput.value;
-        const check = pwCheckInput.value;
+    if (!nickname) {
+        alert("닉네임을 입력해주세요.");
+        if (nicknameInput) nicknameInput.focus();
+        return;
+    }
+
+    if (termsCheckbox && !termsCheckbox.checked) {
+        alert("이용약관 및 개인정보 취급방침에 동의해주세요.");
+        return;
+    }
+
+    try {
+        // 2. 서버(DB_API)에 회원가입 데이터 전송
+        // 중복된 이메일이 있다면 catch 블록으로 에러가 떨어집니다.
+        const newUser = await DB_API.register({
+            email: email,
+            password: password,
+            nickname: nickname
+        });
+
+        // 3. 회원가입 성공 처리
+        alert(`환영합니다, ${newUser.nickname}님! 회원가입이 성공적으로 완료되었습니다.\n로그인 페이지로 이동합니다.`);
         
-        if (!pwConfirmMsg) return;
+        // 가입 성공 후 로그인 페이지로 리다이렉트
+        window.location.href = "/kr/html/login.html"; 
 
-        if (check === "") {
-            pwConfirmMsg.textContent = "";
-            pwConfirmMsg.className = "msg-mini";
-            return;
-        }
-
-        if (pw !== check) {
-            pwConfirmMsg.textContent = "비밀번호가 일치하지 않습니다.";
-            pwConfirmMsg.className = "msg-mini error";
-        } else {
-            pwConfirmMsg.textContent = "비밀번호가 일치합니다.";
-            pwConfirmMsg.className = "msg-mini success";
+    } catch (error) {
+        // 4. 회원가입 실패 처리 (예: 이미 존재하는 이메일)
+        console.error("회원가입 실패:", error);
+        alert(error.message || "회원가입 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
+        
+        // 이메일 중복 에러일 경우 이메일 입력창 비우고 포커스
+        if (error.message.includes("이메일") && emailInput) {
+            emailInput.value = "";
+            emailInput.focus();
         }
     }
-}
-
-// =========================================
-// [기능 4] 회원가입 제출
-// =========================================
-function initSubmit() {
-    const form = document.querySelector(".register-form");
-    if (!form) return;
-
-    form.addEventListener("submit", (e) => {
-        e.preventDefault();
-
-        const id = document.getElementById("regId").value.trim();
-        const nick = document.getElementById("regNick").value.trim();
-        const pw = document.getElementById("regPw").value;
-        const pwCheck = document.getElementById("regPwCheck").value;
-
-        if (!validateEmail(id)) {
-            alert("아이디는 이메일 형식으로 입력해주세요.");
-            document.getElementById("regId").focus();
-            return;
-        }
-        if (nick.length < 2 || nick.length > 10 || checkNicknameDuplicate(nick)) {
-            alert("닉네임을 확인해주세요.");
-            document.getElementById("regNick").focus();
-            return;
-        }
-        if (pw.length < 4 || pw !== pwCheck) {
-            alert("비밀번호를 확인해주세요.");
-            document.getElementById("regPw").focus();
-            return;
-        }
-
-        alert("회원가입이 완료되었습니다!\n로그인 페이지로 이동합니다.");
-        location.replace("login.html");
-    });
-}
-
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-function checkNicknameDuplicate(targetNick) {
-    if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
-    const allWriters = new Set(MOCK_DB.POSTS.map(p => p.writer));
-    MOCK_DB.POSTS.forEach(p => {
-        if (p.commentList) p.commentList.forEach(c => allWriters.add(c.writer));
-    });
-    return allWriters.has(targetNick);
 }

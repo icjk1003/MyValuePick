@@ -91,6 +91,13 @@
     overflow: hidden;
 }
 
+/* [추가된 코드] 댓글 작성자 닉네임 강조 스타일 */
+.comment-writer-name {
+    color: var(--primary); /* 작성자명 색상: 메인 컬러 적용 */
+    font-weight: 700; /* 폰트 굵기: 강조를 위해 700 적용 */
+    margin-right: 6px; /* 우측 여백: 댓글 내용과의 간격 확보 */
+}
+
 /* 댓글 푸터 (답글 뱃지) */
 .comment-foot {
     display: flex;

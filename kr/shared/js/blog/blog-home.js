@@ -1,17 +1,30 @@
 /* kr/shared/js/blog/blog-home.js */
 
 window.BlogHomeManager = {
-    init: function() {
+    async init() {
         console.log("Blog Home Init");
+        
+        // 대상 블로그 닉네임 파악 (URL 파라미터 우선, 없으면 로그인 유저)
+        const urlParams = new URLSearchParams(window.location.search);
+        let targetNick = urlParams.get('user');
+        if (!targetNick) {
+            targetNick = localStorage.getItem("user_nick");
+        }
+        this.targetNick = targetNick;
+
         this.loadWelcomeData();
-        this.loadFeaturedPost();
-        this.loadLatestPosts();
-        this.loadGuestbookPreview();
+        
+        // 비동기 데이터 로딩 실행
+        await Promise.all([
+            this.loadPostsData(),
+            this.loadGuestbookPreview()
+        ]);
     },
 
     // 1. 웰컴 메시지 로드 (사이드바 정보 동기화)
     loadWelcomeData: function() {
         // 사이드바에 있는 닉네임/소개글을 가져와서 홈 화면에 적용
+        // (blog-core.js에서 이미 렌더링을 마친 상태이므로 동기식으로 가져옴)
         const sidebarNick = document.getElementById("blogNick");
         const sidebarBio = document.getElementById("blogBio");
         
@@ -26,102 +39,128 @@ window.BlogHomeManager = {
         }
     },
 
-    // 2. 추천(고정) 게시글 로드
-    loadFeaturedPost: function() {
-        const container = document.getElementById("homeFeaturedPost");
-        
-        // [더미 데이터] 실제로는 'is_featured: true'인 게시글 조회
-        const featuredData = {
-            id: 1,
-            title: "🚀 2024년 하반기 유망 섹터 및 투자 전략 총정리",
-            desc: "금리 인하 시점이 다가옴에 따라 주목해야 할 섹터(바이오, 금융)와 기술주(AI, 반도체)의 흐름을 분석해보았습니다. 포트폴리오 재구성이 필요한 시점입니다.",
-            date: "2024.10.01",
-            tags: ["투자전략", "하반기", "주식"],
-            img: "" // 썸네일 이미지 URL (없으면 텍스트 모드)
-        };
+    // 2. 통합 게시글 데이터 로드 (추천 글 & 최신 글)
+    loadPostsData: async function() {
+        const featContainer = document.getElementById("homeFeaturedPost");
+        const latestContainer = document.getElementById("homeLatestPosts");
 
-        // 렌더링
-        setTimeout(() => {
-            if (featuredData) {
-                container.innerHTML = `
-                    <div class="feat-content clickable" onclick="location.href='javascript:void(0)'">
-                        <div class="feat-badge-row">
-                            <span class="badge-hot">HOT</span>
-                            <span class="badge-cat">투자전략</span>
+        if (featContainer) featContainer.innerHTML = `<div class="loading-msg">추천 게시글을 불러오는 중...</div>`;
+        if (latestContainer) latestContainer.innerHTML = `<div class="loading-msg">최신 게시글을 불러오는 중...</div>`;
+
+        try {
+            // 전체 게시글 로드 후 해당 블로그 주인의 글만 필터링
+            const allPosts = await DB_API.getPosts();
+            const userPosts = allPosts.filter(p => p.writer === this.targetNick);
+
+            // [추천 게시글 렌더링] (조회수 + 추천수가 가장 높은 글 1개)
+            if (featContainer) {
+                if (userPosts.length > 0) {
+                    const featuredPost = [...userPosts].sort((a, b) => (b.views + b.votes * 10) - (a.views + a.votes * 10))[0];
+                    
+                    const dateStr = window.formatBoardDate ? window.formatBoardDate(featuredPost.date) : featuredPost.date.substring(0, 10);
+                    const tag = featuredPost.tag || "일반";
+
+                    featContainer.innerHTML = `
+                        <div class="feat-content clickable" onclick="location.href='/kr/html/post/post.html?id=${featuredPost.id || featuredPost.no}'">
+                            <div class="feat-badge-row">
+                                <span class="badge-hot">HOT</span>
+                                <span class="badge-cat">${this.escapeHtml(tag)}</span>
+                            </div>
+                            <h3 class="feat-title">${this.escapeHtml(featuredPost.title)}</h3>
+                            <p class="feat-desc">${this.escapeHtml(featuredPost.body ? featuredPost.body.substring(0, 100) + '...' : '본문 내용이 없습니다.')}</p>
+                            <div class="feat-meta">
+                                <span class="feat-date">${dateStr}</span>
+                                <span class="feat-read">조회수 ${(featuredPost.views || 0).toLocaleString()}</span>
+                            </div>
                         </div>
-                        <h3 class="feat-title">${featuredData.title}</h3>
-                        <p class="feat-desc">${featuredData.desc}</p>
-                        <div class="feat-meta">
-                            <span class="feat-date">${featuredData.date}</span>
-                            <span class="feat-read">조회수 1.2k</span>
-                        </div>
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `<div class="empty-placeholder">추천 게시글이 없습니다.</div>`;
+                    `;
+                } else {
+                    featContainer.innerHTML = `<div class="empty-placeholder">작성된 추천 게시글이 없습니다.</div>`;
+                }
             }
-        }, 200);
-    },
 
-    // 3. 최신 글 리스트 로드 (최대 5개)
-    loadLatestPosts: function() {
-        const listContainer = document.getElementById("homeLatestPosts");
-        
-        // [더미 데이터]
-        const posts = [
-            { id: 10, title: "삼성전자 3분기 실적 발표 코멘트", date: "2024.10.08" },
-            { id: 9, title: "엔비디아 주가 흐름 분석과 전망", date: "2024.10.06" },
-            { id: 8, title: "배당주 포트폴리오 점검 (리츠, 은행)", date: "2024.10.03" },
-            { id: 7, title: "미국 국채 금리 상승이 시장에 미치는 영향", date: "2024.09.29" },
-            { id: 6, title: "초보자를 위한 주식 용어 정리 (PER, PBR, ROE)", date: "2024.09.25" }
-        ];
+            // [최신 게시글 렌더링] (날짜순 정렬 상위 5개)
+            if (latestContainer) {
+                if (userPosts.length > 0) {
+                    const latestPosts = [...userPosts].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+                    
+                    let html = '<ul class="home-post-list">';
+                    latestPosts.forEach(post => {
+                        const dateStr = window.formatBoardDate ? window.formatBoardDate(post.date) : post.date.substring(0, 10);
+                        html += `
+                            <li class="clickable" onclick="location.href='/kr/html/post/post.html?id=${post.id || post.no}'"> 
+                                <span class="post-title">${this.escapeHtml(post.title)}</span>
+                                <span class="post-date">${dateStr}</span>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    latestContainer.innerHTML = html;
+                } else {
+                    latestContainer.innerHTML = `<div class="empty-placeholder">최근 작성한 글이 없습니다.</div>`;
+                }
+            }
 
-        let html = '<ul class="home-post-list">';
-        posts.forEach(post => {
-            html += `
-                <li onclick="location.href='javascript:void(0)'"> <span class="post-title">${post.title}</span>
-                    <span class="post-date">${post.date}</span>
-                </li>
-            `;
-        });
-        html += '</ul>';
-
-        setTimeout(() => {
-            listContainer.innerHTML = html;
-        }, 300);
-    },
-
-    // 4. 방명록 미리보기 로드 (최대 3개)
-    loadGuestbookPreview: function() {
-        const container = document.getElementById("homeGuestbookPreview");
-
-        // [더미 데이터]
-        const guests = [
-            { writer: "지나가던개미", content: "좋은 정보 감사합니다! 잘 보고 가요.", date: "10.08" },
-            { writer: "성투기원", content: "혹시 바이오 관련 글도 써주실 수 있나요?", date: "10.07" },
-            { writer: "User123", content: "블로그 깔끔하네요.", date: "10.05" }
-        ];
-
-        let html = '<div class="home-guest-list">';
-        if (guests.length > 0) {
-            guests.forEach(item => {
-                html += `
-                    <div class="mini-guest-item">
-                        <div class="mini-guest-head">
-                            <strong>${item.writer}</strong>
-                            <span class="date">${item.date}</span>
-                        </div>
-                        <p class="mini-guest-msg">${item.content}</p>
-                    </div>
-                `;
-            });
-        } else {
-            html += `<div class="empty-msg-mini">최근 방명록이 없습니다.</div>`;
+        } catch (error) {
+            console.error("블로그 게시글 로드 실패:", error);
+            if (featContainer) featContainer.innerHTML = `<div class="error-msg">추천 게시글을 불러오지 못했습니다.</div>`;
+            if (latestContainer) latestContainer.innerHTML = `<div class="error-msg">최신 게시글을 불러오지 못했습니다.</div>`;
         }
-        html += '</div>';
+    },
 
-        setTimeout(() => {
+    // 3. 방명록 미리보기 로드 (비동기 시뮬레이션 적용)
+    loadGuestbookPreview: async function() {
+        const container = document.getElementById("homeGuestbookPreview");
+        if (!container) return;
+
+        container.innerHTML = `<div class="loading-msg">방명록을 불러오는 중...</div>`;
+
+        try {
+            // [Mock] 실제 환경에서는 DB_API.getGuestbooks(this.targetNick) 등으로 호출
+            const guests = await new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve([
+                        { writer: "지나가던개미", content: "좋은 정보 감사합니다! 잘 보고 가요.", date: "10.08" },
+                        { writer: "성투기원", content: "혹시 바이오 관련 글도 써주실 수 있나요?", date: "10.07" },
+                        { writer: "User123", content: "블로그 깔끔하네요.", date: "10.05" }
+                    ]);
+                }, 400); // 네트워크 지연 시뮬레이션
+            });
+
+            let html = '<div class="home-guest-list">';
+            if (guests.length > 0) {
+                guests.forEach(item => {
+                    html += `
+                        <div class="mini-guest-item">
+                            <div class="mini-guest-head">
+                                <strong>${this.escapeHtml(item.writer)}</strong>
+                                <span class="date">${this.escapeHtml(item.date)}</span>
+                            </div>
+                            <p class="mini-guest-msg">${this.escapeHtml(item.content)}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `<div class="empty-msg-mini">최근 방명록이 없습니다.</div>`;
+            }
+            html += '</div>';
+
             container.innerHTML = html;
-        }, 400);
+
+        } catch (error) {
+            console.error("방명록 로드 실패:", error);
+            container.innerHTML = `<div class="error-msg">방명록을 불러오지 못했습니다.</div>`;
+        }
+    },
+
+    // HTML XSS 방지 유틸리티
+    escapeHtml: function(text) {
+        if (!text) return "";
+        return String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 };

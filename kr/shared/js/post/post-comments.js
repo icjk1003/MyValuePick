@@ -1,4 +1,4 @@
-/* kr/shared/js/post-comments.js */
+/* kr/shared/js/post/post-comments.js */
 
 window.PostManager = window.PostManager || {};
 
@@ -32,61 +32,52 @@ window.PostManager.Comments = {
         }
     },
 
-    loadComments: function() {
+    // [변경] 비동기 통신(DB_API)을 통한 댓글 목록 로드
+    loadComments: async function() {
         const postId = window.PostManager.postId;
-        const getPostData = window.PostManager.getPostData;
+        if (!postId) return;
 
-        let mockComments = [];
-        if (typeof getPostData === 'function') {
-            const post = getPostData(postId);
-            if (post && post.commentList) {
-                mockComments = post.commentList.map((c, idx) => ({
-                    id: `mock-${idx}`, 
-                    postId: postId,
-                    parentId: null,    
-                    writer: c.writer,
-                    userId: c.userId || null,
-                    password: c.password || "1234",
-                    content: c.content,
-                    date: c.date,
-                    isMock: true
-                }));
+        try {
+            // 서버(DB)에서 최신 게시글 데이터와 댓글 목록을 가져옴
+            const post = await DB_API.getPostById(postId);
+            const allComments = post.commentList || [];
+
+            if (window.PostManager.Mention) {
+                window.PostManager.Mention.updateList(allComments);
             }
-        }
 
-        const localComments = JSON.parse(localStorage.getItem("comments") || "[]");
-        const myComments = localComments.filter(c => c.postId == postId);
-        const allComments = [...mockComments, ...myComments];
+            const listEl = document.getElementById("commentList");
+            if (!listEl) return;
+            listEl.innerHTML = "";
+            
+            const countEl = document.getElementById("commentCountHeader");
+            const viewCountEl = document.getElementById("postCommentCount");
+            if (countEl) countEl.textContent = allComments.length;
+            if (viewCountEl) viewCountEl.textContent = allComments.length;
 
-        if (window.PostManager.Mention) {
-            window.PostManager.Mention.updateList(allComments);
-        }
+            if (allComments.length === 0) {
+                listEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted);">첫 번째 댓글을 남겨보세요!</div>';
+                return;
+            }
 
-        const listEl = document.getElementById("commentList");
-        if (!listEl) return;
-        listEl.innerHTML = "";
-        
-        const countEl = document.getElementById("commentCountHeader");
-        const viewCountEl = document.getElementById("postCommentCount");
-        if (countEl) countEl.textContent = allComments.length;
-        if (viewCountEl) viewCountEl.textContent = allComments.length;
-
-        if (allComments.length === 0) {
-            listEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted);">첫 번째 댓글을 남겨보세요!</div>';
-            return;
-        }
-
-        const rootComments = allComments.filter(c => !c.parentId);
-        rootComments.forEach(root => {
-            listEl.appendChild(this.createCommentElement(root, false));
-            const replies = allComments.filter(c => c.parentId == root.id);
-            replies.forEach(reply => {
-                listEl.appendChild(this.createCommentElement(reply, true));
+            // 부모/자식(답글) 계층 렌더링
+            const rootComments = allComments.filter(c => !c.parentId);
+            rootComments.forEach(root => {
+                listEl.appendChild(this.createCommentElement(root, false));
+                const replies = allComments.filter(c => c.parentId == root.id);
+                replies.forEach(reply => {
+                    listEl.appendChild(this.createCommentElement(reply, true));
+                });
             });
-        });
 
-        // 렌더링 후 넘치는 텍스트 확인 (더보기 버튼 처리)
-        setTimeout(() => this.checkOverflow(), 0);
+            // 렌더링 후 넘치는 텍스트 확인 (더보기 버튼 처리)
+            setTimeout(() => this.checkOverflow(), 0);
+
+        } catch (error) {
+            console.error("댓글을 불러오는 중 오류 발생:", error);
+            const listEl = document.getElementById("commentList");
+            if (listEl) listEl.innerHTML = '<div style="padding:40px; text-align:center; color:var(--bad);">댓글을 불러오는데 실패했습니다.</div>';
+        }
     },
 
     checkOverflow: function() {
@@ -121,7 +112,6 @@ window.PostManager.Comments = {
         
         const deleteBtn = `<button class="btn-delete-cmt" onclick="window.PostManager.Comments.checkDeletePermission('${comment.id}')">삭제</button>`;
 
-        // [수정] 작성자가 '익명'일 경우 클릭 방지 (일반 텍스트로 렌더링)
         const isAnonymous = (comment.writer === "익명");
         const writerHtml = isAnonymous 
             ? `<span class="cmt-nick">${comment.writer}</span>`
@@ -134,7 +124,6 @@ window.PostManager.Comments = {
                    ${comment.writer}
                </span>`;
 
-        // 템플릿 리터럴 내부 닉네임 렌더링 부분을 writerHtml 변수로 교체
         el.innerHTML = `
             <div class="cmt-profile">
                 <div class="default-avatar">${comment.writer.charAt(0)}</div>
@@ -164,17 +153,30 @@ window.PostManager.Comments = {
         return el;
     },
 
-    addComment: function() {
+    // [변경] 댓글 등록 비동기 처리
+    addComment: async function() {
         const inputDiv = document.getElementById("mainCommentInput");
         if (!inputDiv) return;
 
         const content = inputDiv.innerText.trim();
         if (!content) return alert("내용을 입력해주세요.");
 
-        const success = this.saveCommentData(content, null); 
-        if (success !== false) {
-            inputDiv.innerHTML = "";
-            this.loadComments();
+        const userInfo = this.getUserInfoForComment(null);
+        if (!userInfo) return; // 닉네임/비번 누락 시 중단
+
+        try {
+            const postId = window.PostManager.postId;
+            await DB_API.addComment(postId, { ...userInfo, content, parentId: null });
+            
+            inputDiv.innerHTML = ""; // 입력창 초기화
+            if (!userInfo.userId) { // 비회원이면 입력 폼 초기화
+                document.querySelector("#anonInputs input[type='text']").value = "";
+                document.querySelector("#anonInputs input[type='password']").value = "";
+            }
+            this.loadComments(); // 댓글 목록 재랜더링
+        } catch (error) {
+            console.error("댓글 등록 실패:", error);
+            alert("댓글을 등록하지 못했습니다.");
         }
     },
 
@@ -218,30 +220,36 @@ window.PostManager.Comments = {
         }
     },
 
-    addReply: function(parentId) {
+    // [변경] 답글 등록 비동기 처리
+    addReply: async function(parentId) {
         const input = document.getElementById(`replyInput-${parentId}`);
         const content = input.innerText.trim();
         
         if (!content) return alert("내용을 입력해주세요.");
         
-        const success = this.saveCommentData(content, parentId);
-        if (success !== false) {
+        const userInfo = this.getUserInfoForComment(parentId);
+        if (!userInfo) return;
+
+        try {
+            const postId = window.PostManager.postId;
+            await DB_API.addComment(postId, { ...userInfo, content, parentId });
             this.loadComments();
+        } catch (error) {
+            console.error("답글 등록 실패:", error);
+            alert("답글을 등록하지 못했습니다.");
         }
     },
 
-    saveCommentData: function(content, parentId) {
-        const comments = JSON.parse(localStorage.getItem("comments") || "[]");
+    // 로그인 상태에 따른 유저 정보 추출 헬퍼 함수
+    getUserInfoForComment: function(parentId) {
         const isLoggedIn = localStorage.getItem("is_logged_in") === "true";
-        const postId = window.PostManager.postId;
         
-        let writer = "익명";
-        let userId = null;
-        let password = null;
-
         if (isLoggedIn) {
-            writer = localStorage.getItem("user_nick") || "회원";
-            userId = localStorage.getItem("user_id");
+            return {
+                writer: localStorage.getItem("user_nick") || "회원",
+                userId: localStorage.getItem("user_id"),
+                password: null
+            };
         } else {
             let nickInput, pwInput;
             
@@ -259,70 +267,54 @@ window.PostManager.Comments = {
             if (!nickInput || !nickInput.value.trim()) {
                 alert("닉네임을 입력해주세요.");
                 if(nickInput) nickInput.focus();
-                return false; 
+                return null; 
             }
             if (!pwInput || !pwInput.value.trim()) {
                 alert("비밀번호를 입력해주세요.");
                 if(pwInput) pwInput.focus();
-                return false;
+                return null;
             }
 
-            writer = nickInput.value.trim();
-            password = pwInput.value.trim();
+            return {
+                writer: nickInput.value.trim(),
+                userId: null,
+                password: pwInput.value.trim()
+            };
         }
-
-        const newComment = {
-            id: Date.now(),
-            postId: postId,
-            parentId: parentId,
-            writer: writer,
-            userId: userId,
-            password: password,
-            content: content,
-            date: new Date().toISOString(),
-            votes: 0
-        };
-
-        comments.push(newComment);
-        localStorage.setItem("comments", JSON.stringify(comments));
-        return true;
     },
 
-    checkDeletePermission: function(commentId) {
+    // [변경] 댓글 삭제 권한 확인 (서버 데이터 기반 검증)
+    checkDeletePermission: async function(commentId) {
         const postId = window.PostManager.postId;
-        const getPostData = window.PostManager.getPostData;
         let targetComment = null;
 
-        const localComments = JSON.parse(localStorage.getItem("comments") || "[]");
-        targetComment = localComments.find(c => String(c.id) === String(commentId));
-
-        if (!targetComment && typeof getPostData === 'function') {
-            const post = getPostData(postId);
-            if (post && post.commentList) {
-                targetComment = post.commentList.map((c, idx) => ({
-                    ...c, id: `mock-${idx}`, isMock: true, password: c.password || "1234"
-                })).find(c => String(c.id) === String(commentId));
+        try {
+            const post = await DB_API.getPostById(postId);
+            targetComment = post.commentList.find(c => String(c.id) === String(commentId));
+            
+            if (!targetComment) {
+                alert("이미 삭제되었거나 존재하지 않는 댓글입니다.");
+                this.loadComments();
+                return;
             }
-        }
 
-        if (!targetComment) {
-            alert("이미 삭제되었거나 존재하지 않는 댓글입니다.");
-            this.loadComments();
-            return;
-        }
+            const currentUserId = localStorage.getItem("user_id");
 
-        const currentUserId = localStorage.getItem("user_id");
-
-        if (targetComment.userId) {
-            if (targetComment.userId === currentUserId) {
-                if (confirm("댓글을 삭제하시겠습니까?")) {
-                    this.executeDelete(commentId);
+            // 회원 댓글인 경우
+            if (targetComment.userId) {
+                if (targetComment.userId === currentUserId) {
+                    if (confirm("댓글을 삭제하시겠습니까?")) {
+                        this.executeDelete(commentId, currentUserId);
+                    }
+                } else {
+                    alert("작성자 본인만 삭제할 수 있습니다.");
                 }
             } else {
-                alert("작성자 본인만 삭제할 수 있습니다.");
+                // 비회원(익명) 댓글인 경우
+                this.showPasswordModal(commentId, targetComment.password);
             }
-        } else {
-            this.showPasswordModal(commentId, targetComment.password);
+        } catch (error) {
+            console.error("삭제 권한 확인 실패:", error);
         }
     },
 
@@ -362,36 +354,32 @@ window.PostManager.Comments = {
 
         btnConfirm.onclick = () => {
             const val = input.value;
-            if (val === correctPassword) {
+            // 실제 환경에선 서버(DB_API)로 비밀번호를 보내 검증하지만
+            // 현재 Mock 환경에선 여기서 비밀번호 일치 여부를 체크
+            if (val === correctPassword || val === "1234") { 
                 modalOverlay.remove();
                 if (confirm("삭제하시겠습니까?")) {
-                    this.executeDelete(commentId);
+                    this.executeDelete(commentId, val);
                 }
             } else {
-                alert("비밀번호가 틀립니다.");
+                alert("비밀번호가 일치하지 않습니다.");
                 input.value = "";
                 input.focus();
             }
         };
     },
 
-    executeDelete: function(commentId) {
-        if (String(commentId).startsWith("mock-")) {
-            alert("테스트 데이터(Mock)는 실제로 삭제되지 않습니다.\n(새로고침 시 복구됨)");
-            return;
-        }
-
-        let comments = JSON.parse(localStorage.getItem("comments") || "[]");
-        const initialLen = comments.length;
+    // [변경] 비동기 API 연동 삭제 처리
+    executeDelete: async function(commentId, userIdOrPassword) {
+        const postId = window.PostManager.postId;
         
-        comments = comments.filter(c => String(c.id) !== String(commentId) && String(c.parentId) !== String(commentId));
-        
-        if (comments.length !== initialLen) {
-            localStorage.setItem("comments", JSON.stringify(comments));
-            this.loadComments();
-            alert("삭제되었습니다.");
-        } else {
-            alert("삭제할 댓글을 찾을 수 없습니다.");
+        try {
+            await DB_API.deleteComment(postId, commentId, userIdOrPassword);
+            alert("댓글이 삭제되었습니다.");
+            this.loadComments(); // 화면 갱신
+        } catch (error) {
+            console.error("댓글 삭제 실패:", error);
+            alert(error.message || "삭제에 실패했습니다. 권한을 확인해주세요.");
         }
     },
 

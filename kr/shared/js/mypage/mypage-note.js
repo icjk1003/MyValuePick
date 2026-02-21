@@ -1,10 +1,12 @@
+/* kr/shared/js/mypage/mypage-note.js */
+
 /**
  * [My Page Note Module]
- * 쪽지함 (목록, 읽기, 쓰기, 삭제, 보관) 기능을 관리하는 모듈
+ * 쪽지함 (목록, 읽기, 쓰기, 삭제, 보관) 기능을 관리하는 모듈 (비동기 API 연동 완료)
  */
 class MyPageNoteManager {
     constructor() {
-        // [기존 DOM Elements 캐싱 코드 동일]
+        // DOM Elements 캐싱
         this.els = {
             listArea: document.getElementById('msgListArea'),
             viewArea: document.getElementById('msgViewArea'),
@@ -31,11 +33,11 @@ class MyPageNoteManager {
             actionButtons: document.querySelectorAll('.btn-action[data-action]')
         };
 
-        // [수정] State 초기화: localStorage에서 저장된 탭 불러오기
+        // State 초기화: localStorage에서 저장된 탭 불러오기
         const savedTab = localStorage.getItem("mypage_note_tab") || 'inbox';
 
         this.state = {
-            currentTab: savedTab, // 저장된 탭 적용
+            currentTab: savedTab,
             currentPage: 1,
             itemsPerPage: 10,
             searchKeyword: '',
@@ -49,30 +51,33 @@ class MyPageNoteManager {
         }
     }
 
-    init() {
-        this.initMockData();
+    async init() {
+        await this.initMockData();
         this.bindEvents();
-        this.updateBadge();
+        await this.updateBadge();
         
-        // [추가] 초기 로드 시 저장된 탭으로 화면 전환 수행
+        // 초기 로드 시 저장된 탭으로 화면 전환 수행
         this.switchTab(this.state.currentTab);
     }
 
-    // ... [initMockData, bindEvents 기존 코드 동일] ...
-    initMockData() {
-        if (!localStorage.getItem("MOCK_MESSAGES")) {
-            const myNick = localStorage.getItem("user_nick") || "User";
-            const welcomeMsg = [{
-                id: "welcome_" + Date.now(),
-                sender: "운영자",
-                receiver: myNick,
-                content: "MyValuePick에 오신 것을 환영합니다.\n즐거운 커뮤니티 활동 되세요!",
-                date: new Date().toISOString(),
-                read: false,
-                box: "inbox"
-            }];
-            localStorage.setItem("MOCK_MESSAGES", JSON.stringify(welcomeMsg));
-        }
+    // 초기 더미 쪽지 데이터 생성 (서버 초기화 시뮬레이션)
+    async initMockData() {
+        return new Promise((resolve) => {
+            if (!localStorage.getItem("MOCK_MESSAGES")) {
+                const myNick = localStorage.getItem("user_nick") || "User";
+                const welcomeMsg = [{
+                    id: "welcome_" + Date.now(),
+                    sender: "운영자",
+                    receiver: myNick,
+                    content: "MyValuePick에 오신 것을 환영합니다.\n즐거운 커뮤니티 활동 되세요!",
+                    date: new Date().toISOString(),
+                    read: false,
+                    box: "inbox"
+                }];
+                localStorage.setItem("MOCK_MESSAGES", JSON.stringify(welcomeMsg));
+            }
+            resolve();
+        });
     }
 
     bindEvents() {
@@ -122,11 +127,11 @@ class MyPageNoteManager {
         if(this.els.btnWriteCancel) this.els.btnWriteCancel.addEventListener('click', () => this.switchTab('inbox'));
     }
 
-    // [수정] 탭 전환 로직: 상태 저장 추가
+    // 탭 전환 로직
     switchTab(tabName) {
         this.state.currentTab = tabName;
         
-        // [추가] 탭 상태를 localStorage에 저장
+        // 탭 상태를 localStorage에 저장
         localStorage.setItem("mypage_note_tab", tabName);
         
         // 검색 초기화
@@ -140,7 +145,7 @@ class MyPageNoteManager {
             else btn.classList.remove('active');
         });
 
-        // 영역 표시 제어
+        // 영역 표시 제어 (인라인 스타일 대신 클래스 사용)
         this.els.listArea.classList.add('hidden');
         this.els.viewArea.classList.add('hidden');
         this.els.writeArea.classList.add('hidden');
@@ -157,82 +162,93 @@ class MyPageNoteManager {
         }
     }
 
-    // ... [이하 renderList, openMessage 등 나머지 메소드는 기존과 동일] ...
-    
-    // 4. 목록 렌더링
-    renderList() {
+    // [변경] 목록 비동기 렌더링
+    async renderList() {
         const myNick = localStorage.getItem("user_nick");
-        let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-
-        let filtered = [];
-        if (this.state.currentTab === 'inbox') {
-            filtered = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick);
-        } else if (this.state.currentTab === 'sent') {
-            filtered = msgs.filter(m => m.box === 'sent' && m.sender === myNick);
-        } else if (this.state.currentTab === 'archive') {
-            filtered = msgs.filter(m => m.box === 'archive' && (m.receiver === myNick || m.sender === myNick));
-        }
-
-        if (this.state.searchKeyword) {
-            const kw = this.state.searchKeyword.toLowerCase();
-            filtered = filtered.filter(m => {
-                const sender = (m.sender || "").toLowerCase();
-                const content = (m.content || "").toLowerCase();
-                if (this.state.searchType === 'sender') return sender.includes(kw);
-                if (this.state.searchType === 'content') return content.includes(kw);
-                return sender.includes(kw) || content.includes(kw);
-            });
-        }
-
-        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        if (filtered.length === 0) {
-            this.els.tbody.innerHTML = "";
-            this.els.emptyMsg.classList.remove('hidden');
-            this.els.pagination.innerHTML = "";
-            this.els.checkAll.checked = false;
-            return;
-        }
-        this.els.emptyMsg.classList.add('hidden');
-
-        const totalItems = filtered.length;
-        const totalPages = Math.ceil(totalItems / this.state.itemsPerPage);
         
-        if (this.state.currentPage > totalPages) this.state.currentPage = totalPages;
-        if (this.state.currentPage < 1) this.state.currentPage = 1;
+        // 로딩 UI 표시
+        this.els.tbody.innerHTML = `<tr><td colspan="4" class="text-center loading-msg" style="padding: 40px 0;">쪽지를 불러오는 중입니다...</td></tr>`;
+        this.els.emptyMsg.classList.add('hidden');
+        this.els.pagination.innerHTML = "";
 
-        const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
-        const pageItems = filtered.slice(startIndex, startIndex + this.state.itemsPerPage);
+        try {
+            // 서버에서 데이터 로드 시뮬레이션
+            let msgs = await this.apiGetNotes();
 
-        this.els.tbody.innerHTML = pageItems.map(m => {
-            const isUnread = (!m.read && this.state.currentTab === 'inbox');
-            const senderDisplay = this.state.currentTab === 'sent' 
-                ? `<span class="badge-sent">To</span> ${m.receiver}` 
-                : m.sender;
+            let filtered = [];
+            if (this.state.currentTab === 'inbox') {
+                filtered = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick);
+            } else if (this.state.currentTab === 'sent') {
+                filtered = msgs.filter(m => m.box === 'sent' && m.sender === myNick);
+            } else if (this.state.currentTab === 'archive') {
+                filtered = msgs.filter(m => m.box === 'archive' && (m.receiver === myNick || m.sender === myNick));
+            }
 
-            return `
-            <tr class="msg-row ${isUnread ? 'unread' : ''}" data-id="${m.id}">
-                <td class="check-col">
-                    <input type="checkbox" name="msgCheck" value="${m.id}">
-                </td>
-                <td>${senderDisplay}</td>
-                <td class="td-content">
-                    <div class="msg-content-preview">${this.escapeHtml(m.content)}</div>
-                </td>
-                <td>${new Date(m.date).toLocaleDateString()}</td>
-            </tr>
-            `;
-        }).join("");
+            // 검색어 필터링
+            if (this.state.searchKeyword) {
+                const kw = this.state.searchKeyword.toLowerCase();
+                filtered = filtered.filter(m => {
+                    const sender = (m.sender || "").toLowerCase();
+                    const content = (m.content || "").toLowerCase();
+                    if (this.state.searchType === 'sender') return sender.includes(kw);
+                    if (this.state.searchType === 'content') return content.includes(kw);
+                    return sender.includes(kw) || content.includes(kw);
+                });
+            }
 
-        this.els.tbody.querySelectorAll('.msg-row').forEach(row => {
-            row.addEventListener('click', (e) => {
-                if(e.target.tagName === 'INPUT') return;
-                this.openMessage(row.dataset.id);
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (filtered.length === 0) {
+                this.els.tbody.innerHTML = "";
+                this.els.emptyMsg.classList.remove('hidden');
+                this.els.checkAll.checked = false;
+                return;
+            }
+
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / this.state.itemsPerPage);
+            
+            if (this.state.currentPage > totalPages) this.state.currentPage = totalPages;
+            if (this.state.currentPage < 1) this.state.currentPage = 1;
+
+            const startIndex = (this.state.currentPage - 1) * this.state.itemsPerPage;
+            const pageItems = filtered.slice(startIndex, startIndex + this.state.itemsPerPage);
+
+            this.els.tbody.innerHTML = pageItems.map(m => {
+                const isUnread = (!m.read && this.state.currentTab === 'inbox');
+                const senderDisplay = this.state.currentTab === 'sent' 
+                    ? `<span class="badge-sent">To</span> ${m.receiver}` 
+                    : m.sender;
+
+                return `
+                <tr class="msg-row ${isUnread ? 'unread' : ''}" data-id="${m.id}">
+                    <td class="check-col">
+                        <input type="checkbox" name="msgCheck" value="${m.id}">
+                    </td>
+                    <td>${senderDisplay}</td>
+                    <td class="td-content">
+                        <div class="msg-content-preview">${this.escapeHtml(m.content)}</div>
+                    </td>
+                    <td>${new Date(m.date).toLocaleDateString()}</td>
+                </tr>
+                `;
+            }).join("");
+
+            // 이벤트 재바인딩
+            this.els.tbody.querySelectorAll('.msg-row').forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if(e.target.tagName === 'INPUT') return;
+                    this.openMessage(row.dataset.id);
+                });
             });
-        });
 
-        this.els.checkAll.checked = false;
-        this.renderPagination(totalPages);
+            this.els.checkAll.checked = false;
+            this.renderPagination(totalPages);
+
+        } catch (error) {
+            console.error(error);
+            this.els.tbody.innerHTML = `<tr><td colspan="4" class="text-center error-msg" style="padding: 40px 0;">쪽지를 불러오지 못했습니다.</td></tr>`;
+        }
     }
 
     renderPagination(totalPages) {
@@ -260,34 +276,50 @@ class MyPageNoteManager {
         });
     }
 
-    openMessage(id) {
-        const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-        const msg = msgs.find(m => String(m.id) === String(id));
+    // [변경] 쪽지 열람 (비동기 읽음 처리 연동)
+    async openMessage(id) {
+        try {
+            const msgs = await this.apiGetNotes();
+            const msg = msgs.find(m => String(m.id) === String(id));
 
-        if (!msg) {
-            alert("삭제되거나 없는 쪽지입니다.");
-            return;
+            if (!msg) {
+                alert("삭제되거나 없는 쪽지입니다.");
+                return;
+            }
+
+            this.state.currentViewId = id;
+
+            // 서버 측 읽음 처리 동기화
+            if (msg.box === 'inbox' && !msg.read) {
+                await this.apiMarkAsRead(id);
+                this.updateBadge(); // 뱃지 수 비동기 갱신
+            }
+
+            this.els.listArea.classList.add('hidden');
+            this.els.viewArea.classList.remove('hidden');
+            this.triggerAnim(this.els.viewArea);
+
+            const senderText = this.state.currentTab === 'sent' ? `받는사람: ${msg.receiver}` : `보낸사람: ${msg.sender}`;
+            this.els.viewSender.textContent = senderText;
+            this.els.viewDate.textContent = new Date(msg.date).toLocaleString();
+            this.els.viewBody.textContent = msg.content;
+
+            // 버튼 표시 여부 클래스로 제어
+            if (this.state.currentTab === 'sent') {
+                this.els.btnViewReply.classList.add('hidden');
+            } else {
+                this.els.btnViewReply.classList.remove('hidden');
+            }
+
+            if (msg.box === 'archive') {
+                this.els.btnViewArchive.classList.add('hidden');
+            } else {
+                this.els.btnViewArchive.classList.remove('hidden');
+            }
+
+        } catch (error) {
+            alert("쪽지를 열람하는 중 오류가 발생했습니다.");
         }
-
-        this.state.currentViewId = id;
-
-        if (msg.box === 'inbox' && !msg.read) {
-            msg.read = true;
-            localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
-            this.updateBadge();
-        }
-
-        this.els.listArea.classList.add('hidden');
-        this.els.viewArea.classList.remove('hidden');
-        this.triggerAnim(this.els.viewArea);
-
-        const senderText = this.state.currentTab === 'sent' ? `받는사람: ${msg.receiver}` : `보낸사람: ${msg.sender}`;
-        this.els.viewSender.textContent = senderText;
-        this.els.viewDate.textContent = new Date(msg.date).toLocaleString();
-        this.els.viewBody.textContent = msg.content;
-
-        this.els.btnViewReply.style.display = (this.state.currentTab === 'sent') ? 'none' : 'flex';
-        this.els.btnViewArchive.style.display = (msg.box === 'archive') ? 'none' : 'flex';
     }
 
     backToList() {
@@ -298,7 +330,8 @@ class MyPageNoteManager {
         this.state.currentViewId = null;
     }
 
-    sendMessage() {
+    // [변경] 비동기 쪽지 전송
+    async sendMessage() {
         const receiver = this.els.inputReceiver.value.trim();
         const content = this.els.inputContent.value.trim();
         const myNick = localStorage.getItem("user_nick");
@@ -312,35 +345,25 @@ class MyPageNoteManager {
             return;
         }
 
-        const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-        const newId = Date.now();
-
-        msgs.push({
-            id: newId,
-            sender: myNick,
-            receiver: receiver,
-            content: content,
-            date: new Date().toISOString(),
-            read: true,
-            box: "sent"
-        });
-
-        msgs.push({
-            id: newId + "_r",
-            sender: myNick,
-            receiver: receiver,
-            content: content,
-            date: new Date().toISOString(),
-            read: false,
-            box: "inbox"
-        });
-
-        localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
-        alert("쪽지를 보냈습니다.");
-        this.switchTab('sent');
+        try {
+            if (this.els.btnWriteSend) this.els.btnWriteSend.disabled = true;
+            
+            // DB_API 송신 요청 시뮬레이션
+            await this.apiSendNote(myNick, receiver, content);
+            
+            alert("쪽지를 성공적으로 보냈습니다.");
+            this.switchTab('sent');
+            
+        } catch (error) {
+            console.error(error);
+            alert("쪽지 전송에 실패했습니다.");
+        } finally {
+            if (this.els.btnWriteSend) this.els.btnWriteSend.disabled = false;
+        }
     }
 
-    handleBulkAction(action) {
+    // [변경] 일괄 처리 비동기 연동
+    async handleBulkAction(action) {
         const checkboxes = document.getElementsByName('msgCheck');
         const ids = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
 
@@ -353,35 +376,31 @@ class MyPageNoteManager {
 
         if (ids.length === 0) return alert("선택된 쪽지가 없습니다.");
 
-        let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+        try {
+            if (action === 'delete') {
+                if (!confirm(`선택한 ${ids.length}개의 쪽지를 삭제하시겠습니까?`)) return;
+                await this.apiBulkDelete(ids);
+                alert("삭제되었습니다.");
+            } 
+            else if (action === 'archive') {
+                await this.apiBulkArchive(ids);
+                alert(`${ids.length}개의 쪽지를 보관함으로 이동했습니다.`);
+            }
+            else if (action === 'report') {
+                // 신고 처리 API 호출 (Mock)
+                alert(`선택한 ${ids.length}개의 쪽지를 신고 접수했습니다.`);
+            }
 
-        if (action === 'delete') {
-            if (!confirm(`선택한 ${ids.length}개의 쪽지를 삭제하시겠습니까?`)) return;
-            msgs = msgs.filter(m => !ids.includes(String(m.id)));
-            localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
-            alert("삭제되었습니다.");
-        } 
-        else if (action === 'archive') {
-            let count = 0;
-            msgs.forEach(m => {
-                if (ids.includes(String(m.id))) {
-                    m.box = 'archive';
-                    count++;
-                }
-            });
-            localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
-            alert(`${count}개의 쪽지를 보관함으로 이동했습니다.`);
+            this.renderList();
+            this.updateBadge();
+            
+        } catch (error) {
+            alert("요청을 처리하는 중 오류가 발생했습니다.");
         }
-        else if (action === 'report') {
-            alert(`선택한 ${ids.length}개의 쪽지를 신고 접수했습니다.`);
-        }
-
-        this.renderList();
-        this.updateBadge();
     }
 
-    openReplyForm(msgId) {
-        const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+    async openReplyForm(msgId) {
+        const msgs = await this.apiGetNotes();
         const targetMsg = msgs.find(m => String(m.id) === String(msgId));
         
         if (targetMsg) {
@@ -396,49 +415,114 @@ class MyPageNoteManager {
         if (this.state.currentViewId) this.openReplyForm(this.state.currentViewId);
     }
 
-    deleteFromView() {
+    async deleteFromView() {
         if (!confirm("정말 삭제하시겠습니까?")) return;
-        this.processDelete([this.state.currentViewId]);
+        await this.apiBulkDelete([this.state.currentViewId]);
         this.backToList();
-    }
-
-    archiveFromView() {
-        this.processArchive([this.state.currentViewId]);
-        this.backToList();
-    }
-
-    processDelete(ids) {
-        let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-        msgs = msgs.filter(m => !ids.includes(String(m.id)));
-        localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
         this.updateBadge();
     }
 
-    processArchive(ids) {
-        let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-        msgs.forEach(m => {
-            if (ids.includes(String(m.id))) m.box = 'archive';
-        });
-        localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
+    async archiveFromView() {
+        await this.apiBulkArchive([this.state.currentViewId]);
         alert("보관함으로 이동되었습니다.");
+        this.backToList();
     }
 
-    updateBadge() {
+    // [변경] 상단 네비게이션 뱃지 업데이트 (비동기 처리)
+    async updateBadge() {
         const myNick = localStorage.getItem("user_nick");
-        const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
-        const unreadCount = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick && !m.read).length;
-        
-        const badge = document.getElementById('msgBadge');
-        if (badge) {
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
+        try {
+            const msgs = await this.apiGetNotes();
+            const unreadCount = msgs.filter(m => m.box === 'inbox' && m.receiver === myNick && !m.read).length;
+            
+            const badge = document.getElementById('msgBadge');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
             }
+        } catch (error) {
+            console.error("뱃지 업데이트 실패", error);
         }
     }
 
+    /* ==========================================
+       비동기 API 통신 래퍼 (실제 DB 연동 대비용)
+       ========================================== */
+    async apiGetNotes() {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+                resolve(msgs);
+            }, 100);
+        });
+    }
+
+    async apiMarkAsRead(id) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+                const msg = msgs.find(m => String(m.id) === String(id));
+                if (msg) msg.read = true;
+                localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
+                resolve(true);
+            }, 50);
+        });
+    }
+
+    async apiSendNote(sender, receiver, content) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+                const newId = Date.now();
+
+                // 보낸 쪽지함 저장
+                msgs.push({
+                    id: newId, sender, receiver, content, 
+                    date: new Date().toISOString(), read: true, box: "sent"
+                });
+                // 받은 쪽지함 저장 (상대방)
+                msgs.push({
+                    id: newId + "_r", sender, receiver, content, 
+                    date: new Date().toISOString(), read: false, box: "inbox"
+                });
+
+                localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
+                resolve(true);
+            }, 200);
+        });
+    }
+
+    async apiBulkDelete(ids) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+                msgs = msgs.filter(m => !ids.includes(String(m.id)));
+                localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
+                resolve(true);
+            }, 100);
+        });
+    }
+
+    async apiBulkArchive(ids) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                let msgs = JSON.parse(localStorage.getItem("MOCK_MESSAGES") || "[]");
+                msgs.forEach(m => {
+                    if (ids.includes(String(m.id))) m.box = 'archive';
+                });
+                localStorage.setItem("MOCK_MESSAGES", JSON.stringify(msgs));
+                resolve(true);
+            }, 100);
+        });
+    }
+
+    /* ==========================================
+       유틸리티
+       ========================================== */
     triggerAnim(el) {
         el.classList.remove('anim-fade');
         void el.offsetWidth;

@@ -1,136 +1,153 @@
 /* shared/js/home.js - 홈 화면 전용 로직 (최신글, 인기글, 캘린더) */
 
+// 전역 상태 관리 (캘린더용 데이터 캐싱 및 날짜 상태)
+let calendarEvents = []; // API를 통해 가져온 일정을 저장할 배열
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth() + 1; // 1 ~ 12
+let selectedDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
 document.addEventListener("DOMContentLoaded", () => {
-  renderHomePosts();   // 최신글 & 구독글
-  renderTrending();    // 실시간 인기글
-  initCalendar();      // 증시 캘린더
+  renderHomePosts();   // 최신글 & 구독글 비동기 렌더링
+  renderTrending();    // 실시간 인기글 비동기 렌더링
+  initCalendar();      // 증시 캘린더 비동기 초기화
 });
 
 // =========================================
 // 1. 메인 영역: 최신 글 및 구독글 렌더링
 // =========================================
-function renderHomePosts() {
-  if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return;
-
-  // (1) 최신 글: 날짜 내림차순 정렬 후 상위 5개
-  const sortedPosts = [...MOCK_DB.POSTS].sort((a, b) => new Date(b.date) - new Date(a.date));
-  const homeRows = document.getElementById("homeLatestRows");
-
-  if (homeRows) {
-    homeRows.innerHTML = sortedPosts.slice(0, 5).map(p => {
-        // 댓글 수에 따라 강조 색상 적용
-        const commentColor = (p.comments > 0) ? "var(--primary)" : "var(--muted)";
-        
-        return `
-      <tr>
-        <td class="colNo">${p.no}</td>
-        <td class="colTag"><span class="chip">${p.tag}</span></td>
-        <td class="postTitle">
-          <a href="/kr/html/post/post.html?id=${p.no}">
-            ${p.title} 
-            <span style="color:${commentColor}; font-size:12px; font-weight:700; margin-left:4px;">
-              [${p.comments || 0}]
-            </span>
-          </a>
-        </td>
-        <td class="colVotes">${p.votes}</td>
-        <td class="colViews mobile-hide">${formatNumber(p.views)}</td>
-        <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td>
-      </tr>
-    `}).join("");
-  }
-
-  // (2) 구독한 작가의 글 (로그인 체크)
-  const subRows = document.getElementById("homeSubscribedRows");
-  if (subRows) {
-    const isLogged = localStorage.getItem("is_logged_in");
+async function renderHomePosts() {
+  try {
+    // [변경] 실제 DB 접근을 흉내내는 비동기 API 호출
+    const posts = await DB_API.getPosts();
     
-    if (!isLogged) {
-      subRows.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--muted); font-size:13px;">🔒 로그인 후 확인 가능합니다.</td></tr>`;
-    } else {
-      // 임시: 랜덤으로 5개 섞어서 보여줌 (실제론 구독 리스트 필터링 필요)
-      const shuffled = [...MOCK_DB.POSTS].sort(() => 0.5 - Math.random()).slice(0, 5);
-      
-      subRows.innerHTML = shuffled.length ? shuffled.map(p => `
+    // (1) 최신 글: 날짜 내림차순 정렬 후 상위 5개
+    const sortedPosts = [...posts].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const homeRows = document.getElementById("homeLatestRows");
+
+    if (homeRows) {
+      homeRows.innerHTML = sortedPosts.slice(0, 5).map(p => {
+          // 댓글 수에 따라 강조 색상 적용
+          const commentColor = (p.comments > 0) ? "var(--primary)" : "var(--muted)";
+          
+          return `
         <tr>
           <td class="colNo">${p.no}</td>
           <td class="colTag"><span class="chip">${p.tag}</span></td>
           <td class="postTitle">
-             <a href="/kr/html/post/post.html?id=${p.no}">
-                ${p.title}
-                <span style="color:var(--muted); font-size:12px;">[${p.comments || 0}]</span>
-             </a>
+            <a href="/kr/html/post/post.html?id=${p.no}">
+              ${p.title} 
+              <span style="color:${commentColor}; font-size:12px; font-weight:700; margin-left:4px;">
+                [${p.comments || 0}]
+              </span>
+            </a>
           </td>
           <td class="colVotes">${p.votes}</td>
           <td class="colViews mobile-hide">${formatNumber(p.views)}</td>
           <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td>
-        </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;padding:30px">새 글이 없습니다.</td></tr>`;
+        </tr>
+      `}).join("");
     }
+
+    // (2) 구독한 작가의 글 (로그인 체크)
+    const subRows = document.getElementById("homeSubscribedRows");
+    if (subRows) {
+      const isLogged = localStorage.getItem("is_logged_in"); // 추후 DB_API.getCurrentUser() 등으로 고도화 가능
+      
+      if (!isLogged) {
+        subRows.innerHTML = `<tr><td colspan="6" style="padding:40px; text-align:center; color:var(--muted); font-size:13px;">🔒 로그인 후 확인 가능합니다.</td></tr>`;
+      } else {
+        // 임시: 랜덤으로 5개 섞어서 보여줌 (실제론 구독 리스트 필터링 필요)
+        const shuffled = [...posts].sort(() => 0.5 - Math.random()).slice(0, 5);
+        
+        subRows.innerHTML = shuffled.length ? shuffled.map(p => `
+          <tr>
+            <td class="colNo">${p.no}</td>
+            <td class="colTag"><span class="chip">${p.tag}</span></td>
+            <td class="postTitle">
+               <a href="/kr/html/post/post.html?id=${p.no}">
+                  ${p.title}
+                  <span style="color:var(--muted); font-size:12px;">[${p.comments || 0}]</span>
+               </a>
+            </td>
+            <td class="colVotes">${p.votes}</td>
+            <td class="colViews mobile-hide">${formatNumber(p.views)}</td>
+            <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td>
+          </tr>`).join("") : `<tr><td colspan="6" style="text-align:center;padding:30px">새 글이 없습니다.</td></tr>`;
+      }
+    }
+  } catch (error) {
+    console.error("최신글 데이터를 불러오는 중 오류 발생:", error);
+    const homeRows = document.getElementById("homeLatestRows");
+    if (homeRows) homeRows.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--bad);">게시글을 불러올 수 없습니다.</td></tr>`;
   }
 }
 
 // =========================================
 // 2. 사이드바: 실시간 인기 글 렌더링
 // =========================================
-function renderTrending() {
+async function renderTrending() {
   const container = document.getElementById("homeTrendingList");
-  if (!container || typeof MOCK_DB === 'undefined') return;
+  if (!container) return;
 
-  // 인기순 정렬 (조회수 + 추천수 가중치)
-  const topPosts = [...MOCK_DB.POSTS]
-    .sort((a, b) => (b.views + b.votes * 10) - (a.views + a.votes * 10))
-    .slice(0, 5);
+  try {
+    // [변경] 인기글 전용 비동기 API 호출 (상위 5개)
+    const topPosts = await DB_API.getTrendingPosts(5);
 
-  container.innerHTML = topPosts.map((p, index) => {
-    const rank = index + 1;
-    // 1~3위는 강조 색상, 4~5위는 회색
-    const rankColor = rank <= 3 ? "var(--primary)" : "var(--muted)";
-    const rankWeight = rank <= 3 ? "800" : "600";
+    container.innerHTML = topPosts.map((p, index) => {
+      const rank = index + 1;
+      // 1~3위는 강조 색상, 4~5위는 회색
+      const rankColor = rank <= 3 ? "var(--primary)" : "var(--muted)";
+      const rankWeight = rank <= 3 ? "800" : "600";
 
-    return `
-      <a href="/kr/html/post/post.html?id=${p.no}" class="searchItem">
-        <div class="rank-num" style="color:${rankColor}; font-weight:${rankWeight}">${rank}</div>
-        <div class="rank-content">
-            <div class="rank-title text-ellipsis">${p.title}</div>
-            <div class="rank-meta">
-                <span>조회 ${formatNumber(p.views)}</span>
-                <span style="margin:0 4px">·</span>
-                <span style="color:var(--bad);">추천 ${p.votes}</span>
-            </div>
-        </div>
-        <div class="rank-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-        </div>
-      </a>
-    `;
-  }).join("");
+      return `
+        <a href="/kr/html/post/post.html?id=${p.no}" class="searchItem">
+          <div class="rank-num" style="color:${rankColor}; font-weight:${rankWeight}">${rank}</div>
+          <div class="rank-content">
+              <div class="rank-title text-ellipsis">${p.title}</div>
+              <div class="rank-meta">
+                  <span>조회 ${formatNumber(p.views)}</span>
+                  <span style="margin:0 4px">·</span>
+                  <span style="color:var(--bad);">추천 ${p.votes}</span>
+              </div>
+          </div>
+          <div class="rank-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+          </div>
+        </a>
+      `;
+    }).join("");
+  } catch (error) {
+    console.error("인기글 데이터를 불러오는 중 오류 발생:", error);
+    container.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--muted);">인기글을 불러올 수 없습니다.</div>`;
+  }
 }
 
 // =========================================
 // 3. 증시 캘린더: 로직 분리 및 강화
 // =========================================
 
-// 전역 상태 관리 (캘린더용)
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth() + 1; // 1 ~ 12
-let selectedDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+async function initCalendar() {
+  try {
+    // [변경] 비동기 API로 일정 데이터를 한 번 로드하여 캐싱
+    calendarEvents = await DB_API.getEvents();
 
-function initCalendar() {
-  if (typeof MOCK_DB === 'undefined' || !MOCK_DB.EVENTS) return;
+    // 1. 초기 렌더링
+    renderCalendarDays(calYear, calMonth);
+    renderEventInfo(selectedDate);
+    renderUpcomingEvents();
 
-  // 1. 초기 렌더링
-  renderCalendarDays(calYear, calMonth);
-  renderEventInfo(selectedDate);
-  renderUpcomingEvents();
+    // 2. 드롭다운(Select) 초기화
+    initCalendarControls();
 
-  // 2. 드롭다운(Select) 초기화
-  initCalendarControls();
+    // 3. 이전/다음 버튼 이벤트
+    document.getElementById("calPrev")?.addEventListener("click", () => changeMonth(-1));
+    document.getElementById("calNext")?.addEventListener("click", () => changeMonth(1));
 
-  // 3. 이전/다음 버튼 이벤트
-  document.getElementById("calPrev")?.addEventListener("click", () => changeMonth(-1));
-  document.getElementById("calNext")?.addEventListener("click", () => changeMonth(1));
+  } catch (error) {
+    console.error("캘린더 일정을 불러오는 중 오류 발생:", error);
+  }
 }
 
 // 월 변경 함수
@@ -217,8 +234,8 @@ function renderCalendarDays(y, m) {
     const isToday = (dateStr === todayStr);
     const isSelected = (dateStr === selectedDate);
     
-    // 일정이 있는지 확인
-    const hasEvent = MOCK_DB.EVENTS.some(e => e.date === dateStr);
+    // [변경] 캐싱된 calendarEvents 배열에서 일정 존재 여부 확인
+    const hasEvent = calendarEvents.some(e => e.date === dateStr);
     
     // HTML 생성
     const cell = document.createElement("div");
@@ -247,7 +264,8 @@ function renderEventInfo(dateStr) {
     const box = document.getElementById("eventSelected");
     if(!box) return;
     
-    const events = MOCK_DB.EVENTS.filter(e => e.date === dateStr);
+    // [변경] 캐싱된 calendarEvents 배열 활용
+    const events = calendarEvents.filter(e => e.date === dateStr);
     
     if(events.length === 0) {
         box.innerHTML = `<div style="color:var(--muted); font-size:13px; text-align:center;">선택한 날짜에 일정이 없습니다.</div>`;
@@ -267,7 +285,9 @@ function renderUpcomingEvents() {
     if(!list) return;
     
     const today = new Date().toISOString().split('T')[0];
-    const upcoming = MOCK_DB.EVENTS
+    
+    // [변경] 캐싱된 calendarEvents 배열 활용
+    const upcoming = calendarEvents
         .filter(e => e.date >= today)
         .sort((a,b) => a.date.localeCompare(b.date))
         .slice(0, 3);
