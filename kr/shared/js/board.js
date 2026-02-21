@@ -105,7 +105,19 @@ function renderList(posts) {
           ${p.title} ${(p.comments) > 0 ? `<span style="color:var(--primary); font-size:12px; font-weight:700;">[${p.comments}]</span>` : ""}
         </a>
       </td>
-      <td class="colWriter">${p.writer}</td>
+      <td class="colWriter">
+        ${p.writer === '익명' ? 
+          `${p.writer}` : 
+          `<span class="user-nick-clickable" 
+                style="cursor: pointer;" 
+                data-user-name="${p.writer}" 
+                data-post-count="${p.postCount || 0}" 
+                data-comment-count="${p.commentCount || 0}" 
+                data-blog-url="blog.html?user=${encodeURIComponent(p.writer)}">
+            ${p.writer}
+          </span>`
+        }
+      </td>
       <td class="colVotes">${p.votes}</td>
       <td class="colViews mobile-hide">${p.views.toLocaleString()}</td>
       <td class="colTime mobile-hide">${formatBoardDate(p.date)}</td>

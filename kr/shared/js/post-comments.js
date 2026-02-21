@@ -121,13 +121,20 @@ window.PostManager.Comments = {
         
         const deleteBtn = `<button class="btn-delete-cmt" onclick="window.PostManager.Comments.checkDeletePermission('${comment.id}')">삭제</button>`;
 
-        // [핵심 수정] 템플릿 리터럴 내부의 공백 제거
-        // 기존:
-        // <div ...>
-        //     ${contentHtml}
-        // </div>
-        //
-        // 수정후: <div ...>${contentHtml}</div> (한 줄로 붙임)
+        // [수정] 작성자가 '익명'일 경우 클릭 방지 (일반 텍스트로 렌더링)
+        const isAnonymous = (comment.writer === "익명");
+        const writerHtml = isAnonymous 
+            ? `<span class="cmt-nick">${comment.writer}</span>`
+            : `<span class="cmt-nick user-nick-clickable" 
+                     style="cursor: pointer;" 
+                     data-user-name="${comment.writer}" 
+                     data-post-count="0" 
+                     data-comment-count="0" 
+                     data-blog-url="blog.html?user=${encodeURIComponent(comment.writer)}">
+                   ${comment.writer}
+               </span>`;
+
+        // 템플릿 리터럴 내부 닉네임 렌더링 부분을 writerHtml 변수로 교체
         el.innerHTML = `
             <div class="cmt-profile">
                 <div class="default-avatar">${comment.writer.charAt(0)}</div>
@@ -135,7 +142,7 @@ window.PostManager.Comments = {
             <div class="cmt-body">
                 <div class="cmt-top">
                     <div class="cmt-info">
-                        <span class="cmt-nick">${comment.writer}</span>
+                        ${writerHtml}
                         <span class="cmt-date">${this.formatDate(comment.date)}</span>
                         ${deleteBtn}
                     </div>

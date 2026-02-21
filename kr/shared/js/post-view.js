@@ -28,7 +28,24 @@ window.PostManager.View = {
 
         this.setText("postTag", post.tag || post.category || "일반");
         this.setText("postTitle", post.title);
-        this.setText("postWriter", post.writer || post.nick || "익명");
+
+        // 상단 작성자 닉네임 설정 및 드롭다운 예외 처리
+        const writerName = post.writer || post.nick || "익명";
+        this.setText("postWriter", writerName);
+        
+        const elWriter = document.getElementById("postWriter");
+        if (elWriter) {
+            if (writerName === "익명") {
+                elWriter.classList.remove("user-nick-clickable");
+                elWriter.style.cursor = "default";
+            } else {
+                elWriter.classList.add("user-nick-clickable");
+                elWriter.style.cursor = "pointer";
+                elWriter.dataset.userName = writerName;
+                elWriter.dataset.blogUrl = `blog.html?user=${encodeURIComponent(writerName)}`;
+            }
+        }
+
         this.setText("postDate", this.formatDate(post.date));
         this.setText("postViews", (post.views || 0).toLocaleString());
         this.setText("postVotes", post.votes || 0);
@@ -53,13 +70,25 @@ window.PostManager.View = {
                 const bio = document.querySelector(".author-bio");
 
                 if(img) img.src = post.writerImg || "../shared/images/default_profile.png"; 
-                if(name) name.textContent = post.writer;
+                if(name) {
+                    name.textContent = post.writer;
+                    
+                    // 하단 프로필 닉네임 드롭다운 예외 처리
+                    if (post.writer === "익명") {
+                        name.classList.remove("user-nick-clickable");
+                        name.style.cursor = "default";
+                    } else {
+                        name.classList.add("user-nick-clickable");
+                        name.style.cursor = "pointer";
+                        name.dataset.userName = post.writer;
+                        name.dataset.blogUrl = `blog.html?user=${encodeURIComponent(post.writer)}`;
+                    }
+                }
                 if(bio) bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
             }
         }
     },
 
-    // [중요] 버튼 이벤트 연결
     bindEvents: function() {
         // 공유하기
         const btnShare = document.getElementById("btnShare");
@@ -78,7 +107,7 @@ window.PostManager.View = {
             btnReport.onclick = () => alert("신고가 접수되었습니다.");
         }
 
-        // [복구] 블로그 방문하기
+        // 블로그 방문하기
         const btnVisit = document.getElementById("btnVisitBlog");
         if (btnVisit) {
             btnVisit.onclick = () => {
@@ -87,7 +116,7 @@ window.PostManager.View = {
             };
         }
 
-        // [복구] 구독하기
+        // 구독하기
         const btnSubscribe = document.getElementById("btnSubscribe");
         if (btnSubscribe) {
             btnSubscribe.onclick = () => {
