@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-subscription.js */
+/* kr/shared/js/blog/blog-subscription.js */
 
 window.BlogSubscriptionManager = {
     init: function() {

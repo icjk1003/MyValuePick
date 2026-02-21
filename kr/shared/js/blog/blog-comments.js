@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-comments.js */
+/* kr/shared/js/blog/blog-comments.js */
 
 window.BlogCommentsManager = {
     /**

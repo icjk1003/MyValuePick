@@ -114,7 +114,7 @@ class BlogManager {
         }
 
         tbody.innerHTML = userPosts.map((p, idx) => `
-            <tr onclick="location.href='post.html?id=${p.no}'" style="cursor:pointer">
+            <tr onclick="location.href='/kr/html/post/post.html?id=${p.no}'" style="cursor:pointer">
                 <td>${userPosts.length - idx}</td>
                 <td style="text-align:left; font-weight:600;">
                     ${p.title} 
@@ -148,7 +148,7 @@ class BlogManager {
         emptyDiv.classList.add('hidden');
 
         tbody.innerHTML = scrapData.map((s, idx) => `
-            <tr onclick="location.href='post.html?id=${s.id}'" style="cursor:pointer">
+            <tr onclick="location.href='/kr/html/post/post.html?id=${s.id}'" style="cursor:pointer">
                 <td>${idx + 1}</td>
                 <td style="text-align:left; font-weight:600;">${s.title}</td>
                 <td>${s.writer}</td>

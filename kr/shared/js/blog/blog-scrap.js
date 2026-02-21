@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-scrap.js */
+/* kr/shared/js/blog/blog-scrap.js */
 
 window.BlogScrapManager = {
     init: function() {

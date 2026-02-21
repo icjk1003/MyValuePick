@@ -101,7 +101,7 @@ function renderList(posts) {
       <td class="colNo">${p.id || p.no}</td>
       <td class="colTag"><span class="chip">${p.tag}</span></td>
       <td style="text-align:left">
-        <a class="postTitle" href="post.html?id=${p.id || p.no}">
+        <a class="postTitle" href="/kr/html/post/post.html?id=${p.id || p.no}">
           ${p.title} ${(p.comments) > 0 ? `<span style="color:var(--primary); font-size:12px; font-weight:700;">[${p.comments}]</span>` : ""}
         </a>
       </td>
@@ -113,7 +113,7 @@ function renderList(posts) {
                 data-user-name="${p.writer}" 
                 data-post-count="${p.postCount || 0}" 
                 data-comment-count="${p.commentCount || 0}" 
-                data-blog-url="blog.html?user=${encodeURIComponent(p.writer)}">
+                data-blog-url="/kr/html/blog/blog.html?user=${encodeURIComponent(p.writer)}">
             ${p.writer}
           </span>`
         }

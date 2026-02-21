@@ -79,7 +79,7 @@ class MyPageComments {
         const dateStr = window.formatBoardDate ? window.formatBoardDate(c.date) : c.date;
 
         return `
-        <a href="post.html?id=${c.postId}" class="my-item">
+        <a href="/kr/html/post/post.html?id=${c.postId}" class="my-item">
             <span class="my-item-title">${this.escapeHtml(c.content)}</span>
             <div class="my-item-meta">
                 <span class="origin-post-link">원문: ${this.escapeHtml(c.postTitle)}</span>

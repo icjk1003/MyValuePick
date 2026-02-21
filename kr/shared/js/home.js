@@ -26,7 +26,7 @@ function renderHomePosts() {
         <td class="colNo">${p.no}</td>
         <td class="colTag"><span class="chip">${p.tag}</span></td>
         <td class="postTitle">
-          <a href="post.html?id=${p.no}">
+          <a href="/kr/html/post/post.html?id=${p.no}">
             ${p.title} 
             <span style="color:${commentColor}; font-size:12px; font-weight:700; margin-left:4px;">
               [${p.comments || 0}]
@@ -56,7 +56,7 @@ function renderHomePosts() {
           <td class="colNo">${p.no}</td>
           <td class="colTag"><span class="chip">${p.tag}</span></td>
           <td class="postTitle">
-             <a href="post.html?id=${p.no}">
+             <a href="/kr/html/post/post.html?id=${p.no}">
                 ${p.title}
                 <span style="color:var(--muted); font-size:12px;">[${p.comments || 0}]</span>
              </a>
@@ -88,7 +88,7 @@ function renderTrending() {
     const rankWeight = rank <= 3 ? "800" : "600";
 
     return `
-      <a href="post.html?id=${p.no}" class="searchItem">
+      <a href="/kr/html/post/post.html?id=${p.no}" class="searchItem">
         <div class="rank-num" style="color:${rankColor}; font-weight:${rankWeight}">${rank}</div>
         <div class="rank-content">
             <div class="rank-title text-ellipsis">${p.title}</div>

@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-core.js */
+/* kr/shared/js/blog/blog-core.js */
 
 /**
  * [Blog Core Module]
@@ -52,7 +52,7 @@ window.loadBlogSection = async function(sectionName, pushState = true) {
         if (!htmlContent) {
             // 캐시에 없으면 파일 요청
             // 주의: 로컬 파일 시스템(file://)에서는 CORS 에러 발생 가능. (Live Server 사용 권장)
-            const response = await fetch(`blog-${sectionName}.html`);
+            const response = await fetch(`/kr/html/blog/blog-${sectionName}.html`);
             
             if (!response.ok) {
                 throw new Error(`Failed to load ${sectionName} (Status: ${response.status})`);

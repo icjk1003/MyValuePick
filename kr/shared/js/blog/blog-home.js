@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-home.js */
+/* kr/shared/js/blog/blog-home.js */
 
 window.BlogHomeManager = {
     init: function() {

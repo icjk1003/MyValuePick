@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-post.js */
+/* kr/shared/js/blog/blog-post.js */
 
 window.BlogPostManager = {
     init: function() {

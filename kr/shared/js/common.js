@@ -61,7 +61,7 @@ function renderHeader() {
       
       <div style="width:1000px; max-width:96vw; display:flex; justify-content:space-between; align-items:center; padding:0 16px;">
         
-        <a href="home.html" style="font-size:20px; font-weight:800; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <a href="/kr/html/home.html" style="font-size:20px; font-weight:800; color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:6px; flex-shrink:0;">
           <span style="background:var(--primary); color:white; width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px;">M</span>
           <span class="mobile-hide">MyValuePick</span>
         </a>
@@ -148,7 +148,7 @@ function wireLoginState() {
 
   if(isLoggedIn) {
     btnLogin.textContent = nickName; 
-    btnLogin.href = "mypage.html"; 
+    btnLogin.href = "/kr/html/mypage/mypage.html"; 
     btnLogin.onclick = null; 
 
     // 알림 활성화
@@ -261,7 +261,7 @@ function logout() {
     localStorage.removeItem("user_email");
     localStorage.removeItem("user_role");
     alert("로그아웃 되었습니다.");
-    location.href = "home.html";
+    location.href = "/kr/html/home.html";
   }
 }
 window.logout = logout;
@@ -299,10 +299,10 @@ function initNotifications() {
                 user: '운영자', 
                 text: '환영합니다! 첫 쪽지를 확인해보세요.', 
                 time: new Date().toISOString(), 
-                link: 'mypage.html?section=messages&id=welcome_msg' 
+                link: '/kr/html/mypage/mypage.html?section=messages&id=welcome_msg' 
             },
             // 기존 데이터...
-            { id: 1, type: 'reply', user: '주식고수', text: '댓글을 남겼습니다.', time: new Date().toISOString(), link: 'post.html?id=1#cmt-0' },
+            { id: 1, type: 'reply', user: '주식고수', text: '댓글을 남겼습니다.', time: new Date().toISOString(), link: '/kr/html/post/post.html?id=1#cmt-0' },
             // ...
         ];
         localStorage.setItem('my_notifications', JSON.stringify(initialData));

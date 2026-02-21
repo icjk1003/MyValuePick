@@ -694,7 +694,7 @@ function renderMyPosts() {
     const myPosts = (typeof MOCK_DB !== 'undefined' ? MOCK_DB.POSTS : []).filter(p => p.writer === myNick);
     if (myPosts.length === 0) { container.innerHTML = `<div class="empty-msg">작성한 게시글이 없습니다.</div>`; return; }
     container.innerHTML = myPosts.map(p => `
-        <a href="post.html?id=${p.no}" class="my-item">
+        <a href="/kr/html/post/post.html?id=${p.no}" class="my-item">
             <span class="my-item-title">${p.title}</span>
             <div class="my-item-meta">
                 <span>${p.tag}</span><span>조회 ${p.views}</span><span>추천 ${p.votes}</span>
@@ -719,7 +719,7 @@ function renderMyComments() {
     }
     if (myComments.length === 0) { container.innerHTML = `<div class="empty-msg">작성한 댓글이 없습니다.</div>`; return; }
     container.innerHTML = myComments.map(c => `
-        <a href="post.html?id=${c.postId}" class="my-item">
+        <a href="/kr/html/post/post.html?id=${c.postId}" class="my-item">
             <span class="my-item-title">${c.content}</span>
             <div class="my-item-meta">
                 <span style="color:var(--primary)">원문: ${c.postTitle}</span>

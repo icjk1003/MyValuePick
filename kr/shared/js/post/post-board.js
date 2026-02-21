@@ -101,7 +101,7 @@ window.PostManager.Board = {
                 <td class="colNo">${id}</td>
                 <td class="colTag"><span class="chip">${p.tag || p.category || "일반"}</span></td>
                 <td style="text-align:left">
-                    <a href="post.html?id=${id}">
+                    <a href="/kr/html/post/post.html?id=${id}">
                         ${p.title} ${cmtHtml}
                     </a>
                 </td>

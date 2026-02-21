@@ -1,4 +1,4 @@
-/* kr/shared/js/blog-guestbook.js */
+/* kr/shared/js/blog/blog-guestbook.js */
 
 window.BlogGuestbookManager = {
     init: function() {
@@ -112,7 +112,7 @@ window.BlogGuestbookManager = {
 
     createGuestItem: function(item) {
         // 프로필 이미지가 없으면 기본 아이콘 사용
-        const imgSrc = item.writerImg || "../shared/img/default_profile.png"; 
+        const imgSrc = item.writerImg || "/kr/shared/img/default_profile.png"; 
         // 실제로는 onerror 처리 등이 필요할 수 있음
         const imgTag = item.writerImg 
             ? `<img src="${item.writerImg}" alt="img">` 

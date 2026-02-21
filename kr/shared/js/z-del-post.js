@@ -122,7 +122,7 @@ window.PostDetailManager = {
                 const bio = document.querySelector(".author-bio");
                 const btnVisit = document.getElementById("btnVisitBlog");
 
-                if(img) img.src = "../shared/images/default_profile.png"; 
+                if(img) img.src = "/kr/shared/images/default_profile.png"; 
                 if(name) name.textContent = post.writer;
                 if(bio) bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
                 if(btnVisit) {
@@ -461,7 +461,7 @@ window.PostDetailManager = {
                 <td class="colNo">${id}</td>
                 <td class="colTag"><span class="chip">${p.tag || p.category || "일반"}</span></td>
                 <td style="text-align:left">
-                    <a href="post.html?id=${id}" style="color:inherit; text-decoration:none;">
+                    <a href="/kr/html/post/post.html?id=${id}" style="color:inherit; text-decoration:none;">
                         ${p.title} ${cmtHtml}
                     </a>
                 </td>
@@ -487,16 +487,16 @@ window.PostDetailManager = {
         let html = "";
         
         if (startPage > 1) {
-            html += `<a class="pagerBtn" href="post.html?id=${this.postId}&page=${startPage - 1}">‹</a>`;
+            html += `<a class="pagerBtn" href="/kr/html/post/post.html?id=${this.postId}&page=${startPage - 1}">‹</a>`;
         }
 
         for (let i = startPage; i <= endPage; i++) {
             const active = (i === this.currentPage) ? "active" : "";
-            html += `<a href="post.html?id=${this.postId}&page=${i}" class="${active}">${i}</a>`;
+            html += `<a href="/kr/html/post/post.html?id=${this.postId}&page=${i}" class="${active}">${i}</a>`;
         }
 
         if (endPage < totalPages) {
-            html += `<a class="pagerBtn" href="post.html?id=${this.postId}&page=${endPage + 1}">›</a>`;
+            html += `<a class="pagerBtn" href="/kr/html/post/post.html?id=${this.postId}&page=${endPage + 1}">›</a>`;
         }
 
         pager.innerHTML = html;

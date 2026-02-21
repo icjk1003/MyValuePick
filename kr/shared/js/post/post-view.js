@@ -42,7 +42,7 @@ window.PostManager.View = {
                 elWriter.classList.add("user-nick-clickable");
                 elWriter.style.cursor = "pointer";
                 elWriter.dataset.userName = writerName;
-                elWriter.dataset.blogUrl = `blog.html?user=${encodeURIComponent(writerName)}`;
+                elWriter.dataset.blogUrl = `/kr/html/blog/blog.html?user=${encodeURIComponent(writerName)}`;
             }
         }
 
@@ -69,7 +69,7 @@ window.PostManager.View = {
                 const name = document.getElementById("authorName");
                 const bio = document.querySelector(".author-bio");
 
-                if(img) img.src = post.writerImg || "../shared/images/default_profile.png"; 
+                if(img) img.src = post.writerImg || "/kr/shared/images/default_profile.png"; 
                 if(name) {
                     name.textContent = post.writer;
                     
@@ -81,7 +81,7 @@ window.PostManager.View = {
                         name.classList.add("user-nick-clickable");
                         name.style.cursor = "pointer";
                         name.dataset.userName = post.writer;
-                        name.dataset.blogUrl = `blog.html?user=${encodeURIComponent(post.writer)}`;
+                        name.dataset.blogUrl = `/kr/html/blog/blog.html?user=${encodeURIComponent(post.writer)}`;
                     }
                 }
                 if(bio) bio.textContent = post.writerBio || "주식과 경제를 분석하는 개인 투자자입니다.";
@@ -112,7 +112,7 @@ window.PostManager.View = {
         if (btnVisit) {
             btnVisit.onclick = () => {
                 const writer = document.getElementById("postWriter").textContent;
-                location.href = `blog.html?user=${encodeURIComponent(writer)}`;
+                location.href = `/kr/html/blog/blog.html?user=${encodeURIComponent(writer)}`;
             };
         }
 

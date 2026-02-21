@@ -130,7 +130,7 @@ window.PostManager.Comments = {
                      data-user-name="${comment.writer}" 
                      data-post-count="0" 
                      data-comment-count="0" 
-                     data-blog-url="blog.html?user=${encodeURIComponent(comment.writer)}">
+                     data-blog-url="/kr/html/blog/blog.html?user=${encodeURIComponent(comment.writer)}">
                    ${comment.writer}
                </span>`;
 

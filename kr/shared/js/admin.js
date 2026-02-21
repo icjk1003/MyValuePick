@@ -79,7 +79,7 @@ function loadPostList() {
             <td>${post.writer}</td>
             <td>${post.date}</td>
             <td>
-                <button class="btn-small btn-view" onclick="window.open('post.html?id=${post.no}')">보기</button>
+                <button class="btn-small btn-view" onclick="window.open('/kr/html/post/post.html?id=${post.no}')">보기</button>
                 <button class="btn-small btn-delete" onclick="deletePost(${post.no})">삭제</button>
             </td>
         </tr>

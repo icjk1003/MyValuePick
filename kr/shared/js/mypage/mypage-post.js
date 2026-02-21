@@ -93,7 +93,7 @@ class MyPagePostManager {
         const votes = post.votes ? post.votes.toLocaleString() : 0;
 
         return `
-        <a href="post.html?id=${post.no}" class="my-item">
+        <a href="/kr/html/post/post.html?id=${post.no}" class="my-item">
             <span class="my-item-title">${this.escapeHtml(post.title)}</span>
             <div class="my-item-meta">
                 <span class="meta-tag">${post.tag || '일반'}</span>
