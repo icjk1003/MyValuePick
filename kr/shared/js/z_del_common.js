@@ -99,7 +99,7 @@ function renderHeader() {
             </div>
           </div>
 
-          <a href="login.html" id="btnLogin" style="font-size:14px; font-weight:600; color:var(--muted); text-decoration:none;">로그인</a>
+          <a href="/kr/html/login.html" id="btnLogin" style="font-size:14px; font-weight:600; color:var(--muted); text-decoration:none;">로그인</a>
         </div>
 
       </div>
@@ -229,7 +229,7 @@ function wireGlobalSearch() {
 
     if (matched.length > 0) {
       suggestionsBox.innerHTML = matched.map(stock => `
-        <div class="suggestion-item" onclick="location.href='board.html?q=${stock.name}'">
+        <div class="suggestion-item" onclick="location.href='/kr/html/board.html?q=${stock.name}'">
           <div style="text-align:left">
             <div style="font-weight:700; font-size:13px; color:var(--text)">${stock.name}</div>
             <div style="font-size:11px; color:var(--muted)">${stock.enName}</div>
@@ -248,7 +248,7 @@ function wireGlobalSearch() {
 
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter" && input.value.trim()) {
-      location.href = `board.html?q=${encodeURIComponent(input.value.trim())}`;
+      location.href = `/kr/html/board.html?q=${encodeURIComponent(input.value.trim())}`;
     }
   });
 }

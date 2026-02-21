@@ -111,7 +111,7 @@ function wirePublishButton() {
       
       // 작성 완료 후 해당 게시글 상세 페이지 또는 게시판 목록으로 이동
       // location.href = `/kr/html/post/post.html?id=${newPostId}`; // 상세페이지로 보낼 경우
-      location.href = "board.html"; 
+      location.href = "/kr/html/board.html"; 
 
     } catch (error) {
       console.error("게시글 작성 중 오류 발생:", error);

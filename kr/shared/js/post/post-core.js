@@ -14,7 +14,7 @@ window.PostManager.init = function() {
     
     if (!idParam) {
         alert("잘못된 접근입니다.");
-        location.href = 'board.html';
+        location.href = '/kr/html/board.html';
         return;
     }
     

@@ -240,7 +240,7 @@ window.PostManager.View = {
         try {
             await DB_API.deletePost(postId, userIdOrPassword);
             alert("게시글이 성공적으로 삭제되었습니다.");
-            location.href = "board.html"; // 삭제 성공 시 목록으로 이동
+            location.href = "/kr/html/board.html"; // 삭제 성공 시 목록으로 이동
         } catch (error) {
             console.error("삭제 실패:", error);
             alert(error.message || "삭제에 실패했습니다. 권한을 확인해주세요.");

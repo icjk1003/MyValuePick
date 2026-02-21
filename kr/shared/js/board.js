@@ -192,7 +192,7 @@ function wireSearchActions() {
   if (!btn || !input) return;
   const doSearch = () => {
     if (!input.value.trim()) { alert("검색어를 입력해주세요."); return; }
-    location.href = `board.html?q=${encodeURIComponent(input.value.trim())}&type=${currentSearchType}&page=1`;
+    location.href = `/kr/html/board.html?q=${encodeURIComponent(input.value.trim())}&type=${currentSearchType}&page=1`;
   };
   btn.onclick = doSearch;
   input.onkeypress = (e) => { if (e.key === "Enter") doSearch(); };
