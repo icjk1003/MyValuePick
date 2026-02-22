@@ -1,0 +1,293 @@
+/* =========================================
+   1. [Account] 로그인 레이아웃 (Layout)
+   ========================================= */
+
+/* 로그인 페이지 전체 래퍼 (Wrapper) */
+.login-wrap {
+    display: flex; /* 레이아웃: 내부 요소 정렬을 위해 플렉스박스 적용 */
+    justify-content: center; /* 가로 정렬: 중앙 배치 */
+    align-items: center; /* 세로 정렬: 중앙 배치 */
+    min-height: calc(100vh - 140px); /* 최소 높이: 헤더와 푸터 영역을 제외한 화면 꽉 찬 높이 유지 */
+    background-color: var(--bg); /* 배경색: 테마 공통 배경 변수 적용 */
+    padding: 40px 20px; /* 내부 여백: 상하 40px, 좌우 20px 적용하여 모바일 여백 확보 */
+}
+
+/* 로그인 입력 폼 카드 컨테이너 */
+.login-card {
+    width: 100%; /* 너비: 모바일 화면을 위해 100% 할당 */
+    max-width: 400px; /* 최대 너비: 데스크탑에서 카드가 너무 넓어지지 않도록 400px 제한 */
+    background: var(--surface); /* 배경색: 카드형 컴포넌트용 테마 표면 색상 적용 */
+    padding: 40px 30px; /* 내부 여백: 상하 40px, 좌우 30px 넉넉하게 적용 */
+    border-radius: 16px; /* 테두리 둥글기: 모던한 UI를 위해 16px 둥글게 처리 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 그림자: 입체감을 주기 위한 부드러운 하단 그림자 적용 */
+    border: 1px solid var(--line); /* 테두리 선: 구분감을 위해 얇은 테마 라인 색상 적용 */
+}
+
+/* 로그인 폼 최상단 타이틀 */
+.login-title {
+    margin: 0 0 30px; /* 외부 여백: 하단에만 30px 여백을 주어 폼과 분리 */
+    font-size: 26px; /* 글꼴 크기: 시각적 계층 구조상 가장 크게 설정 */
+    font-weight: 700; /* 글꼴 두께: 강조를 위해 볼드 처리 */
+    text-align: center; /* 텍스트 정렬: 중앙 정렬 */
+    color: var(--text); /* 글자색: 테마 기본 텍스트 색상 적용 */
+}
+
+/* =========================================
+   2. [Account] 로그인 폼 (Form & Inputs)
+   ========================================= */
+
+/* 폼 요소 컨테이너 */
+.login-form {
+    display: flex; /* 레이아웃: 입력창들을 세로로 나열하기 위해 플렉스 적용 */
+    flex-direction: column; /* 정렬 방향: 위에서 아래로 세로 배치 */
+}
+
+/* 개별 입력 필드 그룹 */
+.input-group {
+    margin-bottom: 16px; /* 외부 여백: 입력창 간의 세로 간격 16px 확보 */
+}
+
+/* 텍스트 및 비밀번호 입력 필드 */
+.input-group input {
+    width: 100%; /* 너비: 부모 요소에 꽉 차도록 100% 설정 */
+    padding: 14px; /* 내부 여백: 터치 영역 확보를 위해 14px 적용 */
+    background: var(--bg); /* 배경색: 입력 필드 전용 배경색 적용 */
+    border: 1px solid var(--line); /* 테두리 선: 기본 테마 라인 색상 적용 */
+    border-radius: 8px; /* 테두리 둥글기: 8px 적용하여 부드러운 느낌 제공 */
+    font-size: 15px; /* 글꼴 크기: 가독성을 위해 15px 설정 */
+    color: var(--text); /* 글자색: 사용자가 입력하는 텍스트 색상 */
+    outline: none; /* 외곽선: 브라우저 기본 포커스 외곽선 제거 */
+    transition: border-color 0.2s, background-color 0.2s; /* 애니메이션: 포커스 시 부드러운 색상 전환 효과 적용 */
+}
+
+/* 입력 필드 플레이스홀더 텍스트 */
+.input-group input::placeholder {
+    color: var(--muted); /* 글자색: 덜 강조되는 안내 문구용 색상 적용 */
+}
+
+/* 입력 필드 포커스(활성화) 상태 */
+.input-group input:focus {
+    border-color: var(--primary); /* 테두리 색상: 활성화 시 브랜드 컬러로 변경 */
+    background: var(--surface); /* 배경색: 입력 집중을 위해 표면 색상으로 약간 밝게 처리 */
+}
+
+/* =========================================
+   3. [Account] 커스텀 라운드 체크박스 (Auto Login)
+   ========================================= */
+
+/* 자동 로그인 영역 래퍼 */
+.auto-login-wrap {
+    margin-bottom: 20px; /* 외부 여백: 하단 로그인 버튼과의 간격 확보 */
+    display: flex; /* 레이아웃: 체크박스와 텍스트 가로 정렬 */
+    align-items: center; /* 세로 정렬: 중앙에 맞춤 */
+}
+
+/* 커스텀 체크박스 클릭 영역 */
+.custom-checkbox {
+    display: flex; /* 레이아웃: 커스텀 원형과 텍스트의 가로 배치 */
+    align-items: center; /* 세로 정렬: 요소들을 수직 중앙 정렬 */
+    cursor: pointer; /* 마우스 커서: 클릭 가능함을 나타내는 포인터로 변경 */
+    font-size: 14px; /* 글꼴 크기: 14px 텍스트 크기 적용 */
+    color: var(--muted); /* 글자색: 비활성화 느낌의 옅은 색상 적용 */
+    user-select: none; /* 텍스트 선택 방지: 더블 클릭 시 텍스트가 드래그되는 현상 방지 */
+}
+
+/* 브라우저 기본 체크박스 숨김 처리 */
+.custom-checkbox input {
+    position: absolute; /* 위치: 화면 흐름에서 제외 */
+    opacity: 0; /* 투명도: 완전히 투명하게 만들어 시각적으로 숨김 */
+    cursor: pointer; /* 마우스 커서: 포인터 유지 */
+    height: 0; /* 높이: 공간을 차지하지 않도록 0 설정 */
+    width: 0; /* 너비: 공간을 차지하지 않도록 0 설정 */
+}
+
+/* 커스텀 원형 체크 마크 (기본 상태) */
+.checkmark {
+    position: relative; /* 위치: 내부의 V자 마크를 절대 좌표로 배치하기 위한 기준점 */
+    height: 20px; /* 높이: 20px 크기 지정 */
+    width: 20px; /* 너비: 20px 크기 지정 */
+    background-color: var(--bg); /* 배경색: 체크 전 기본 배경색 */
+    border: 1px solid var(--line); /* 테두리 선: 옅은 구분선 적용 */
+    border-radius: 50%; /* 테두리 둥글기: 50%를 적용하여 완벽한 원형 생성 */
+    margin-right: 8px; /* 외부 여백: 우측 텍스트와의 간격 8px 확보 */
+    transition: 0.2s; /* 애니메이션: 호버 및 체크 시 상태 변화를 부드럽게 처리 */
+}
+
+/* 커스텀 원형 체크 마크 (마우스 호버 상태) */
+.custom-checkbox:hover input ~ .checkmark {
+    border-color: var(--primary); /* 테두리 색상: 마우스 오버 시 브랜드 컬러로 강조 */
+}
+
+/* 커스텀 원형 체크 마크 (체크된 상태) */
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: var(--primary); /* 배경색: 체크 시 브랜드 컬러로 채움 */
+    border-color: var(--primary); /* 테두리 색상: 동일한 브랜드 컬러로 적용 */
+}
+
+/* 커스텀 원형 체크 마크 내부의 V자 표시 (가상 요소) */
+.checkmark:after {
+    content: ""; /* 내용: 빈 콘텐츠를 생성하여 도형으로 활용 */
+    position: absolute; /* 위치: 부모(.checkmark)를 기준으로 절대 좌표 배치 */
+    display: none; /* 표시 상태: 기본적으로는 숨김 처리 */
+    left: 7px; /* 좌측 위치: 중앙 배치를 위한 미세 조정 */
+    top: 3px; /* 상단 위치: 중앙 배치를 위한 미세 조정 */
+    width: 4px; /* 너비: V자의 짧은 선 길이 */
+    height: 9px; /* 높이: V자의 긴 선 길이 */
+    border: solid white; /* 테두리: 흰색 실선 지정 */
+    border-width: 0 2px 2px 0; /* 테두리 두께: 우측과 하단에만 2px 두께 적용 (L자 형태) */
+    transform: rotate(45deg); /* 회전: L자 형태를 45도 돌려 V자 모양으로 시각화 */
+}
+
+/* 체크된 상태일 때 내부 V자 표시 활성화 */
+.custom-checkbox input:checked ~ .checkmark:after {
+    display: block; /* 표시 상태: 체크 시 가상 요소를 화면에 노출 */
+}
+
+/* 체크된 상태일 때 옆의 텍스트 색상 변경 */
+.custom-checkbox input:checked ~ .text {
+    color: var(--primary); /* 글자색: 시각적 피드백을 위해 브랜드 컬러로 변경 */
+    font-weight: 600; /* 글꼴 두께: 텍스트를 약간 두껍게 처리하여 강조 */
+}
+
+/* =========================================
+   4. [Account] 로그인 버튼 및 유틸리티 (Buttons & Utility)
+   ========================================= */
+
+/* 메인 로그인 제출 버튼 */
+.btn-login {
+    width: 100%; /* 너비: 폼 영역에 꽉 차게 확장 */
+    padding: 16px; /* 내부 여백: 터치 및 클릭하기 쉽도록 상하좌우 16px 넉넉히 지정 */
+    background-color: var(--primary); /* 배경색: 브랜드 아이덴티티를 나타내는 프라이머리 컬러 */
+    color: white; /* 글자색: 배경과 대비되는 흰색 적용 */
+    font-size: 16px; /* 글꼴 크기: 버튼 텍스트 가독성 확보 */
+    font-weight: 700; /* 글꼴 두께: 행동 유도를 위한 볼드 처리 */
+    border: none; /* 테두리 선: 기본 외곽선 제거 */
+    border-radius: 8px; /* 테두리 둥글기: 8px 둥근 모서리 적용 */
+    cursor: pointer; /* 마우스 커서: 클릭 가능한 버튼임을 명시 */
+    transition: filter 0.2s; /* 애니메이션: 마우스 오버 시 밝기 변화 효과 적용 */
+}
+
+/* 메인 로그인 버튼 호버 상태 */
+.btn-login:hover {
+    filter: brightness(1.1); /* 필터: 마우스를 올렸을 때 색상을 10% 더 밝게 처리 */
+}
+
+/* 계정 찾기 및 회원가입 링크 컨테이너 */
+.login-utility {
+    display: flex; /* 레이아웃: 양끝 배치를 위해 플렉스박스 사용 */
+    justify-content: space-between; /* 가로 정렬: 양쪽 끝으로 요소 분산 배치 */
+    align-items: center; /* 세로 정렬: 수직 중앙 맞춤 */
+    margin-top: 20px; /* 외부 여백: 로그인 버튼 하단과의 간격 20px */
+    font-size: 13px; /* 글꼴 크기: 부가적인 정보이므로 작게 13px 설정 */
+    color: var(--muted); /* 글자색: 덜 강조되는 옅은 색상 사용 */
+}
+
+/* 아이디/비밀번호 찾기 링크 래퍼 */
+.find-links {
+    display: flex; /* 레이아웃: 하위 요소 정렬 목적 */
+    align-items: center; /* 세로 정렬: 수직 중앙 맞춤 */
+}
+
+/* 유틸리티 영역 내 하이퍼링크 공통 속성 */
+.find-links a,
+.link-register {
+    color: var(--muted); /* 글자색: 기본 텍스트보다 옅은 색상 적용 */
+    text-decoration: none; /* 밑줄: 기본 링크 밑줄 제거 */
+    transition: color 0.2s; /* 애니메이션: 마우스 호버 시 색상 전환 효과 */
+}
+
+/* 유틸리티 링크 호버 상태 */
+.find-links a:hover,
+.link-register:hover {
+    color: var(--text); /* 글자색: 호버 시 일반 텍스트 색상으로 진하게 변경 */
+    text-decoration: underline; /* 밑줄: 호버 시 클릭 가능함을 알리기 위해 밑줄 생성 */
+}
+
+/* =========================================
+   5. [Account] 소셜 로그인 (Social Login)
+   ========================================= */
+
+/* 소셜 로그인 전체 래퍼 */
+.social-login-wrap {
+    margin-top: 50px; /* 외부 여백: 위쪽 폼 영역과 멀리 띄워 구분감 제공 (50px) */
+    text-align: center; /* 텍스트 정렬: 라벨 및 내부 요소 중앙 정렬 */
+    border-top: 1px solid var(--line); /* 테두리 선: 상단에 가로 구분선 추가 */
+    padding-top: 15px; /* 내부 여백: 구분선과 텍스트 사이의 간격 지정 */
+}
+
+/* 소셜 로그인 상단 안내 텍스트 */
+.social-label {
+    display: block; /* 디스플레이: 한 줄을 온전히 차지하도록 블록 요소로 변경 */
+    font-size: 13px; /* 글꼴 크기: 부가 설명이므로 13px 적용 */
+    color: var(--muted); /* 글자색: 안내 문구 전용 옅은 색상 */
+    margin-bottom: 24px; /* 외부 여백: 하단 아이콘 버튼들과의 간격 확보 */
+    background: transparent; /* 배경색: 투명 처리 */
+    position: static; /* 위치: 기존 포지셔닝 속성 초기화 */
+    transform: none; /* 변형: 기존 변형(Transform) 속성 초기화 */
+}
+
+/* 소셜 버튼들을 감싸는 컨테이너 */
+.social-buttons {
+    display: flex; /* 레이아웃: 버튼들을 가로로 나열 */
+    justify-content: center; /* 가로 정렬: 중앙 배치 */
+    gap: 16px; /* 간격: 각 소셜 버튼 사이 16px 여백 생성 */
+}
+
+/* 개별 소셜 로그인 원형 버튼 공통 */
+.btn-social {
+    width: 48px; /* 너비: 터치하기 좋은 48px 크기 지정 */
+    height: 48px; /* 높이: 48px 지정하여 1:1 비율 유지 */
+    border-radius: 50%; /* 테두리 둥글기: 완벽한 원형 형태 유지 */
+    border: none; /* 테두리 선: 기본 외곽선 제거 */
+    cursor: pointer; /* 마우스 커서: 포인터로 변경하여 버튼임을 인지시킴 */
+    display: flex; /* 레이아웃: 내부 SVG 아이콘 정렬을 위한 플렉스박스 */
+    align-items: center; /* 세로 정렬: 내부 아이콘 수직 중앙 */
+    justify-content: center; /* 가로 정렬: 내부 아이콘 수평 중앙 */
+    transition: transform 0.2s, filter 0.2s, box-shadow 0.2s; /* 애니메이션: 클릭 및 호버 효과 부드럽게 적용 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* 그림자: 아이콘이 약간 떠 있는 듯한 입체감 제공 */
+}
+
+/* 소셜 버튼 내부 SVG 아이콘 */
+.btn-social svg {
+    display: block; /* 디스플레이: 인라인 요소의 하단 여백 버그를 방지하기 위해 블록 처리 */
+}
+
+/* 네이버 버튼 내부 SVG 미세 조정 */
+.btn-social.naver svg {
+    transform: translateY(1px); /* 변형: 네이버 로고의 시각적 무게 중심을 맞추기 위해 1px 아래로 이동 */
+}
+
+/* 소셜 버튼 호버 상태 애니메이션 */
+.btn-social:hover {
+    transform: translateY(-3px); /* 변형: 마우스를 올리면 버튼이 위로 3px 떠오르는 효과 */
+    filter: brightness(0.95); /* 필터: 색상을 약간 어둡게 처리하여 눌리는 느낌 제공 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자: 호버 시 그림자를 넓게 퍼트려 깊이감 추가 */
+}
+
+/* 브랜드별 아이콘 고유 색상 설정 */
+.btn-social.kakao {
+    background-color: #FEE500; /* 배경색: 카카오 브랜드 고유 노란색 */
+    color: #3C1E1E; /* 글자색(아이콘색): 카카오 로고 고유 갈색 */
+}
+
+.btn-social.naver {
+    background-color: #03C75A; /* 배경색: 네이버 브랜드 고유 초록색 */
+    color: #fff; /* 글자색(아이콘색): 흰색 텍스트 적용 */
+}
+
+.btn-social.google {
+    background-color: #fff; /* 배경색: 구글 버튼은 흰색 바탕 사용 */
+    border: 1px solid var(--line); /* 테두리 선: 배경과 분리하기 위한 얇은 라인 추가 */
+    color: #4285F4; /* 글자색(아이콘색): 구글 브랜드 파란색 적용 */
+}
+
+.btn-social.apple {
+    background-color: #000; /* 배경색: 애플 브랜드 고유 검은색 */
+    color: #fff; /* 글자색(아이콘색): 흰색 로고 적용 */
+}
+
+/* 소셜 버튼 다크모드 대응 (애플 버튼 반전) */
+html[data-theme="dark"] .btn-social.apple {
+    background-color: #fff; /* 배경색: 다크모드 시 애플 버튼 배경을 흰색으로 변경 */
+    color: #000; /* 글자색(아이콘색): 다크모드 시 애플 로고를 검은색으로 변경 */
+}

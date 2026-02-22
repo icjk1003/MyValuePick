@@ -1,8 +1,6 @@
-/* kr/shared/js/mypage/mypage-info.js */
-
 /**
  * [My Page Info Module]
- * 내 정보 수정, 프로필 이미지 변경, 회원 탈퇴 기능을 관리하는 모듈 (비동기 DB_API 연동 완료)
+ * 내 정보 수정, 프로필 이미지 변경, 회원 탈퇴 기능을 관리하는 모듈
  * 의존성: Cropper.js (이미지 자르기 라이브러리)
  */
 class MyPageInfoManager {
@@ -48,36 +46,23 @@ class MyPageInfoManager {
         this.bindEvents();
     }
 
-    // [변경] 비동기 API 통신으로 사용자 최신 정보 로드
-    async loadUserInfo() {
-        const userId = localStorage.getItem("user_id");
-        if (!userId) return;
+    // 1. 사용자 정보 로드 및 표시
+    loadUserInfo() {
+        const myNick = localStorage.getItem("user_nick");
+        const myEmail = localStorage.getItem("user_email");
+        let myBio = localStorage.getItem("user_bio");
 
-        try {
-            // DB에서 최신 회원정보 조회
-            const user = await DB_API.getUserProfile(userId);
-            
-            // 기본값 처리
-            let myBio = user.bio;
-            if (!myBio) {
-                myBio = `안녕하세요. ${user.nickname}입니다.`;
-            }
-
-            if (this.els.emailInput) this.els.emailInput.value = user.email || "";
-            if (this.els.nickInput) this.els.nickInput.value = user.nickname || "";
-            if (this.els.bioInput) this.els.bioInput.value = myBio;
-
-            // 로컬 스토리지 동기화
-            localStorage.setItem("user_nick", user.nickname);
+        if (!myBio) {
+            myBio = `안녕하세요. ${myNick}입니다.`;
             localStorage.setItem("user_bio", myBio);
-
-        } catch (error) {
-            console.error("회원 정보 로딩 실패:", error);
-            alert("회원 정보를 불러오지 못했습니다.");
         }
+
+        if (this.els.emailInput) this.els.emailInput.value = myEmail || "";
+        if (this.els.nickInput) this.els.nickInput.value = myNick || "";
+        if (this.els.bioInput) this.els.bioInput.value = myBio;
     }
 
-    // 이벤트 바인딩 통합
+    // 2. 이벤트 바인딩 통합
     bindEvents() {
         // 닉네임 실시간 체크
         if (this.els.nickInput) {
@@ -111,7 +96,7 @@ class MyPageInfoManager {
 
     /* ================= Logic Methods ================= */
 
-    // [Logic] 닉네임 유효성 검사 (프론트엔드 단)
+    // [Logic] 닉네임 유효성 검사
     handleNickCheck() {
         const val = this.els.nickInput.value.trim();
         const currentNick = localStorage.getItem("user_nick");
@@ -129,8 +114,6 @@ class MyPageInfoManager {
             this.setMsg(msg, "닉네임은 2~10자여야 합니다.", "error");
             return;
         }
-        
-        // Mock 환경에서의 중복 체크 (실제 환경에선 API 호출 필요)
         if (this.checkNicknameDuplicate(val)) {
             this.setMsg(msg, "이미 사용 중인 닉네임입니다.", "error");
         } else {
@@ -155,10 +138,11 @@ class MyPageInfoManager {
         if (pw !== pwCheck) {
             this.setMsg(msg, "비밀번호가 일치하지 않습니다.", "error");
         } else {
-            if (pw.length < 4) {
-                this.setMsg(msg, "비밀번호가 너무 짧습니다 (4자 이상).", "error");
+            // 변경됨: 비밀번호 최소 8자, 최대 64자 제한 (실시간 검사)
+            if (pw.length < 8 || pw.length > 64) {
+                this.setMsg(msg, "비밀번호는 8자 이상, 64자 이하로 설정해주세요.", "error");
             } else {
-                this.setMsg(msg, "비밀번호가 일치합니다.", "success");
+                this.setMsg(msg, "비밀번호가 안전하게 일치합니다.", "success");
             }
         }
     }
@@ -198,55 +182,42 @@ class MyPageInfoManager {
         }
     }
 
-    // [변경] 자기소개 개별 저장 (비동기 DB 업데이트)
-    async saveBio() {
+    // [Logic] 자기소개 저장 (개별 저장)
+    saveBio() {
         const newBio = this.els.bioInput.value.trim();
         if (!newBio) {
             alert("자기소개글을 입력해주세요.");
             return;
         }
+        localStorage.setItem("user_bio", newBio);
+        
+        // UI 모드 변경 (저장 상태로)
+        this.els.bioInput.dataset.original = newBio; // 원본 업데이트
+        
+        this.els.bioInput.readOnly = true;
+        this.els.bioInput.classList.add("input-readonly");
+        this.els.bioInput.classList.remove("editable");
+        
+        this.els.btnEditBio.classList.remove("hidden");
+        this.els.btnSaveBio.classList.add("hidden");
+        this.els.btnCancelBio.classList.add("hidden");
 
-        const userId = localStorage.getItem("user_id");
-        if (!userId) return;
-
-        try {
-            // DB_API를 통해 정보 업데이트
-            await DB_API.updateUserProfile(userId, { bio: newBio });
-
-            localStorage.setItem("user_bio", newBio);
-            
-            // UI 모드 변경 (저장 상태로)
-            this.els.bioInput.dataset.original = newBio;
-            this.els.bioInput.readOnly = true;
-            this.els.bioInput.classList.add("input-readonly");
-            this.els.bioInput.classList.remove("editable");
-            
-            this.els.btnEditBio.classList.remove("hidden");
-            this.els.btnSaveBio.classList.add("hidden");
-            this.els.btnCancelBio.classList.add("hidden");
-
-        } catch (error) {
-            console.error("자기소개 저장 실패:", error);
-            alert("자기소개를 저장하지 못했습니다.");
-        }
+        // alert("자기소개가 저장되었습니다."); // 필요 시 주석 해제
     }
 
-    // [변경] 닉네임 및 비밀번호 등 전체 정보 저장 (비동기 DB 업데이트)
-    async saveAllInfo() {
-        const userId = localStorage.getItem("user_id");
-        if (!userId) return;
-
+    // [Logic] 전체 정보 저장
+    saveAllInfo() {
         const newNick = this.els.nickInput.value.trim();
         const currentNick = localStorage.getItem("user_nick");
         const newPw = this.els.pwInput.value;
         const newPwCheck = this.els.pwCheckInput.value;
 
-        const updateData = {};
-
         // 1. 비밀번호 검증
         if (newPw !== "") {
-            if (newPw.length < 4) {
-                alert("비밀번호는 최소 4자 이상이어야 합니다.");
+            // 변경됨: 비밀번호 최소 8자, 최대 64자 제한 (저장 시 검증)
+            if (newPw.length < 8 || newPw.length > 64) {
+                alert("비밀번호는 8자 이상 64자 이하로 설정해야 합니다.");
+                this.els.pwInput.focus();
                 return;
             }
             if (newPw !== newPwCheck) {
@@ -254,10 +225,10 @@ class MyPageInfoManager {
                 this.els.pwCheckInput.focus();
                 return;
             }
-            updateData.password = newPw;
+            // TODO: 실제로는 API로 비밀번호 변경 요청을 보내야 함
         }
 
-        // 2. 닉네임 검증
+        // 2. 닉네임 검증 및 변경
         if (newNick !== currentNick) {
             if (newNick.length < 2 || newNick.length > 10) {
                 alert("닉네임은 2자 이상 10자 이하로 설정해주세요.");
@@ -267,42 +238,23 @@ class MyPageInfoManager {
                 alert("이미 사용 중인 닉네임입니다.");
                 return;
             }
-            updateData.nickname = newNick;
+            
+            // 게시글/댓글 작성자명 업데이트 (Mock Data 처리)
+            this.updateUserContentNickname(currentNick, newNick);
+            localStorage.setItem("user_nick", newNick);
         }
 
-        // 변경 사항이 없으면 중단
-        if (Object.keys(updateData).length === 0) {
-            alert("수정된 정보가 없습니다.");
-            return;
-        }
-
-        try {
-            // DB_API 호출하여 회원정보 갱신
-            await DB_API.updateUserProfile(userId, updateData);
-
-            // 로컬 상태 동기화 및 부가 처리
-            if (updateData.nickname) {
-                localStorage.setItem("user_nick", newNick);
-                this.updateUserContentNickname(currentNick, newNick); // 기존 글 작성자명 동기화 (Mock용)
-            }
-
-            alert("회원 정보가 성공적으로 수정되었습니다.");
-            location.reload();
-
-        } catch (error) {
-            console.error("정보 저장 실패:", error);
-            alert("정보를 수정하는 데 실패했습니다.");
-        }
+        alert("회원 정보가 수정되었습니다.");
+        location.reload();
     }
 
     // [Logic] 회원 탈퇴
     handleWithdrawal() {
         if (!confirm("정말로 탈퇴하시겠습니까?\n탈퇴 시 모든 데이터가 삭제될 수 있습니다.")) return;
         
-        // 실제 운영 환경에서는 await DB_API.deleteUser(userId)를 호출해야 함
         localStorage.clear();
         alert("탈퇴되었습니다. 메인 화면으로 이동합니다.");
-        location.replace("/kr/html/home.html");
+        location.replace("home.html");
     }
 
     /* ================= Image Cropper Logic ================= */
@@ -337,43 +289,41 @@ class MyPageInfoManager {
         }
     }
 
-    // [변경] 크롭한 프로필 이미지를 비동기로 DB에 업데이트
-    async confirmCrop() {
+    confirmCrop() {
         if (!this.cropper) return;
         
-        // 캔버스 추출 (base64 인코딩)
+        // 캔버스 추출
         const canvas = this.cropper.getCroppedCanvas({ width: 300, height: 300 });
         const croppedBase64 = canvas.toDataURL("image/png");
-        const userId = localStorage.getItem("user_id");
 
-        try {
-            // DB_API로 이미지 업데이트
-            await DB_API.updateUserProfile(userId, { profileImg: croppedBase64 });
-            
-            // 로컬 캐시 갱신
-            localStorage.setItem("user_profile_img", croppedBase64);
-            
-            // UI 실시간 렌더링
-            if (this.els.profileImg) {
-                this.els.profileImg.src = croppedBase64;
-            }
-            
-            this.closeCropModal();
-        } catch (error) {
-            console.error("프로필 이미지 변경 실패:", error);
-            alert("이미지를 변경하지 못했습니다.");
+        // 저장 (Mock)
+        localStorage.setItem("user_img", croppedBase64);
+        
+        // UI 업데이트
+        if (this.els.profileImg) {
+            this.els.profileImg.src = croppedBase64;
         }
+        
+        this.closeCropModal();
     }
 
     /* ================= Mock Data Helpers ================= */
     
-    // 이 부분은 나중에 서버에서 SELECT 쿼리나 API 단에서 처리하게 됨
     checkNicknameDuplicate(targetNick) {
-        if (typeof MOCK_DB === 'undefined' || !MOCK_DB.USERS) return false;
-        return MOCK_DB.USERS.some(u => u.nickname === targetNick);
+        if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
+        
+        // 모든 작성자 수집
+        const allWriters = new Set();
+        MOCK_DB.POSTS.forEach(p => {
+            allWriters.add(p.writer);
+            if(p.commentList) {
+                p.commentList.forEach(c => allWriters.add(c.writer));
+            }
+        });
+        
+        return allWriters.has(targetNick);
     }
 
-    // NoSQL(Firebase 등)에서 역정규화된 작성자 닉네임을 일괄 업데이트하는 로직 시뮬레이션
     updateUserContentNickname(oldNick, newNick) {
         if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return;
         
@@ -394,14 +344,11 @@ class MyPageInfoManager {
         });
         
         if (updateCount > 0) {
-            // Mock DB 강제 동기화 (DB_API._commit() 접근)
-            if (typeof DB_API !== 'undefined' && DB_API._commit) {
-                DB_API._commit();
-            }
+            localStorage.setItem("MOCK_POSTS_V3", JSON.stringify(MOCK_DB.POSTS));
         }
     }
 }
 
 // [모듈 실행]
-// 전역 인스턴스 할당 (mypage.js 등 타 스크립트에서 접근 가능하도록)
+// 전역 인스턴스 할당 (mypage.js에서 사용 가능하도록)
 window.MyPageInfoManager = new MyPageInfoManager();

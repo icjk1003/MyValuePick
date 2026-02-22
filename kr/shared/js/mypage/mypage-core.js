@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = localStorage.getItem("user_id");
     if (!userId) {
         alert("로그인이 필요합니다.");
-        location.replace("/kr/html/login.html");
+        location.replace("/kr/html/account/account-login.html");
         return;
     }
 

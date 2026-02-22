@@ -65,7 +65,7 @@ function renderHeader() {
                         </div>
                     </div>
 
-                    <a href="/kr/html/login.html" id="btnLogin" style="font-size:14px; font-weight:600; color:var(--muted); text-decoration:none;">로그인</a>
+                    <a href="/kr/html/account/account-login.html" id="btnLogin" style="font-size:14px; font-weight:600; color:var(--muted); text-decoration:none;">로그인</a>
                 </div>
 
             </div>
@@ -153,7 +153,7 @@ function wireLoginState() {
     } else {
         // 비로그인 상태: 로그인 버튼 표시 및 기능 초기화
         btnLogin.textContent = "로그인";
-        btnLogin.href = "/kr/html/login.html";
+        btnLogin.href = "/kr/html/account/account-login.html";
         btnLogin.onclick = null;
 
         if (notiBtn) {

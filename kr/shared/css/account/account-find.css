@@ -1,0 +1,209 @@
+/* =========================================
+   1. [Account] 계정 찾기 레이아웃 (Layout)
+   ========================================= */
+
+/* 계정 찾기 페이지 전체 래퍼 (Wrapper) */
+.find-wrap {
+    display: flex; /* 레이아웃: 내부 요소 배치를 위해 플렉스박스 적용 */
+    justify-content: center; /* 가로 정렬: 카드 컨테이너를 중앙에 배치 */
+    align-items: flex-start; /* 세로 정렬: 탭 전환 시 화면 들썩거림을 방지하기 위해 위치를 상단으로 고정 */
+    min-height: calc(100vh - 140px); /* 최소 높이: 헤더와 푸터 영역을 제외한 화면 전체 높이 확보 */
+    background-color: var(--bg); /* 배경색: 테마 공통 배경 변수 적용 */
+    padding: 10vh 20px 20px; /* 내부 여백: 상단에서 10vh 띄워 시작 위치를 항상 동일하게 유지, 좌우/하단 여백 20px */
+    box-sizing: border-box; /* 크기 계산: 패딩을 너비/높이에 포함시켜 레이아웃 깨짐 방지 */
+}
+
+/* 계정 찾기 폼 카드 컨테이너 */
+.find-card {
+    width: 400px; /* 너비: 모바일 및 데스크탑에서 일정한 너비를 유지하도록 400px 고정 */
+    min-height: 440px; /* 최소 높이: 탭별 콘텐츠나 결과창 출력 시 박스 크기가 변하는 현상 방지 */
+    background: var(--surface); /* 배경색: 카드형 컴포넌트용 테마 표면 색상 적용 */
+    padding: 40px 30px; /* 내부 여백: 넉넉한 상하/좌우 여백으로 시각적 안정감 제공 */
+    border-radius: 16px; /* 테두리 둥글기: 모던한 UI를 위해 16px 적용 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* 그림자: 입체감을 위한 부드러운 그림자 추가 */
+    border: 1px solid var(--line); /* 테두리 선: 옅은 선으로 배경과 카드를 명확히 분리 */
+    text-align: center; /* 텍스트 정렬: 카드 내부의 텍스트 요소들을 기본 중앙 정렬 */
+}
+
+/* 계정 찾기 폼 최상단 타이틀 */
+.page-title {
+    margin: 0 0 30px; /* 외부 여백: 하단에만 30px 간격을 주어 탭 영역과 분리 */
+    font-size: 24px; /* 글꼴 크기: 페이지 명칭을 명확히 알리기 위해 24px 설정 */
+    font-weight: 700; /* 글꼴 두께: 타이틀 강조를 위해 볼드 처리 */
+    color: var(--text); /* 글자색: 테마 기본 텍스트 색상 적용 */
+}
+
+/* =========================================
+   2. [Account] 탭 메뉴 (Tabs)
+   ========================================= */
+
+/* 아이디/비밀번호 찾기 탭 영역 */
+.find-tabs {
+    display: flex; /* 레이아웃: 탭 버튼들을 가로로 나란히 배치 */
+    border-bottom: 2px solid var(--line); /* 하단 테두리: 탭 메뉴 전체의 기준선 역할 */
+    margin-bottom: 30px; /* 외부 여백: 하단 콘텐츠와의 간격 30px 확보 */
+}
+
+/* 개별 탭 버튼 */
+.tab-btn {
+    flex: 1; /* 플렉스 비율: 모든 탭 버튼이 동일한 너비를 가지도록 1:1 비율 분배 */
+    padding: 12px; /* 내부 여백: 터치 및 클릭 영역 확보를 위해 12px 적용 */
+    background: none; /* 배경색: 기본 배경색 제거 */
+    border: none; /* 테두리: 기본 외곽선 제거 */
+    font-size: 15px; /* 글꼴 크기: 가독성을 위해 15px 지정 */
+    font-weight: 600; /* 글꼴 두께: 세미볼드 처리로 명확성 확보 */
+    color: var(--muted); /* 글자색: 비활성화 상태임을 나타내는 옅은 텍스트 색상 */
+    cursor: pointer; /* 마우스 커서: 클릭 가능한 버튼임을 명시 */
+    position: relative; /* 위치: 활성화(active) 시 테두리를 겹치게 하기 위한 기준점 */
+    top: 2px; /* 상단 위치: 부모의 하단 선(border-bottom)을 덮기 위해 2px 아래로 이동 */
+}
+
+/* 활성화된 탭 버튼 상태 */
+.tab-btn.active {
+    color: var(--primary); /* 글자색: 선택된 탭임을 알리기 위해 브랜드 컬러 적용 */
+    border-bottom: 2px solid var(--primary); /* 하단 테두리: 선택된 탭을 시각적으로 강조 */
+}
+
+/* =========================================
+   3. [Account] 콘텐츠 및 폼 (Content & Form)
+   ========================================= */
+
+/* 탭별 전환되는 콘텐츠 영역 (기본 숨김) */
+.find-content {
+    display: none; /* 표시 상태: 기본적으로 화면에 보이지 않도록 숨김 */
+    animation: fadeIn 0.3s ease; /* 애니메이션: 화면 전환 시 부드럽게 나타나는 페이드인 효과 */
+}
+
+/* 활성화된 콘텐츠 영역 (화면 노출) */
+.find-content.active {
+    display: block; /* 표시 상태: active 클래스가 붙으면 블록 요소로 화면에 렌더링 */
+}
+
+/* 콘텐츠 전환 페이드인 애니메이션 키프레임 */
+@keyframes fadeIn {
+    from {
+        opacity: 0; /* 투명도: 완전히 투명한 상태에서 시작 */
+        transform: translateY(5px); /* 변형: 아래로 5px 내려가 있는 위치에서 시작 */
+    }
+    to {
+        opacity: 1; /* 투명도: 완전히 불투명한 상태로 전환 */
+        transform: translateY(0); /* 변형: 원래 위치(0)로 돌아옴 */
+    }
+}
+
+/* 폼 상단 안내 텍스트 */
+.guide-text {
+    font-size: 14px; /* 글꼴 크기: 부가 설명이므로 14px 적용 */
+    color: var(--muted); /* 글자색: 덜 강조되는 옅은 색상 사용 */
+    margin-bottom: 24px; /* 외부 여백: 하단 입력창 영역과의 간격 24px 확보 */
+    line-height: 1.5; /* 줄 간격: 두 줄 이상일 때 가독성을 위해 1.5배 적용 */
+}
+
+/* 입력 필드 그룹 래퍼 */
+.input-group {
+    display: flex; /* 레이아웃: 입력 필드 정렬을 위해 플렉스박스 사용 */
+    flex-direction: column; /* 정렬 방향: 인풋창들을 세로로 배치 */
+    gap: 12px; /* 간격: 여러 개의 인풋창이 있을 경우 사이 간격 12px 유지 */
+    margin-bottom: 24px; /* 외부 여백: 하단 제출 버튼과의 간격 24px 확보 */
+}
+
+/* 계정 찾기용 텍스트/이메일 입력 필드 */
+.input-group input {
+    width: 100%; /* 너비: 폼 영역에 꽉 차도록 100% 적용 */
+    padding: 14px; /* 내부 여백: 입력 시 답답하지 않도록 14px 넉넉하게 적용 */
+    border: 1px solid var(--line); /* 테두리 선: 테마 라인 색상으로 구분선 처리 */
+    border-radius: 8px; /* 테두리 둥글기: 8px 지정으로 부드러운 형태 생성 */
+    background: var(--bg); /* 배경색: 입력 필드 전용 배경색 적용 */
+    font-size: 15px; /* 글꼴 크기: 텍스트 입력 시 가독성을 위한 15px 지정 */
+    color: var(--text); /* 글자색: 입력되는 텍스트 색상 */
+    outline: none; /* 외곽선: 기본 포커스 아웃라인 제거 */
+    transition: 0.2s; /* 애니메이션: 포커스 시 부드러운 전환 효과 */
+    box-sizing: border-box; /* 크기 계산: 패딩을 너비에 포함시켜 100%가 넘치지 않게 방지 */
+}
+
+/* 텍스트 입력 필드 활성화(포커스) 상태 */
+.input-group input:focus {
+    border-color: var(--primary); /* 테두리 색상: 활성화 시 브랜드 컬러로 강조 */
+    background: var(--surface); /* 배경색: 눈에 잘 띄도록 밝은 표면 색상으로 변경 */
+}
+
+/* 조회 및 이메일 발송 제출 버튼 */
+.btn-submit {
+    width: 100%; /* 너비: 영역 하단에 꽉 차게 100% 적용 */
+    padding: 14px; /* 내부 여백: 터치 영역 확보를 위해 14px 적용 */
+    background: var(--primary); /* 배경색: 주요 액션이므로 프라이머리 컬러 사용 */
+    color: white; /* 글자색: 배경과 대비되는 흰색 지정 */
+    border: none; /* 테두리 선: 외곽선 제거 */
+    border-radius: 8px; /* 테두리 둥글기: 입력 필드와 동일한 8px 둥글기 적용 */
+    font-size: 16px; /* 글꼴 크기: 버튼 강조를 위해 16px 지정 */
+    font-weight: 700; /* 글꼴 두께: 볼드 처리로 시인성 향상 */
+    cursor: pointer; /* 마우스 커서: 클릭 가능함을 명시 */
+    transition: 0.2s; /* 애니메이션: 호버 효과 시 부드러운 전환 */
+}
+
+/* 제출 버튼 마우스 호버 상태 */
+.btn-submit:hover {
+    filter: brightness(1.1); /* 필터: 마우스를 올리면 10% 더 밝아지는 시각적 피드백 제공 */
+}
+
+/* =========================================
+   4. [Account] 결과 출력 (Result Box)
+   ========================================= */
+
+/* 아이디/비밀번호 찾기 완료 시 보여지는 결과 박스 */
+.result-box {
+    margin-top: 30px; /* 외부 여백: 상단 폼과의 분리를 위해 30px 간격 지정 */
+    padding: 24px; /* 내부 여백: 내용물이 답답해 보이지 않도록 24px 지정 */
+    background: var(--surface-hover); /* 배경색: 구분감을 주기 위해 약간 어두운 호버 배경색 사용 */
+    border-radius: 12px; /* 테두리 둥글기: 12px 지정 */
+    border: 1px solid var(--line); /* 테두리 선: 옅은 구분선 적용 */
+}
+
+/* 결과 메인 안내 메시지 */
+.result-msg {
+    font-size: 16px; /* 글꼴 크기: 결과를 명확하게 알리기 위해 16px 적용 */
+    color: var(--text); /* 글자색: 기본 텍스트 색상 */
+    line-height: 1.6; /* 줄 간격: 두 줄 이상 출력될 경우 가독성을 위해 1.6배 적용 */
+    margin-bottom: 16px; /* 외부 여백: 하단 서브 메시지와의 간격 확보 */
+}
+
+/* 결과 부가 안내 메시지 (비밀번호 변경 권장 등) */
+.sub-msg {
+    font-size: 13px; /* 글꼴 크기: 부가 설명이므로 작은 13px 적용 */
+    color: var(--muted); /* 글자색: 덜 강조되는 옅은 텍스트 색상 적용 */
+    margin-bottom: 20px; /* 외부 여백: 하단 로그인 링크 버튼과의 간격 확보 */
+}
+
+/* 찾은 아이디나 중요 단어 하이라이트 표시 */
+.highlight-text {
+    color: var(--primary); /* 글자색: 브랜드 컬러를 적용하여 눈에 띄게 강조 */
+    font-weight: 700; /* 글꼴 두께: 볼드 처리 */
+    font-size: 18px; /* 글꼴 크기: 일반 텍스트보다 살짝 크게(18px) 하여 강조 */
+}
+
+/* 결과창 하단 로그인 페이지 이동 링크 버튼 */
+.btn-link {
+    display: inline-block; /* 디스플레이: 링크(a) 태그를 버튼 형태의 블록처럼 취급 */
+    padding: 10px 20px; /* 내부 여백: 상하 10px, 좌우 20px로 버튼 모양 형성 */
+    background: var(--text); /* 배경색: 검정(텍스트 색상) 바탕으로 무거운 느낌의 버튼 생성 */
+    color: var(--surface); /* 글자색: 바탕색(표면색)을 텍스트 색으로 반전시켜 사용 */
+    text-decoration: none; /* 밑줄: 기본 링크 하단선 제거 */
+    border-radius: 6px; /* 테두리 둥글기: 약간 둥근 6px 적용 */
+    font-size: 14px; /* 글꼴 크기: 14px 적용 */
+    font-weight: 600; /* 글꼴 두께: 세미볼드 처리 */
+    transition: 0.2s; /* 애니메이션: 마우스 호버 시 부드러운 변화 적용 */
+}
+
+/* 링크 버튼 마우스 호버 상태 */
+.btn-link:hover {
+    opacity: 0.9; /* 투명도: 호버 시 약간 투명하게 만들어 클릭 유도 */
+}
+
+/* =========================================
+   5. [Account] 유틸리티 (Utility)
+   ========================================= */
+
+/* 범용 숨김 처리 클래스 */
+.hidden {
+    display: none; /* 표시 상태: JS 로직 제어 시 요소를 화면과 DOM 흐름에서 완전히 제거 */
+}

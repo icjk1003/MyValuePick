@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 · MyValuePick</title>
+  
+  <script src="/kr/shared/js/common/common-theme.js"></script>
+  <link rel="stylesheet" href="/kr/shared/css/common/common.css">
+  
+  <link rel="stylesheet" href="/kr/shared/css/account/account-register.css">
+</head>
+<body>
+
+  <div id="global-header"></div>
+
+  <main class="register-wrap">
+    <div class="register-card">
+      <h1 class="register-title">회원가입</h1>
+      
+      <form class="register-form">
+        
+        <div class="input-group">
+          <label>아이디</label>
+          <input type="text" id="regId" placeholder="아이디" required>
+          <p id="idCheckMsg" class="msg-mini"></p>
+        </div>
+
+        <div class="input-group">
+          <label>닉네임</label>
+          <input type="text" id="regNick" placeholder="닉네임 (2~10자)" required>
+          <p id="nickCheckMsg" class="msg-mini"></p>
+        </div>
+
+        <div class="input-group">
+          <label>비밀번호</label>
+          <input type="password" id="regPw" placeholder="비밀번호 (8~64자)" maxlength="64" required>
+          <p id="pwCheckMsg" class="msg-mini"></p> 
+        </div>
+
+        <div class="input-group">
+          <label>비밀번호 확인</label>
+          <input type="password" id="regPwCheck" placeholder="비밀번호 재입력" maxlength="64" required>
+          <p id="pwCheckMsgConfirm" class="msg-mini"></p> 
+        </div>
+
+        <button type="submit" class="btn-register">가입하기</button>
+        
+        <div class="register-utility">
+            <span>이미 계정이 있으신가요?</span>
+            <a href="/kr/html/account/account-login.html" class="link-login">로그인</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <div id="global-footer"></div>
+
+  <script src="/kr/shared/js/common/common-utils.js"></script>
+  <script src="/kr/shared/js/common/common-noti.js"></script>
+  <script src="/kr/shared/js/common/common-layout.js"></script>
+  <script src="/kr/shared/js/common/common-modal.js"></script>
+  <script src="/kr/shared/js/data.js"></script>
+
+  <script src="/kr/shared/js/account/account-auth.js"></script>
+  
+  <script src="/kr/shared/js/account/account-register.js"></script>
+</body>
+</html>
