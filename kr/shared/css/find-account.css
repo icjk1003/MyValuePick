@@ -3,14 +3,19 @@
 .find-wrap {
     display: flex;
     justify-content: center;
-    align-items: center;
+    /* 탭 전환 시 수직 중앙 정렬로 인한 화면 들썩거림을 방지하기 위해 위치 상단 고정 */
+    align-items: flex-start; 
     min-height: calc(100vh - 140px); /* 헤더,푸터 제외 중앙 정렬 */
     background-color: var(--bg);
-    padding: 20px;
+    /* 화면 위에서부터 일정 비율(10vh) 띄워 시작 위치를 항상 동일하게 만듦 */
+    padding: 10vh 20px 20px; 
+    box-sizing: border-box;
 }
 
 .find-card {
     width: 400px;
+    /* 탭별 콘텐츠 높이 차이나 결과창 출력 시 박스 크기가 줄어들거나 커지는 것을 방지 */
+    min-height: 440px; 
     background: var(--surface);
     padding: 40px 30px;
     border-radius: 16px;
@@ -91,6 +96,7 @@
     color: var(--text);
     outline: none;
     transition: 0.2s;
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
 .input-group input:focus {
