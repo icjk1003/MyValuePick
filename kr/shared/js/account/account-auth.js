@@ -2,11 +2,49 @@
 
 /**
  * [Account Auth Core Module]
- * 계정(로그인, 회원가입, 계정 찾기) 관련 공통 유효성 검사 및 데이터 통신(Mock)을 담당하는 모듈
+ * 계정(로그인, 회원가입, 접근 권한) 관련 공통 모듈
  */
 const AccountAuth = {
+    // [System] 최고 관리자 권한을 부여할 이메일 리스트
+    ADMIN_EMAILS: [
+        "icjk1003@gmail.com", // 사용자님의 마스터 계정
+        "admin@valuepick.com"
+    ],
+
+    // [System] 결제 등급별 권한 레벨 (숫자가 클수록 상위 권한)
+    TIER_LEVELS: {
+        "free": 1,
+        "pro": 2,
+        "premium": 3
+    },
+
     // =========================================
-    // 1. 유효성 검사 (Validation)
+    // 1. 등급 기반 접근 제어 (Feature Gating)
+    // =========================================
+    
+    /**
+     * 특정 등급 이상의 권한이 있는지 확인하는 함수
+     * @param {string} requiredTier 요구되는 최소 등급 ('free', 'pro', 'premium')
+     * @returns {boolean} 접근 가능 여부
+     */
+    checkAccess: function(requiredTier) {
+        const userRole = localStorage.getItem("user_role");
+        const userTier = localStorage.getItem("user_tier") || "free";
+
+        // 1. 관리자(admin)는 모든 결제 등급 제한을 무시하고 접근 가능 (Super Pass)
+        if (userRole === "admin") {
+            return true;
+        }
+
+        // 2. 현재 사용자의 등급과 요구 등급을 숫자로 변환하여 비교
+        const currentLevel = this.TIER_LEVELS[userTier] || 1;
+        const requiredLevel = this.TIER_LEVELS[requiredTier] || 1;
+
+        return currentLevel >= requiredLevel;
+    },
+
+    // =========================================
+    // 2. 유효성 검사 (Validation)
     // =========================================
     
     validateEmail: function(email) {
@@ -15,24 +53,19 @@ const AccountAuth = {
     },
 
     validatePassword: function(pw) {
-        if (!pw) return false;
-        return pw.length >= 8 && pw.length <= 64;
+        return pw && pw.length >= 8 && pw.length <= 64;
     },
 
     validateNickname: function(nick) {
-        if (!nick) return false;
-        return nick.length >= 2 && nick.length <= 10;
+        return nick && nick.length >= 2 && nick.length <= 10;
     },
 
     // =========================================
-    // 2. 데이터 조회 및 API 통신 (현재는 Mock DB)
+    // 3. 데이터 조회 및 API 통신 (Mock DB)
     // =========================================
     
     checkNicknameDuplicate: function(targetNick) {
-        if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) {
-            console.warn("MOCK_DB가 로드되지 않았습니다. 중복 검사를 통과 처리합니다.");
-            return false;
-        }
+        if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
         
         const allWriters = new Set();
         MOCK_DB.POSTS.forEach(p => {
@@ -46,29 +79,19 @@ const AccountAuth = {
     },
 
     // =========================================
-    // 3. UI 유틸리티 (메시지 표시 공통화)
+    // 4. UI 유틸리티
     // =========================================
     
     setMsg: function(element, text, type = '') {
         if (!element) return;
         element.textContent = text;
-        
-        if (text === '') {
-            element.className = 'msg-mini';
-        } else {
-            element.className = `msg-mini ${type}`;
-        }
+        element.className = text === '' ? 'msg-mini' : `msg-mini ${type}`;
     },
 
     // =========================================
-    // 4. 보안 식별자 생성 (Security Identifier)
+    // 5. 보안 식별자 생성
     // =========================================
 
-    /**
-     * NanoID 스타일의 무작위 고유 ID 생성 (12자)
-     * 영문 대소문자와 숫자를 조합하여 외부 노출용으로 안전한 식별자를 만듭니다.
-     * @returns {string} 고유 식별자 (UID)
-     */
     generateUID: function() {
         const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         let id = '';

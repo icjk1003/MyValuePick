@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>마이페이지 · MyValuePick</title>
+  
   <script src="/kr/shared/js/common/common-theme.js"></script>
-  <script src="/kr/shared/js/account/account-auth.js"></script>
   <link rel="stylesheet" href="/kr/shared/css/common/common.css">
   
   <link rel="stylesheet" href="/kr/shared/css/mypage/mypage-core.css">
-  
   <link rel="stylesheet" href="/kr/shared/css/mypage/mypage-info.css">
   <link rel="stylesheet" href="/kr/shared/css/mypage/mypage-note.css">
   <link rel="stylesheet" href="/kr/shared/css/mypage/mypage-post.css">
@@ -60,16 +59,19 @@
         
         <section id="section-edit" class="mypage-content card">
             <h2 class="section-title">내 정보 관리</h2>
+            
             <div class="form-row">
                 <label for="myEmailInput">이메일</label>
                 <input type="email" id="myEmailInput" class="input-readonly" readonly>
                 <p class="desc">이메일은 변경할 수 없습니다.</p>
             </div>
+            
             <div class="form-row">
                 <label for="myNickInput">닉네임</label>
                 <input type="text" id="myNickInput" class="input-edit" placeholder="닉네임을 입력하세요">
                 <p id="nickCheckMsg" class="msg-mini"></p>
             </div>
+            
             <div class="form-row">
                 <div class="bio-header">
                     <label for="myBioInput" style="margin-bottom:0;">자기소개</label>
@@ -81,19 +83,27 @@
                 </div>
                 <textarea id="myBioInput" class="input-bio input-readonly" readonly></textarea>
             </div>
+            
             <div class="form-row">
                 <label for="myPwInput">비밀번호 변경</label>
-                <input type="password" id="myPwInput" class="input-edit" placeholder="새 비밀번호">
-                <input type="password" id="myPwCheckInput" class="input-edit input-gap-top" placeholder="새 비밀번호 확인">
+                <input type="password" id="myPwInput" class="input-edit" placeholder="새 비밀번호 (8~64자 입력)" maxlength="64">
+                <input type="password" id="myPwCheckInput" class="input-edit input-gap-top" placeholder="새 비밀번호 확인" maxlength="64">
                 <p id="pwCheckMsg" class="msg-mini"></p>
             </div>
+            
             <div class="btn-area">
                 <button type="button" id="btnSaveMyInfo" class="btn-save">변경사항 저장</button>
             </div>
+            
             <div class="withdrawal-area">
                 <span class="withdrawal-desc">더 이상 서비스를 이용하지 않으시려면</span>
                 <button type="button" id="btnWithdrawal" class="btn-text-action bad">회원 탈퇴</button>
             </div>
+
+            <div class="support-info-area">
+                <p>고객 지원 번호: <span id="myUidDisplay" class="uid-text"></span></p>
+            </div>
+            
             <div id="cropModal" class="modal-overlay hidden">
                 <div class="crop-container">
                     <h3>프로필 사진 자르기</h3>
@@ -140,6 +150,7 @@
                 <div id="msgEmpty" class="empty-msg hidden">쪽지가 없습니다.</div>
                 <div id="msgPagination" class="pagination-area"></div>
             </div>
+            
             <div id="msgViewArea" class="msg-view-wrap hidden">
                 <div class="msg-view-header">
                     <button type="button" id="btnBackToList" class="btn-back-list">목록으로</button>
@@ -154,6 +165,7 @@
                     <div class="msg-body" id="viewBody"></div>
                 </div>
             </div>
+            
             <div id="msgWriteArea" class="msg-write-wrap hidden">
                 <div class="form-row"><label for="msgReceiver">받는 사람</label><input type="text" id="msgReceiver" class="input-edit" placeholder="닉네임"></div>
                 <div class="form-row"><label for="msgContent">내용</label><textarea id="msgContent" class="input-edit" style="height:300px;"></textarea></div>
@@ -213,20 +225,23 @@
             </div>
         </section>
 
-      </div> </div> </main>
+      </div>
+    </div>
+  </main>
 
   <div id="global-footer"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-  
   <script src="/kr/shared/js/data.js"></script>
   
-    <script src="/kr/shared/js/common/common-utils.js"></script>
-    <script src="/kr/shared/js/common/common-noti.js"></script>
-    <script src="/kr/shared/js/common/common-layout.js"></script>
-    <script src="/kr/shared/js/common/common-modal.js"></script>
+  <script src="/kr/shared/js/common/common-utils.js"></script>
+  <script src="/kr/shared/js/common/common-noti.js"></script>
+  <script src="/kr/shared/js/common/common-layout.js"></script>
+  <script src="/kr/shared/js/common/common-modal.js"></script>
+
+  <script src="/kr/shared/js/account/account-auth.js"></script>
+
   <script src="/kr/shared/js/mypage/mypage-core.js"></script>
-  
   <script src="/kr/shared/js/mypage/mypage-info.js"></script>
   <script src="/kr/shared/js/mypage/mypage-note.js"></script>
   <script src="/kr/shared/js/mypage/mypage-post.js"></script>

@@ -1,15 +1,17 @@
-/* shared/js/mypage/mypage-core.js */
+/* kr/shared/js/mypage/mypage-core.js */
 
 /**
  * [My Page Core Module]
- * 마이페이지의 전반적인 상태 관리, 라우팅, 초기화를 담당 (비동기 DB_API 연동 완료)
+ * 마이페이지의 전반적인 상태 관리, 라우팅, 초기화를 담당
  */
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. 로그인 여부 확인 (userId 유무로 체크)
-    const userId = localStorage.getItem("user_id");
-    if (!userId) {
+    // 1. 로그인 여부 확인
+    const isLogged = localStorage.getItem("is_logged_in");
+    
+    if (!isLogged || isLogged !== "true") {
         alert("로그인이 필요합니다.");
-        location.replace("/kr/html/account/account-login.html");
+        // [변경됨] 새 아키텍처 구조의 로그인 페이지로 강제 이동
+        location.replace("../account/account-login.html");
         return;
     }
 
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initMyPageController() {
-    // [Init 1] 서버에서 최신 프로필 정보 로드 (비동기)
+    // [Init 1] 사이드바 프로필 정보 로드
     loadSidebarProfile();
 
     // [Init 2] URL 파라미터를 기반으로 초기 섹션(탭) 설정
@@ -43,47 +45,25 @@ function initMyPageController() {
 }
 
 /**
- * [변경] 서버(DB_API)에서 최신 유저 정보를 조회하여 사이드바에 렌더링
+ * 사이드바 프로필(이미지, 닉네임, 이메일) 렌더링
  */
-async function loadSidebarProfile() {
-    const userId = localStorage.getItem("user_id");
-    if (!userId) return;
+function loadSidebarProfile() {
+    const myNick = localStorage.getItem("user_nick") || "Guest";
+    const myEmail = localStorage.getItem("user_email") || "이메일 없음";
+    
+    // 텍스트 설정
+    const nickEl = document.getElementById("myNickDisplay");
+    const emailEl = document.getElementById("myEmailDisplay");
+    
+    if (nickEl) nickEl.textContent = myNick;
+    if (emailEl) emailEl.textContent = myEmail;
 
-    try {
-        // DB_API를 통해 최신 회원 정보 가져오기
-        const user = await DB_API.getUserProfile(userId);
-
-        // 로컬 스토리지 정보 최신화 (다른 페이지에서 캐시로 사용하기 위함)
-        localStorage.setItem("user_nick", user.nickname);
-        localStorage.setItem("user_email", user.email);
-        if (user.profileImg) {
-            localStorage.setItem("user_profile_img", user.profileImg);
-        }
-
-        // 화면(DOM) 업데이트
-        const nickEl = document.getElementById("myNickDisplay");
-        const emailEl = document.getElementById("myEmailDisplay");
-        const imgEl = document.getElementById("myProfileImg");
-        
-        if (nickEl) nickEl.textContent = user.nickname;
-        if (emailEl) emailEl.textContent = user.email;
-        if (imgEl) imgEl.src = user.profileImg || "https://via.placeholder.com/150?text=User";
-
-    } catch (error) {
-        console.error("유저 정보를 불러오는 중 오류 발생:", error);
-        
-        // 네트워크 에러 시 기존 로컬 스토리지에 저장된 데이터로 폴백(Fallback) 렌더링
-        const myNick = localStorage.getItem("user_nick") || "Guest";
-        const myEmail = localStorage.getItem("user_email") || "이메일 없음";
-        const myImg = localStorage.getItem("user_profile_img") || "https://via.placeholder.com/150?text=User";
-
-        const nickEl = document.getElementById("myNickDisplay");
-        const emailEl = document.getElementById("myEmailDisplay");
-        const imgEl = document.getElementById("myProfileImg");
-
-        if (nickEl) nickEl.textContent = myNick;
-        if (emailEl) emailEl.textContent = myEmail;
-        if (imgEl) imgEl.src = myImg;
+    // 프로필 이미지 설정 (window.getProfileImage가 common.js에 있다면 사용)
+    const imgEl = document.getElementById("myProfileImg");
+    if (imgEl) {
+        const storedImg = localStorage.getItem("user_img");
+        // 저장된 이미지가 있으면 사용, 없으면 더미 이미지
+        imgEl.src = storedImg || "https://via.placeholder.com/150?text=User";
     }
 }
 
@@ -105,7 +85,6 @@ window.showMypageSection = function(type, updateHistory = true) {
     if (targetMenu) targetMenu.classList.add('active');
 
     // 3. 모듈별 데이터 렌더링 (Lazy Load / Re-render)
-    // 각 하위 매니저들도 추후 비동기 연동 방식으로 동작하도록 준비
     if (type === 'posts' && window.MyPagePostManager) {
         window.MyPagePostManager.render();
     }
@@ -113,9 +92,8 @@ window.showMypageSection = function(type, updateHistory = true) {
         window.MyPageCommentsManager.render();
     }
     if (type === 'social' && window.MyPageSocialManager) {
-        window.MyPageSocialManager.init(); 
+        window.MyPageSocialManager.init(); // 상태 최신화
     }
-    // Info(edit)와 Messages(note)는 내부 상태를 관리하므로 자체 초기화 이용
 
     // 4. URL 히스토리 업데이트
     if (updateHistory) {
@@ -132,18 +110,18 @@ window.showMypageSection = function(type, updateHistory = true) {
 };
 
 /**
- * [변경] 로그아웃 시 관련된 모든 세션 데이터 삭제
+ * 로그아웃
  */
 window.logout = function() {
     if (confirm("로그아웃 하시겠습니까?")) {
-        // 로그인/유저 관련 스토리지 데이터 모두 클리어
+        // [보안] 세션 관련 데이터 모두 삭제 (UID, Role, Tier 등)
         localStorage.removeItem("is_logged_in");
-        localStorage.removeItem("user_id");
-        localStorage.removeItem("user_nick");
-        localStorage.removeItem("user_email");
-        localStorage.removeItem("user_profile_img");
+        localStorage.removeItem("user_uid");
+        localStorage.removeItem("user_role");
+        localStorage.removeItem("user_tier");
         
         alert("로그아웃 되었습니다.");
-        location.replace("/kr/html/home.html");
+        // [변경됨] 상위 폴더의 홈 화면으로 이동
+        location.replace("../home.html");
     }
 };

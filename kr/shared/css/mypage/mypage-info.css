@@ -212,3 +212,24 @@
     justify-content: flex-end;
     gap: 16px;
 }
+
+/* =========================================
+   6. [기타] 고객 지원 정보 영역
+   ========================================= */
+.support-info-area {
+    margin-top: 40px; /* 위쪽 영역과 충분한 거리 유지 */
+    padding-top: 20px; /* 구분감을 위한 내부 여백 */
+    border-top: 1px dashed var(--line); /* 구분선: 점선으로 가볍게 표시 */
+    text-align: right; /* 정렬: 우측 정렬로 메인 폼과 분리 */
+}
+
+.support-info-area p {
+    font-size: 12px; /* 글꼴 크기: 매우 작게 설정하여 방해 금지 */
+    color: var(--muted); /* 글자색: 흐리게 처리 */
+}
+
+.uid-text {
+    font-family: monospace; /* 글꼴: 식별자이므로 고정폭 글꼴 사용 */
+    font-weight: 600; /* 글꼴 두께: 가독성을 위해 약간 두껍게 */
+    user-select: all; /* 편의성: 한 번 클릭 시 전체 선택되도록 설정 */
+}
