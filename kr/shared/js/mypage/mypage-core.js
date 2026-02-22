@@ -114,9 +114,9 @@ window.showMypageSection = function(type, updateHistory = true) {
  */
 window.logout = function() {
     if (confirm("로그아웃 하시겠습니까?")) {
-        // [보안] 세션 관련 데이터 모두 삭제 (UID, Role, Tier 등)
+        // [보안] 세션 관련 데이터 모두 삭제 (ID, Role, Tier 등)
         localStorage.removeItem("is_logged_in");
-        localStorage.removeItem("user_uid");
+        localStorage.removeItem("user_id");
         localStorage.removeItem("user_role");
         localStorage.removeItem("user_tier");
         

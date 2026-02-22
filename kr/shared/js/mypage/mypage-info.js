@@ -8,7 +8,7 @@ class MyPageInfoManager {
         // DOM Elements 캐싱
         this.els = {
             // [변경됨] input이 아닌 span(또는 div) 요소로 변경되어 textContent로 제어함
-            uidDisplay: document.getElementById("myUidDisplay"), 
+            idDisplay: document.getElementById("myIdDisplay"), 
             emailInput: document.getElementById("myEmailInput"),
             nickInput: document.getElementById("myNickInput"),
             nickMsg: document.getElementById("nickCheckMsg"),
@@ -50,8 +50,8 @@ class MyPageInfoManager {
 
     // 1. 사용자 정보 로드 및 표시
     loadUserInfo() {
-        // [New] UID 로드 (localStorage에 없는 경우 발급 대기중으로 표시)
-        const myUid = localStorage.getItem("user_uid") || "발급 대기중";
+        // [New] ID 로드 (localStorage에 없는 경우 발급 대기중으로 표시)
+        const myId = localStorage.getItem("user_id") || "발급 대기중";
         const myNick = localStorage.getItem("user_nick");
         const myEmail = localStorage.getItem("user_email");
         let myBio = localStorage.getItem("user_bio");
@@ -62,8 +62,8 @@ class MyPageInfoManager {
             localStorage.setItem("user_bio", myBio);
         }
 
-        // [변경됨] UID는 인풋이 아니므로 textContent에 할당
-        if (this.els.uidDisplay) this.els.uidDisplay.textContent = myUid;
+        // [변경됨] ID는 인풋이 아니므로 textContent에 할당
+        if (this.els.idDisplay) this.els.idDisplay.textContent = myId;
         if (this.els.emailInput) this.els.emailInput.value = myEmail || "";
         if (this.els.nickInput) this.els.nickInput.value = myNick || "";
         if (this.els.bioInput) this.els.bioInput.value = myBio;

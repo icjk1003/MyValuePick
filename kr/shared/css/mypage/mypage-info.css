@@ -228,7 +228,7 @@
     color: var(--muted); /* 글자색: 흐리게 처리 */
 }
 
-.uid-text {
+.id-text {
     font-family: monospace; /* 글꼴: 식별자이므로 고정폭 글꼴 사용 */
     font-weight: 600; /* 글꼴 두께: 가독성을 위해 약간 두껍게 */
     user-select: all; /* 편의성: 한 번 클릭 시 전체 선택되도록 설정 */

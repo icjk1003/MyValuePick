@@ -48,9 +48,9 @@ let MOCK_DB = {
 
 // 다른 파일에서 접근 가능하도록 window 객체에 할당
 window.DB_API = {
-    /** 공통: 로컬스토리지 강제 동기화 */
+    /** 공통: 로컬스토리지 강제 동기화 (버전을 V6로 올려 새 데이터 강제 적용) */
     _commit: function() {
-        localStorage.setItem("MOCK_DB_V5", JSON.stringify(MOCK_DB));
+        localStorage.setItem("MOCK_DB_V6", JSON.stringify(MOCK_DB));
     },
     
     /** 공통: 네트워크 지연 시뮬레이션 */
@@ -58,11 +58,12 @@ window.DB_API = {
 
     // [A] 회원/인증 (Auth & Users)
     login: async function(email, password) {
-        console.log("Login Start!!!!"); // 사용자 요청 로그 유지
+        console.log("Login Start!!!!"); 
         await this._delay();
         const user = MOCK_DB.USERS.find(u => u.email === email && u.password === password);
         if (!user) throw new Error("이메일 또는 비밀번호가 일치하지 않습니다.");
-        return { id: user.id, email: user.email, nickname: user.nickname, profileImg: user.profileImg };
+        // 로그인 성공 시 권한(role)도 함께 반환
+        return { id: user.id, email: user.email, nickname: user.nickname, profileImg: user.profileImg, role: user.role };
     },
 
     register: async function(userData) {
@@ -71,12 +72,13 @@ window.DB_API = {
         if (exists) throw new Error("이미 가입된 이메일입니다.");
         
         const newUser = {
-            id: "user_" + Date.now(),
+            id: "user_" + Math.random().toString(36).substring(2, 10), // 난수 아이디 발급
             email: userData.email,
             password: userData.password,
             nickname: userData.nickname || "신규유저",
             profileImg: null,
             bio: "",
+            role: "user", // 기본 가입은 일반 유저
             createdAt: new Date().toISOString()
         };
         MOCK_DB.USERS.push(newUser);
@@ -246,10 +248,41 @@ window.DB_API = {
 // =========================================
 
 function generateAndSaveMockData() {
-    // 1. 더미 유저 생성
+    // 1. 최고 관리자 및 더미 유저 생성
+    const masterAdminId = "admin_" + Math.random().toString(36).substring(2, 10); // 난수 생성
+    
     MOCK_DB.USERS = [
-        { id: "mock_admin", email: "admin@test.com", password: "123", nickname: "관리자", profileImg: null, bio: "관리자 계정입니다." },
-        { id: "mock_user_1", email: "user1@test.com", password: "123", nickname: "StockMaster_1", profileImg: null, bio: "가치투자를 지향합니다." }
+        // 🔥 사용자가 요청한 최고 관리자 계정 하드코딩 (이메일, 비번, 권한 부여)
+        { 
+            id: masterAdminId, 
+            email: "icjk1003@gmail.com", 
+            password: "123123123", 
+            nickname: "마스터", 
+            profileImg: null, 
+            bio: "최고 관리자 계정입니다.", 
+            role: "admin",
+            createdAt: new Date().toISOString()
+        },
+        { 
+            id: "mock_admin", 
+            email: "admin@test.com", 
+            password: "123", 
+            nickname: "관리자", 
+            profileImg: null, 
+            bio: "일반 관리자 계정입니다.", 
+            role: "admin",
+            createdAt: new Date().toISOString()
+        },
+        { 
+            id: "mock_user_1", 
+            email: "user1@test.com", 
+            password: "123", 
+            nickname: "StockMaster_1", 
+            profileImg: null, 
+            bio: "가치투자를 지향합니다.", 
+            role: "user",
+            createdAt: new Date().toISOString()
+        }
     ];
 
     // 2. 더미 게시글 생성 (600개)
@@ -301,7 +334,7 @@ function generateAndSaveMockData() {
     MOCK_DB.POSTS = tempPosts;
     
     DB_API._commit();
-    console.log("MOCK_DB: 데이터 새로 생성 완료 (V5)");
+    console.log("MOCK_DB: 데이터 새로 생성 완료 (V6 - 관리자 계정 추가됨)");
 }
 
 // =========================================
@@ -310,12 +343,13 @@ function generateAndSaveMockData() {
 
 // 중요: 모든 객체와 함수가 선언된 후 마지막에 실행하여 ReferenceError 방지
 (function initData() {
-    const storedDB = localStorage.getItem("MOCK_DB_V5"); 
+    // V6로 버전을 올려 기존 잔여 데이터를 덮어씌움
+    const storedDB = localStorage.getItem("MOCK_DB_V6"); 
     
     if (storedDB) {
         try {
             MOCK_DB = JSON.parse(storedDB);
-            console.log("MOCK_DB: 데이터 로드 완료 (V5)");
+            console.log("MOCK_DB: 데이터 로드 완료 (V6)");
         } catch (e) {
             console.error("데이터 파싱 오류", e);
             generateAndSaveMockData();

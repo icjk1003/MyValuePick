@@ -2,10 +2,13 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 관리자 권한 체크 (보안)
-    const userId = localStorage.getItem("user_id");
-    if (userId !== 'root') {
-        alert("관리자 권한이 없습니다.");
-        location.replace("/kr/html/home.html");
+    const userUid = localStorage.getItem("user_uid"); // [수정] user_id -> user_uid로 식별자 통일
+    const userRole = localStorage.getItem("user_role");
+    
+    // 권한이 admin이 아니면 접근 차단
+    if (userRole !== 'admin') {
+        alert("관리자 권한이 없습니다. 관리자 계정으로 로그인해주세요.");
+        location.replace("/kr/html/home.html"); // [수정] 절대 경로로 수정하여 404 에러 방지
         return;
     }
 

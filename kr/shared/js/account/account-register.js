@@ -119,7 +119,7 @@ function initPasswordCheck() {
 }
 
 // =========================================
-// [기능 4] 회원가입 제출 (UID 발급 및 데이터 저장)
+// [기능 4] 회원가입 제출 (ID 발급 및 데이터 저장)
 // =========================================
 function initSubmit() {
     const form = document.querySelector(".register-form");
@@ -151,20 +151,20 @@ function initSubmit() {
         }
 
         // ==============================================
-        // [핵심 아키텍처] UID 발급 및 소셜 확장성 데이터 저장
+        // [핵심 아키텍처] ID 발급 및 소셜 확장성 데이터 저장
         // ==============================================
         
         // 1. 고유 식별자(NanoID) 발급
-        const newUserUID = AccountAuth.generateUID();
+        const newUserID = AccountAuth.generateID();
 
         // 2. 소셜 연동 정보를 포함한 메타데이터 객체 생성
         const authData = {
             provider: "local",      // 가입 경로 (local, kakao, google 등)
-            provider_id: newUserUID // 로컬 가입은 UID를 자체 고유키로 사용
+            provider_id: newUserID // 로컬 가입은 ID를 자체 고유키로 사용
         };
 
         // 3. Mock DB (로컬스토리지)에 저장
-        localStorage.setItem("user_uid", newUserUID); // 불변 식별자
+        localStorage.setItem("user_id", newUserID); // 불변 식별자
         localStorage.setItem("user_email", id);       // 가변 식별자 (로그인 ID)
         localStorage.setItem("user_nick", nick);
         localStorage.setItem("user_pw", pw);

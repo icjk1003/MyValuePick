@@ -92,7 +92,7 @@ const AccountAuth = {
     // 5. 보안 식별자 생성
     // =========================================
 
-    generateUID: function() {
+    generateID: function() {
         const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         let id = '';
         for (let i = 0; i < 12; i++) {
