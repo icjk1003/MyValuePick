@@ -103,7 +103,6 @@ function wireLoginState() {
     if(!btnLogin) return;
 
     const isLoggedIn = localStorage.getItem("is_logged_in");
-    const userId = localStorage.getItem("user_id");
     const nickName = localStorage.getItem("user_nick") || "내 정보";
     const notiBtn = document.getElementById("notiBtnWrap");
 
@@ -129,27 +128,6 @@ function wireLoginState() {
                 }
             };
         }
-
-        // 최상위 관리자 권한 확인 시 '관리자 모드' 버튼 동적 생성
-        if (userId === 'root') {
-            if (!document.getElementById('btnAdminMode')) {
-                const parent = btnLogin.parentNode;
-                parent.style.position = 'relative';
-
-                const adminBtn = document.createElement('a');
-                adminBtn.id = 'btnAdminMode';
-                adminBtn.href = 'admin.html';
-                adminBtn.textContent = '👑 관리자 모드';
-                adminBtn.style.cssText = `
-                    position: absolute; left: 100%; top: 50%; transform: translateY(-50%);
-                    margin-left: 12px; font-size: 13px; font-weight: 700; color: #fff;
-                    background-color: #333; padding: 6px 12px; border-radius: 6px;
-                    text-decoration: none; white-space: nowrap; z-index: 10;
-                `;
-                parent.appendChild(adminBtn); 
-            }
-        }
-
     } else {
         // 비로그인 상태: 로그인 버튼 표시 및 기능 초기화
         btnLogin.textContent = "로그인";

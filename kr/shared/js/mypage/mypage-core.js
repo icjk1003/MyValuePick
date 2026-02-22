@@ -1,4 +1,4 @@
-/* kr/shared/js/mypage/mypage-core.js */
+/* shared/js/mypage/mypage-core.js */
 
 /**
  * [My Page Core Module]
@@ -7,11 +7,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     // 1. 로그인 여부 확인
     const isLogged = localStorage.getItem("is_logged_in");
-    
-    if (!isLogged || isLogged !== "true") {
+    if (!isLogged) {
         alert("로그인이 필요합니다.");
-        // [변경됨] 새 아키텍처 구조의 로그인 페이지로 강제 이동
-        location.replace("../account/account-login.html");
+        location.replace("/kr/html/login.html");
         return;
     }
 
@@ -45,11 +43,12 @@ function initMyPageController() {
 }
 
 /**
- * 사이드바 프로필(이미지, 닉네임, 이메일) 렌더링
+ * 사이드바 프로필(이미지, 닉네임, 이메일) 및 관리자 메뉴 렌더링
  */
 function loadSidebarProfile() {
     const myNick = localStorage.getItem("user_nick") || "Guest";
     const myEmail = localStorage.getItem("user_email") || "이메일 없음";
+    const userRole = localStorage.getItem("user_role"); // 권한 정보 가져오기
     
     // 텍스트 설정
     const nickEl = document.getElementById("myNickDisplay");
@@ -58,19 +57,22 @@ function loadSidebarProfile() {
     if (nickEl) nickEl.textContent = myNick;
     if (emailEl) emailEl.textContent = myEmail;
 
-    // 프로필 이미지 설정 (window.getProfileImage가 common.js에 있다면 사용)
+    // 프로필 이미지 설정
     const imgEl = document.getElementById("myProfileImg");
     if (imgEl) {
         const storedImg = localStorage.getItem("user_img");
-        // 저장된 이미지가 있으면 사용, 없으면 더미 이미지
         imgEl.src = storedImg || "https://via.placeholder.com/150?text=User";
+    }
+
+    // [추가] 관리자 권한 시 메뉴 표시
+    const menuAdmin = document.getElementById("menu-admin");
+    if (userRole === "admin" && menuAdmin) {
+        menuAdmin.classList.remove("hidden");
     }
 }
 
 /**
  * 섹션 전환 (Router 역할)
- * @param {string} type - 섹션 ID (edit, messages, posts, comments, social)
- * @param {boolean} updateHistory - URL 히스토리 변경 여부
  */
 window.showMypageSection = function(type, updateHistory = true) {
     // 1. 모든 섹션 숨김 & 메뉴 비활성화
@@ -85,22 +87,15 @@ window.showMypageSection = function(type, updateHistory = true) {
     if (targetMenu) targetMenu.classList.add('active');
 
     // 3. 모듈별 데이터 렌더링 (Lazy Load / Re-render)
-    if (type === 'posts' && window.MyPagePostManager) {
-        window.MyPagePostManager.render();
-    }
-    if (type === 'comments' && window.MyPageCommentsManager) {
-        window.MyPageCommentsManager.render();
-    }
-    if (type === 'social' && window.MyPageSocialManager) {
-        window.MyPageSocialManager.init(); // 상태 최신화
-    }
+    if (type === 'posts' && window.MyPagePostManager) window.MyPagePostManager.render();
+    if (type === 'comments' && window.MyPageCommentsManager) window.MyPageCommentsManager.render();
+    if (type === 'social' && window.MyPageSocialManager) window.MyPageSocialManager.init();
 
     // 4. URL 히스토리 업데이트
     if (updateHistory) {
         const url = new URL(window.location);
         url.searchParams.set('section', type);
         
-        // 섹션 변경 시 하위 파라미터(쪽지함 탭 등) 정리
         if (type !== 'messages') {
             url.searchParams.delete('tab');
             url.searchParams.delete('id');
@@ -110,18 +105,18 @@ window.showMypageSection = function(type, updateHistory = true) {
 };
 
 /**
- * 로그아웃
+ * 로그아웃 (세션 완전 정리)
  */
 window.logout = function() {
     if (confirm("로그아웃 하시겠습니까?")) {
-        // [보안] 세션 관련 데이터 모두 삭제 (ID, Role, Tier 등)
         localStorage.removeItem("is_logged_in");
         localStorage.removeItem("user_id");
+        localStorage.removeItem("user_uid");
+        localStorage.removeItem("user_nick");
+        localStorage.removeItem("user_email");
         localStorage.removeItem("user_role");
         localStorage.removeItem("user_tier");
-        
         alert("로그아웃 되었습니다.");
-        // [변경됨] 상위 폴더의 홈 화면으로 이동
-        location.replace("../home.html");
+        location.replace("/kr/html/home.html"); // 절대경로 사용
     }
 };
