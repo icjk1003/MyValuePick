@@ -302,7 +302,7 @@ class MyPageInfoManager {
         // 실제 운영 환경에서는 await DB_API.deleteUser(userId)를 호출해야 함
         localStorage.clear();
         alert("탈퇴되었습니다. 메인 화면으로 이동합니다.");
-        location.replace("home.html");
+        location.replace("/kr/html/home.html");
     }
 
     /* ================= Image Cropper Logic ================= */

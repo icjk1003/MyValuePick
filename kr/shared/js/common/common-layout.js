@@ -153,7 +153,7 @@ function wireLoginState() {
     } else {
         // 비로그인 상태: 로그인 버튼 표시 및 기능 초기화
         btnLogin.textContent = "로그인";
-        btnLogin.href = "login.html";
+        btnLogin.href = "/kr/html/login.html";
         btnLogin.onclick = null;
 
         if (notiBtn) {

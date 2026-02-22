@@ -71,6 +71,18 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             e.stopPropagation(); // 이벤트 버블링 방지
 
+            // [추가된 로직] 비로그인(익명) 사용자일 경우 '쪽지 보내기' 버튼 숨김 처리
+            const isLoggedIn = localStorage.getItem("is_logged_in") === "true" || localStorage.getItem("is_logged_in") !== null;
+            const btnMsgModal = document.getElementById('btnOpenMsgModal');
+            
+            if (btnMsgModal) {
+                if (isLoggedIn) {
+                    btnMsgModal.style.display = 'flex'; // 로그인 상태면 보이기 (CSS 레이아웃에 맞게 flex 유지)
+                } else {
+                    btnMsgModal.style.display = 'none'; // 비로그인 상태면 숨기기
+                }
+            }
+
             // data 속성에서 유저 정보 파싱 (없으면 기본값 설정)
             currentTargetName = target.dataset.userName || target.innerText.trim();
             const postCount = target.dataset.postCount || "0";

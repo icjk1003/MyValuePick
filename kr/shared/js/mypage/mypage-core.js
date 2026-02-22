@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = localStorage.getItem("user_id");
     if (!userId) {
         alert("로그인이 필요합니다.");
-        location.replace("login.html");
+        location.replace("/kr/html/login.html");
         return;
     }
 
@@ -144,6 +144,6 @@ window.logout = function() {
         localStorage.removeItem("user_profile_img");
         
         alert("로그아웃 되었습니다.");
-        location.replace("home.html");
+        location.replace("/kr/html/home.html");
     }
 };

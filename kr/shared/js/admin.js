@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = localStorage.getItem("user_id");
     if (userId !== 'root') {
         alert("관리자 권한이 없습니다.");
-        location.replace("home.html");
+        location.replace("/kr/html/home.html");
         return;
     }
 
