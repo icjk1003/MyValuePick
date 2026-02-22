@@ -27,12 +27,10 @@ function initTabs() {
 }
 
 function switchTab(targetId) {
-    // 버튼 활성화
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
     });
 
-    // 콘텐츠 표시
     document.querySelectorAll('.find-content').forEach(content => {
         content.classList.toggle('active', content.id === targetId);
     });
@@ -58,16 +56,18 @@ function initFindId() {
             return;
         }
 
-        // [TODO] 향후 account-auth.js 의 공통 validateEmail(email) 함수로 유효성 검사 교체 권장
+        // Core 모듈을 활용한 사전 검증
+        if (!AccountAuth.validateEmail(email)) {
+            alert('올바른 이메일 형식이 아닙니다.');
+            input.focus();
+            return;
+        }
 
-        // [Mock Logic] 테스트를 위해 특정 이메일만 성공 처리
-        // 실제로는 서버 API를 호출해야 합니다.
-        // 여기서는 로컬스토리지에 저장된 정보와 비교합니다.
+        // [Mock Logic] 로컬스토리지에 저장된 정보와 비교
         const storedEmail = localStorage.getItem('user_email');
         
         if (email === storedEmail || email === 'user@email.com') {
-            // 성공 시 결과 표시
-            resultText.textContent = localStorage.getItem('user_id') || 'ValuePicker123';
+            resultText.textContent = localStorage.getItem('user_email') || 'user@email.com';
             resultArea.classList.remove('hidden');
             btn.classList.add('hidden'); // 버튼 숨김
             input.readOnly = true; // 수정 방지
@@ -89,17 +89,23 @@ function initFindPw() {
     if (!btn || !inputId || !inputEmail) return;
 
     btn.addEventListener('click', () => {
-        const id = inputId.value.trim();
-        const email = inputEmail.value.trim();
+        const id = inputId.value.trim(); // 아이디로 이메일을 사용하므로 사실상 이메일
+        const email = inputEmail.value.trim(); // 가입 시 등록한 보조 이메일(또는 동일)
 
         if (!id || !email) {
             alert('아이디와 이메일을 모두 입력해주세요.');
             return;
         }
 
+        // Core 모듈을 활용한 사전 검증
+        if (!AccountAuth.validateEmail(email)) {
+            alert('입력하신 이메일 형식이 올바르지 않습니다.');
+            inputEmail.focus();
+            return;
+        }
+
         // [Mock Logic]
-        // [TODO] 향후 이메일 형식 검사 등은 account-auth.js 모듈을 활용하도록 개선
-        if (id.length > 3 && email.includes('@')) {
+        if (id.length > 3 && email === localStorage.getItem('user_email')) {
             // 성공 시뮬레이션
             setTimeout(() => {
                 resultArea.classList.remove('hidden');

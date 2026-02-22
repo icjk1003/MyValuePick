@@ -1,12 +1,15 @@
+/* kr/shared/js/mypage/mypage-info.js */
+
 /**
  * [My Page Info Module]
  * 내 정보 수정, 프로필 이미지 변경, 회원 탈퇴 기능을 관리하는 모듈
- * 의존성: Cropper.js (이미지 자르기 라이브러리)
+ * 의존성: Cropper.js, AccountAuth (공통 유효성 모듈)
  */
 class MyPageInfoManager {
     constructor() {
         // DOM Elements 캐싱
         this.els = {
+            uidInput: document.getElementById("myUidInput"), // [New] UID 인풋
             emailInput: document.getElementById("myEmailInput"),
             nickInput: document.getElementById("myNickInput"),
             nickMsg: document.getElementById("nickCheckMsg"),
@@ -15,18 +18,15 @@ class MyPageInfoManager {
             pwCheckInput: document.getElementById("myPwCheckInput"),
             pwMsg: document.getElementById("pwCheckMsg"),
             
-            // Buttons
             btnSaveInfo: document.getElementById("btnSaveMyInfo"),
             btnWithdrawal: document.getElementById("btnWithdrawal"),
             
-            // Bio Buttons
             btnEditBio: document.getElementById("btnEditBio"),
             btnSaveBio: document.getElementById("btnSaveBio"),
             btnCancelBio: document.getElementById("btnCancelBio"),
 
-            // Profile Image
-            fileInput: document.getElementById("profileUpload"), // 사이드바에 존재
-            profileImg: document.getElementById("myProfileImg"), // 사이드바에 존재
+            fileInput: document.getElementById("profileUpload"), 
+            profileImg: document.getElementById("myProfileImg"), 
             cropModal: document.getElementById("cropModal"),
             imageToCrop: document.getElementById("imageToCrop"),
             btnCropCancel: document.getElementById("btnCropCancel"),
@@ -35,7 +35,6 @@ class MyPageInfoManager {
 
         this.cropper = null;
         
-        // 초기화 실행
         if (this.els.emailInput) {
             this.init();
         }
@@ -48,6 +47,8 @@ class MyPageInfoManager {
 
     // 1. 사용자 정보 로드 및 표시
     loadUserInfo() {
+        // [New] UID 로드 (구버전 사용자를 위해 fallback 처리)
+        const myUid = localStorage.getItem("user_uid") || "발급 대기중";
         const myNick = localStorage.getItem("user_nick");
         const myEmail = localStorage.getItem("user_email");
         let myBio = localStorage.getItem("user_bio");
@@ -57,6 +58,7 @@ class MyPageInfoManager {
             localStorage.setItem("user_bio", myBio);
         }
 
+        if (this.els.uidInput) this.els.uidInput.value = myUid;
         if (this.els.emailInput) this.els.emailInput.value = myEmail || "";
         if (this.els.nickInput) this.els.nickInput.value = myNick || "";
         if (this.els.bioInput) this.els.bioInput.value = myBio;
@@ -64,31 +66,24 @@ class MyPageInfoManager {
 
     // 2. 이벤트 바인딩 통합
     bindEvents() {
-        // 닉네임 실시간 체크
         if (this.els.nickInput) {
             ['focus', 'input'].forEach(evt => 
                 this.els.nickInput.addEventListener(evt, () => this.handleNickCheck())
             );
         }
 
-        // 비밀번호 실시간 체크
         if (this.els.pwInput && this.els.pwCheckInput) {
             this.els.pwInput.addEventListener("input", () => this.handlePwCheck());
             this.els.pwCheckInput.addEventListener("input", () => this.handlePwCheck());
         }
 
-        // 자기소개 편집 토글
         if (this.els.btnEditBio) this.els.btnEditBio.onclick = () => this.toggleBioEdit(true);
         if (this.els.btnCancelBio) this.els.btnCancelBio.onclick = () => this.toggleBioEdit(false);
         if (this.els.btnSaveBio) this.els.btnSaveBio.onclick = () => this.saveBio();
 
-        // 전체 정보 저장
         if (this.els.btnSaveInfo) this.els.btnSaveInfo.onclick = () => this.saveAllInfo();
-
-        // 회원 탈퇴
         if (this.els.btnWithdrawal) this.els.btnWithdrawal.onclick = () => this.handleWithdrawal();
 
-        // 프로필 이미지 업로드 & 크롭
         if (this.els.fileInput) this.els.fileInput.addEventListener("change", (e) => this.handleFileChange(e));
         if (this.els.btnCropCancel) this.els.btnCropCancel.onclick = () => this.closeCropModal();
         if (this.els.btnCropConfirm) this.els.btnCropConfirm.onclick = () => this.confirmCrop();
@@ -96,61 +91,57 @@ class MyPageInfoManager {
 
     /* ================= Logic Methods ================= */
 
-    // [Logic] 닉네임 유효성 검사
+    // [Logic] 닉네임 유효성 검사 (AccountAuth Core 연동)
     handleNickCheck() {
         const val = this.els.nickInput.value.trim();
         const currentNick = localStorage.getItem("user_nick");
         const msg = this.els.nickMsg;
 
         if (val === currentNick) {
-            msg.textContent = ""; 
+            AccountAuth.setMsg(msg, ""); 
             return;
         }
         if (val === "") {
-            this.setMsg(msg, "변경할 닉네임을 입력해주세요.", "info");
+            AccountAuth.setMsg(msg, "변경할 닉네임을 입력해주세요.", "info");
             return;
         }
-        if (val.length < 2 || val.length > 10) {
-            this.setMsg(msg, "닉네임은 2~10자여야 합니다.", "error");
+        
+        // [변경됨] Core 모듈 재사용
+        if (!AccountAuth.validateNickname(val)) {
+            AccountAuth.setMsg(msg, "닉네임은 2~10자여야 합니다.", "error");
             return;
         }
-        if (this.checkNicknameDuplicate(val)) {
-            this.setMsg(msg, "이미 사용 중인 닉네임입니다.", "error");
+        if (AccountAuth.checkNicknameDuplicate(val)) {
+            AccountAuth.setMsg(msg, "이미 사용 중인 닉네임입니다.", "error");
         } else {
-            this.setMsg(msg, "사용 가능한 닉네임입니다.", "success");
+            AccountAuth.setMsg(msg, "사용 가능한 닉네임입니다.", "success");
         }
     }
 
-    // [Logic] 비밀번호 일치 검사
+    // [Logic] 비밀번호 일치 검사 (AccountAuth Core 연동)
     handlePwCheck() {
         const pw = this.els.pwInput.value;
         const pwCheck = this.els.pwCheckInput.value;
         const msg = this.els.pwMsg;
 
         if (pw === "" && pwCheck === "") {
-            msg.textContent = "";
+            AccountAuth.setMsg(msg, "");
             return;
         }
         if (pw !== "" && pwCheck === "") {
-            this.setMsg(msg, "비밀번호 확인을 입력해주세요.", "info");
+            AccountAuth.setMsg(msg, "비밀번호 확인을 입력해주세요.", "info");
             return;
         }
         if (pw !== pwCheck) {
-            this.setMsg(msg, "비밀번호가 일치하지 않습니다.", "error");
+            AccountAuth.setMsg(msg, "비밀번호가 일치하지 않습니다.", "error");
         } else {
-            // 변경됨: 비밀번호 최소 8자, 최대 64자 제한 (실시간 검사)
-            if (pw.length < 8 || pw.length > 64) {
-                this.setMsg(msg, "비밀번호는 8자 이상, 64자 이하로 설정해주세요.", "error");
+            // [변경됨] Core 모듈 재사용
+            if (!AccountAuth.validatePassword(pw)) {
+                AccountAuth.setMsg(msg, "비밀번호는 8~64자 이하로 설정해주세요.", "error");
             } else {
-                this.setMsg(msg, "비밀번호가 안전하게 일치합니다.", "success");
+                AccountAuth.setMsg(msg, "비밀번호가 안전하게 일치합니다.", "success");
             }
         }
-    }
-
-    // [Helper] 메시지 스타일 설정
-    setMsg(el, text, type) {
-        el.textContent = text;
-        el.className = `msg-mini ${type}`;
     }
 
     // [Logic] 자기소개 토글
@@ -168,7 +159,6 @@ class MyPageInfoManager {
             btnSaveBio.classList.remove("hidden");
             btnCancelBio.classList.remove("hidden");
         } else {
-            // 취소 시 원복
             if (bioInput.dataset.original !== undefined) {
                 bioInput.value = bioInput.dataset.original;
             }
@@ -191,8 +181,7 @@ class MyPageInfoManager {
         }
         localStorage.setItem("user_bio", newBio);
         
-        // UI 모드 변경 (저장 상태로)
-        this.els.bioInput.dataset.original = newBio; // 원본 업데이트
+        this.els.bioInput.dataset.original = newBio; 
         
         this.els.bioInput.readOnly = true;
         this.els.bioInput.classList.add("input-readonly");
@@ -201,11 +190,9 @@ class MyPageInfoManager {
         this.els.btnEditBio.classList.remove("hidden");
         this.els.btnSaveBio.classList.add("hidden");
         this.els.btnCancelBio.classList.add("hidden");
-
-        // alert("자기소개가 저장되었습니다."); // 필요 시 주석 해제
     }
 
-    // [Logic] 전체 정보 저장
+    // [Logic] 전체 정보 저장 (Core 검증)
     saveAllInfo() {
         const newNick = this.els.nickInput.value.trim();
         const currentNick = localStorage.getItem("user_nick");
@@ -214,8 +201,7 @@ class MyPageInfoManager {
 
         // 1. 비밀번호 검증
         if (newPw !== "") {
-            // 변경됨: 비밀번호 최소 8자, 최대 64자 제한 (저장 시 검증)
-            if (newPw.length < 8 || newPw.length > 64) {
+            if (!AccountAuth.validatePassword(newPw)) {
                 alert("비밀번호는 8자 이상 64자 이하로 설정해야 합니다.");
                 this.els.pwInput.focus();
                 return;
@@ -225,16 +211,17 @@ class MyPageInfoManager {
                 this.els.pwCheckInput.focus();
                 return;
             }
-            // TODO: 실제로는 API로 비밀번호 변경 요청을 보내야 함
+            // 실제 서비스에서는 여기서 API 통신을 통해 비밀번호를 변경합니다.
+            localStorage.setItem("user_pw", newPw);
         }
 
         // 2. 닉네임 검증 및 변경
         if (newNick !== currentNick) {
-            if (newNick.length < 2 || newNick.length > 10) {
+            if (!AccountAuth.validateNickname(newNick)) {
                 alert("닉네임은 2자 이상 10자 이하로 설정해주세요.");
                 return;
             }
-            if (this.checkNicknameDuplicate(newNick)) {
+            if (AccountAuth.checkNicknameDuplicate(newNick)) {
                 alert("이미 사용 중인 닉네임입니다.");
                 return;
             }
@@ -254,7 +241,7 @@ class MyPageInfoManager {
         
         localStorage.clear();
         alert("탈퇴되었습니다. 메인 화면으로 이동합니다.");
-        location.replace("home.html");
+        location.replace("../home.html");
     }
 
     /* ================= Image Cropper Logic ================= */
@@ -269,7 +256,6 @@ class MyPageInfoManager {
                 
                 if (this.cropper) this.cropper.destroy();
                 
-                // Cropper.js 인스턴스 생성
                 this.cropper = new Cropper(this.els.imageToCrop, {
                     aspectRatio: 1,
                     viewMode: 1,
@@ -278,7 +264,7 @@ class MyPageInfoManager {
             };
             reader.readAsDataURL(file);
         }
-        e.target.value = ''; // 같은 파일 재선택 가능하게 리셋
+        e.target.value = ''; 
     }
 
     closeCropModal() {
@@ -292,14 +278,11 @@ class MyPageInfoManager {
     confirmCrop() {
         if (!this.cropper) return;
         
-        // 캔버스 추출
         const canvas = this.cropper.getCroppedCanvas({ width: 300, height: 300 });
         const croppedBase64 = canvas.toDataURL("image/png");
 
-        // 저장 (Mock)
         localStorage.setItem("user_img", croppedBase64);
         
-        // UI 업데이트
         if (this.els.profileImg) {
             this.els.profileImg.src = croppedBase64;
         }
@@ -309,21 +292,7 @@ class MyPageInfoManager {
 
     /* ================= Mock Data Helpers ================= */
     
-    checkNicknameDuplicate(targetNick) {
-        if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return false;
-        
-        // 모든 작성자 수집
-        const allWriters = new Set();
-        MOCK_DB.POSTS.forEach(p => {
-            allWriters.add(p.writer);
-            if(p.commentList) {
-                p.commentList.forEach(c => allWriters.add(c.writer));
-            }
-        });
-        
-        return allWriters.has(targetNick);
-    }
-
+    // 닉네임 변경 시 기존 작성된 글/댓글의 닉네임도 일괄 변경
     updateUserContentNickname(oldNick, newNick) {
         if (typeof MOCK_DB === 'undefined' || !MOCK_DB.POSTS) return;
         
@@ -350,5 +319,4 @@ class MyPageInfoManager {
 }
 
 // [모듈 실행]
-// 전역 인스턴스 할당 (mypage.js에서 사용 가능하도록)
 window.MyPageInfoManager = new MyPageInfoManager();
